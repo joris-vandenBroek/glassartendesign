@@ -17,5 +17,65 @@
     "label": "Contact",
     "email": "info@glassartanddesign.nl",
     "phone": "+31 (0)6 12345678"
+  },
+  "nav": {
+    "home": "Home",
+    "collections": "Collections",
+    "contact": "Contact",
+    "becomeClient": "Become a client",
+    "login": "Log in",
+    "logout": "Log out",
+    "myOrders": "My orders"
+  },
+  "collectionsPage": {
+    "title": "Collections",
+    "intro": "Discover our artwork on glass, organized by application."
+  },
+  "segments": {
+    "hotel": {
+      "title": "Hotel",
+      "intro": "Art on glass adds a timeless look to lobbies, corridors and guest rooms, and withstands heavy daily use."
+    },
+    "restaurant": {
+      "title": "Restaurant",
+      "intro": "An inviting interior starts with the details — art on glass adds character without compromising on hygiene or upkeep."
+    },
+    "wellness": {
+      "title": "Wellness",
+      "intro": "Calming artwork on moisture-resistant glass, specifically suited for spas, sauna areas and treatment rooms."
+    },
+    "office": {
+      "title": "Office",
+      "intro": "Give office spaces a professional, inspiring look with custom artwork that matches your corporate identity."
+    },
+    "abstract": {
+      "title": "Abstract",
+      "intro": "Bold colors and shapes, printed on 4mm safety glass — abstract art that makes a statement in any space."
+    },
+    "artistCollections": {
+      "title": "Artist Collections",
+      "intro": "Collaborations with artists: exclusive, limited-edition pieces produced on glass."
+    }
+  },
+  "orders": {
+    "reorder": "Reorder",
+    "items": {
+      "order1": {
+        "description": "Abstract panel 60x90cm",
+        "status": "Pending"
+      },
+      "order2": {
+        "description": "Hotel lobby set – 3 panels",
+        "status": "In production"
+      },
+      "order3": {
+        "description": "Wellness panel 40x60cm",
+        "status": "Shipped"
+      },
+      "order4": {
+        "description": "Restaurant wall panel 80x120cm",
+        "status": "Delivered"
+      }
+    }
   }
 }

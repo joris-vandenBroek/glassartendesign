@@ -17,5 +17,65 @@
     "label": "Contact",
     "email": "info@glassartanddesign.nl",
     "phone": "+31 (0)6 12345678"
+  },
+  "nav": {
+    "home": "Accueil",
+    "collections": "Collections",
+    "contact": "Contact",
+    "becomeClient": "Devenir client",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "myOrders": "Mes commandes"
+  },
+  "collectionsPage": {
+    "title": "Collections",
+    "intro": "Découvrez nos œuvres sur verre, classées par application."
+  },
+  "segments": {
+    "hotel": {
+      "title": "Hôtel",
+      "intro": "L'art sur verre apporte une touche intemporelle aux halls, couloirs et chambres, tout en résistant à un usage intensif."
+    },
+    "restaurant": {
+      "title": "Restaurant",
+      "intro": "Un intérieur chaleureux commence par les détails — l'art sur verre apporte du caractère sans compromis sur l'hygiène et l'entretien."
+    },
+    "wellness": {
+      "title": "Bien-être",
+      "intro": "Des œuvres apaisantes sur verre résistant à l'humidité, spécialement adaptées aux spas, saunas et salles de soins."
+    },
+    "office": {
+      "title": "Bureaux",
+      "intro": "Donnez à vos espaces de bureau une allure professionnelle et inspirante grâce à des œuvres sur mesure, assorties à votre identité visuelle."
+    },
+    "abstract": {
+      "title": "Abstrait",
+      "intro": "Couleurs et formes audacieuses, imprimées sur verre de sécurité de 4mm — un art abstrait qui affirme sa présence dans tout espace."
+    },
+    "artistCollections": {
+      "title": "Artist Collections",
+      "intro": "Collaborations avec des artistes : œuvres exclusives, produites en édition limitée sur verre."
+    }
+  },
+  "orders": {
+    "reorder": "Commander à nouveau",
+    "items": {
+      "order1": {
+        "description": "Panneau abstrait 60x90cm",
+        "status": "En cours de traitement"
+      },
+      "order2": {
+        "description": "Ensemble hall d'hôtel – 3 panneaux",
+        "status": "En production"
+      },
+      "order3": {
+        "description": "Panneau bien-être 40x60cm",
+        "status": "Expédié"
+      },
+      "order4": {
+        "description": "Panneau mural restaurant 80x120cm",
+        "status": "Livré"
+      }
+    }
   }
 }

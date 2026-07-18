@@ -17,5 +17,65 @@
     "label": "Contact",
     "email": "info@glassartanddesign.nl",
     "phone": "+31 (0)6 12345678"
+  },
+  "nav": {
+    "home": "Home",
+    "collections": "Collecties",
+    "contact": "Contact",
+    "becomeClient": "Word klant",
+    "login": "Inloggen",
+    "logout": "Uitloggen",
+    "myOrders": "Mijn bestellingen"
+  },
+  "collectionsPage": {
+    "title": "Collecties",
+    "intro": "Ontdek onze kunstwerken op glas, gerangschikt per toepassing."
+  },
+  "segments": {
+    "hotel": {
+      "title": "Hotel",
+      "intro": "Kunst op glas voegt een tijdloze uitstraling toe aan lobby's, gangen en gastenkamers, en is bestand tegen intensief gebruik."
+    },
+    "restaurant": {
+      "title": "Restaurant",
+      "intro": "Een sfeervol interieur begint bij de details — kunst op glas brengt karakter zonder in te leveren op hygiëne en onderhoud."
+    },
+    "wellness": {
+      "title": "Wellness",
+      "intro": "Rustgevende kunstwerken op vochtbestendig glas, speciaal geschikt voor spa's, saunaruimtes en behandelkamers."
+    },
+    "office": {
+      "title": "Office",
+      "intro": "Geef kantoorruimtes een professionele en inspirerende uitstraling met kunst op maat, passend bij uw huisstijl."
+    },
+    "abstract": {
+      "title": "Abstract",
+      "intro": "Gedurfde kleuren en vormen, gedrukt op 4mm veiligheidsglas — abstracte kunst die in elke ruimte een statement maakt."
+    },
+    "artistCollections": {
+      "title": "Artist Collections",
+      "intro": "Samenwerkingen met kunstenaars: exclusieve, in gelimiteerde oplage geproduceerde werken op glas."
+    }
+  },
+  "orders": {
+    "reorder": "Bestel opnieuw",
+    "items": {
+      "order1": {
+        "description": "Abstract paneel 60x90cm",
+        "status": "In behandeling"
+      },
+      "order2": {
+        "description": "Hotel lobby set – 3 panelen",
+        "status": "In productie"
+      },
+      "order3": {
+        "description": "Wellness paneel 40x60cm",
+        "status": "Verzonden"
+      },
+      "order4": {
+        "description": "Restaurant wandpaneel 80x120cm",
+        "status": "Geleverd"
+      }
+    }
   }
 }

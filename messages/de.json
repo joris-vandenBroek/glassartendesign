@@ -17,5 +17,65 @@
     "label": "Kontakt",
     "email": "info@glassartanddesign.nl",
     "phone": "+31 (0)6 12345678"
+  },
+  "nav": {
+    "home": "Home",
+    "collections": "Kollektionen",
+    "contact": "Kontakt",
+    "becomeClient": "Kunde werden",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "myOrders": "Meine Bestellungen"
+  },
+  "collectionsPage": {
+    "title": "Kollektionen",
+    "intro": "Entdecken Sie unsere Kunstwerke auf Glas, gegliedert nach Einsatzbereich."
+  },
+  "segments": {
+    "hotel": {
+      "title": "Hotel",
+      "intro": "Kunst auf Glas verleiht Lobbys, Fluren und Gästezimmern eine zeitlose Ausstrahlung und hält intensiver Nutzung stand."
+    },
+    "restaurant": {
+      "title": "Restaurant",
+      "intro": "Ein stimmungsvolles Interieur beginnt mit den Details — Kunst auf Glas bringt Charakter, ohne bei Hygiene und Pflege Kompromisse einzugehen."
+    },
+    "wellness": {
+      "title": "Wellness",
+      "intro": "Beruhigende Kunstwerke auf feuchtigkeitsbeständigem Glas, speziell geeignet für Spas, Saunabereiche und Behandlungsräume."
+    },
+    "office": {
+      "title": "Office",
+      "intro": "Verleihen Sie Büroräumen mit maßgeschneiderter Kunst, die zu Ihrer Corporate Identity passt, eine professionelle und inspirierende Ausstrahlung."
+    },
+    "abstract": {
+      "title": "Abstrakt",
+      "intro": "Kräftige Farben und Formen, gedruckt auf 4mm Sicherheitsglas — abstrakte Kunst, die in jedem Raum ein Statement setzt."
+    },
+    "artistCollections": {
+      "title": "Artist Collections",
+      "intro": "Zusammenarbeit mit Künstlern: exklusive, in limitierter Auflage produzierte Werke auf Glas."
+    }
+  },
+  "orders": {
+    "reorder": "Erneut bestellen",
+    "items": {
+      "order1": {
+        "description": "Abstraktes Panel 60x90cm",
+        "status": "In Bearbeitung"
+      },
+      "order2": {
+        "description": "Hotel-Lobby-Set – 3 Paneele",
+        "status": "In Produktion"
+      },
+      "order3": {
+        "description": "Wellness-Panel 40x60cm",
+        "status": "Versandt"
+      },
+      "order4": {
+        "description": "Restaurant-Wandpaneel 80x120cm",
+        "status": "Geliefert"
+      }
+    }
   }
 }
