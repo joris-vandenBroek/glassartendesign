@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { GlassPanel } from '@/components/GlassPanel';
+import { SegmentCta } from '@/components/SegmentCta';
 import { getSegment, SEGMENTS } from '@/data/segments';
 import { BASE_PATH } from '@/lib/basePath';
 
@@ -21,7 +22,6 @@ export default async function SegmentPage({
   }
 
   const t = await getTranslations(`segments.${segment.messageKey}`);
-  const tNav = await getTranslations('nav');
   const contactHref = `${BASE_PATH}/${locale}/#contact`;
 
   return (
@@ -44,13 +44,7 @@ export default async function SegmentPage({
       </div>
 
       <div className="mx-auto mt-10 max-w-3xl text-center">
-        <a
-          href={contactHref}
-          data-testid="segment-cta"
-          className="inline-block rounded-sm bg-silver px-6 py-3 text-xs tracking-[0.2em] text-ink"
-        >
-          {tNav('becomeClient')}
-        </a>
+        <SegmentCta contactHref={contactHref} />
       </div>
     </main>
   );

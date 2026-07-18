@@ -36,20 +36,27 @@ export function NavBar() {
             {t('collections')}
           </Link>
           {isCollectionsOpen && (
-            <div
-              data-testid="collections-dropdown"
-              className="absolute left-0 top-full mt-2 flex flex-col gap-1 rounded-md border border-white/10 bg-black/90 p-2"
-            >
-              {SEGMENTS.map((segment) => (
-                <Link
-                  key={segment.slug}
-                  href={`/collecties/${segment.slug}`}
-                  data-testid={`nav-segment-${segment.slug}`}
-                  className="whitespace-nowrap rounded px-3 py-1.5 hover:bg-white/10 hover:text-white"
-                >
-                  {tSegments(`${segment.messageKey}.title`)}
-                </Link>
-              ))}
+            // Zero-gap outer box: its own padding (not a margin on a
+            // sibling) keeps the hoverable area continuous from the
+            // trigger link down into the visible panel, so moving the
+            // mouse through the visual gap never leaves this element and
+            // never fires the wrapper's onMouseLeave early.
+            <div className="absolute left-0 top-full pt-2">
+              <div
+                data-testid="collections-dropdown"
+                className="flex flex-col gap-1 rounded-md border border-white/10 bg-black/90 p-2"
+              >
+                {SEGMENTS.map((segment) => (
+                  <Link
+                    key={segment.slug}
+                    href={`/collecties/${segment.slug}`}
+                    data-testid={`nav-segment-${segment.slug}`}
+                    className="whitespace-nowrap rounded px-3 py-1.5 hover:bg-white/10 hover:text-white"
+                  >
+                    {tSegments(`${segment.messageKey}.title`)}
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
         </div>
