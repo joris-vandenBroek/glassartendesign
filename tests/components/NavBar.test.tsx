@@ -41,15 +41,10 @@ describe('NavBar', () => {
     expect(screen.queryByTestId('account-menu-stub')).not.toBeInTheDocument();
   });
 
-  it('shows all 6 segment links in the collections dropdown on hover', () => {
+  it('renders Collecties as a single direct link, no dropdown', () => {
     renderNavBar();
-    fireEvent.mouseEnter(screen.getByTestId('collections-trigger'));
-    expect(screen.getByTestId('nav-segment-hotel')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-segment-restaurant')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-segment-wellness')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-segment-office')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-segment-abstract')).toBeInTheDocument();
-    expect(screen.getByTestId('nav-segment-artist-collections')).toBeInTheDocument();
+    expect(screen.getByTestId('nav-collections')).toHaveAttribute('href', '/collecties');
+    expect(screen.queryByTestId('collections-dropdown')).not.toBeInTheDocument();
   });
 
   it('shows the account menu instead of "Word klant"/"Inloggen" after clicking login', () => {
