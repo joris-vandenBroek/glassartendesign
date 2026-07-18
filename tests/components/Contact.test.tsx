@@ -9,8 +9,8 @@ describe('Contact', () => {
     renderWithIntl(<Contact />, 'nl', messages);
     expect(screen.getByText('Contact')).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'info@glassartanddesign.nl' })
-    ).toHaveAttribute('href', 'mailto:info@glassartanddesign.nl');
+      screen.getByRole('link', { name: 'info@glassartdesign.nl' })
+    ).toHaveAttribute('href', 'mailto:info@glassartdesign.nl');
     expect(screen.getByText(/\+31 \(0\)6 12345678/)).toBeInTheDocument();
     expect(screen.getByTestId('glass-panel')).toHaveAttribute('id', 'contact');
   });
