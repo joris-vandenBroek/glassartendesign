@@ -20,6 +20,10 @@ vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
 
+vi.mock('@/components/CartPanel', () => ({
+  CartPanel: () => <div data-testid="cart-panel-stub" />,
+}));
+
 function renderNavBarWithSharedAuth() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>

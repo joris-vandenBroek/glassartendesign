@@ -19,6 +19,10 @@ vi.mock('@/components/AccountMenu', () => ({
   AccountMenu: () => <div data-testid="account-menu-stub" />,
 }));
 
+vi.mock('@/components/CartPanel', () => ({
+  CartPanel: () => <div data-testid="cart-panel-stub" />,
+}));
+
 function renderNavBar() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>

@@ -6,6 +6,7 @@ import { useMockAuth } from '@/lib/useMockAuth';
 import { BASE_PATH } from '@/lib/basePath';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { AccountMenu } from './AccountMenu';
+import { CartPanel } from './CartPanel';
 
 export function NavBar() {
   const locale = useLocale();
@@ -52,6 +53,7 @@ export function NavBar() {
             </button>
           </>
         )}
+        <CartPanel />
         <LanguageSwitcher />
       </div>
     </nav>

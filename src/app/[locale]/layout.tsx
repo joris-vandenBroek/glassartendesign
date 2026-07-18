@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { NavBar } from '@/components/NavBar';
 import { MockAuthProvider } from '@/lib/useMockAuth';
+import { CartProvider } from '@/lib/useCart';
+import { OrdersProvider } from '@/lib/useOrders';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -26,8 +28,12 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       <MockAuthProvider>
-        <NavBar />
-        {children}
+        <CartProvider>
+          <OrdersProvider>
+            <NavBar />
+            {children}
+          </OrdersProvider>
+        </CartProvider>
       </MockAuthProvider>
     </NextIntlClientProvider>
   );
