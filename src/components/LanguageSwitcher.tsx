@@ -19,7 +19,7 @@ export function LanguageSwitcher() {
   return (
     <div
       data-testid="language-switcher"
-      className="fixed right-4 top-4 z-50 flex gap-1 rounded-full border border-white/10 bg-black/40 p-1 backdrop-blur-sm"
+      className="flex gap-1 rounded-full border border-white/10 bg-black/40 p-1 backdrop-blur-sm"
     >
       {routing.locales.map((locale) => (
         <button
