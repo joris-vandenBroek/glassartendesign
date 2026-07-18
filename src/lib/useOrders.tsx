@@ -12,6 +12,9 @@ import {
 
 const STORAGE_KEY = 'glassart-placed-orders';
 
+// Known seed order IDs that must not be generated
+const SEED_ORDER_IDS = ['GD-10234', 'GD-10221', 'GD-10198', 'GD-10177'];
+
 export interface PlacedOrder {
   id: string;
   date: string;
@@ -27,9 +30,21 @@ interface OrdersValue {
 
 const OrdersContext = createContext<OrdersValue | null>(null);
 
-function generateOrderId(): string {
-  const suffix = Math.floor(10000 + Math.random() * 89999);
-  return `GD-${suffix}`;
+function generateOrderId(existingOrderIds: string[] = []): string {
+  const reserved = new Set([...SEED_ORDER_IDS, ...existingOrderIds]);
+
+  // Retry up to 100 times to avoid collisions
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const suffix = Math.floor(10000 + Math.random() * 89999);
+    const candidateId = `GD-${suffix}`;
+
+    if (!reserved.has(candidateId)) {
+      return candidateId;
+    }
+  }
+
+  // Fallback: should almost never happen given the range (90,000 possible IDs)
+  throw new Error('Failed to generate unique order ID after 100 attempts');
 }
 
 export function OrdersProvider({ children }: { children: ReactNode }) {
@@ -50,9 +65,10 @@ export function OrdersProvider({ children }: { children: ReactNode }) {
 
   const placeOrder = useCallback((description: string, status: string) => {
     setPlacedOrders((current) => {
+      const currentOrderIds = current.map((order) => order.id);
       const next = [
         {
-          id: generateOrderId(),
+          id: generateOrderId(currentOrderIds),
           date: new Date().toISOString().slice(0, 10),
           description,
           status,
