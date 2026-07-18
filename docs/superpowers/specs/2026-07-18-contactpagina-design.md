@@ -1,0 +1,44 @@
+# Design: Contactpagina
+
+## Context
+
+Losse contactpagina (`/contact`), geïnspireerd op de contactsectie van het referentieproject `C:\Temp\Zeus` (twee kolommen: bedrijfsgegevens + kaart links, contactformulier rechts). Vervangt op termijn de huidige contact-sectie op de homepage niet — die blijft als korte samenvatting staan; deze nieuwe pagina is de volledige, uitgebreide contactervaring. De navigatiebalk en de interim `#contact`-ankerlinks (nu wijzend naar de homepage-sectie) worden in dit deelproject omgezet naar deze nieuwe, losse pagina.
+
+## Doel
+
+Bezoekers kunnen op één centrale plek alle manieren vinden om contact op te nemen (telefoon, e-mail, WhatsApp, formulier) en zien de formele bedrijfsgegevens.
+
+## Inhoud — linkerkolom
+
+- Bezoekadres (placeholder) + link "Plan route" (Google Maps) + ingesloten kaart (Google Maps embed, placeholder locatie).
+- Telefoonnummer (placeholder, `tel:`-link).
+- E-mailadres (bestaande `info@glassartanddesign.nl`, `mailto:`-link).
+- WhatsApp-knop/link (placeholder nummer, `https://wa.me/<nummer>`-link, opent WhatsApp-chat).
+- Openingstijden (placeholder).
+- Bedrijfsgegevens-blok: KvK-nummer, BTW-nummer, IBAN (alle placeholders).
+
+## Inhoud — rechterkolom: contactformulier (mock)
+
+- Velden: naam*, bedrijf, e-mailadres*, telefoon, onderwerp* (keuzelijst: bijv. "Algemene vraag", "Offerte aanvragen", "Overig"), bericht* (* = verplicht).
+- Versturen: `preventDefault`, geen echte verzending/opslag (geen backend) — toont een korte "Verzonden!"-bevestiging op de knop (zelfde patroon als Zeus' mock-formulier), en reset het formulier na een paar seconden.
+
+## Navigatie
+
+- Nieuwe route `/[locale]/contact`.
+- De navigatiebalk-link "Contact" en alle bestaande interim `/${locale}/#contact`-links (in `NavBar`, de segmentpagina-opvolger `ProductsGrid`/`BecomeClientCta`, en elders) worden vervangen door een echte link naar `/contact` — dit lost de "tijdelijke interim-link" op die in eerdere specs als bewuste, tijdelijke beperking is genoteerd.
+- De bestaande contact-sectie op de homepage (`Contact`-component, met e-mail/telefoon) blijft ongewijzigd bestaan als korte samenvatting; deze pagina is een uitgebreidere, aparte bestemming.
+
+## Talen
+
+- Alle nieuwe tekst (labels, placeholders, bevestigingsbericht) in alle 4 talen (NL/EN/DE/FR), consistent met de rest van de site.
+
+## Niet in scope
+
+- Echte verzending van het contactformulier (geen backend/e-mailservice) — puur visuele bevestiging, net als bij Zeus.
+- Echte bedrijfsgegevens (adres, KvK, BTW, IBAN, WhatsApp-nummer, openingstijden) — allemaal placeholders, door de klant zelf later te vervangen.
+- Wijzigen van de bestaande homepage-contactsectie.
+
+## Risico's / aandachtspunten
+
+- Zodra deze pagina bestaat, moeten alle bestaande `#contact`-interim-links (genoemd als tijdelijke beperking in eerdere specs: navigatiebalk, "Word klant"-knoppen) worden bijgewerkt naar de echte `/contact`-route — dit is een bewuste opruimactie die bij dit deelproject hoort, niet een aparte losse taak.
+- Google Maps-embed vereist een `iframe` met een placeholder-locatie; zodra het echte adres bekend is, is dit een eenvoudige URL-vervanging.
