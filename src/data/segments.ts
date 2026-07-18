@@ -82,3 +82,21 @@ export const SEGMENTS: Segment[] = [
 export function getSegment(slug: string): Segment | undefined {
   return SEGMENTS.find((segment) => segment.slug === slug);
 }
+
+export interface SegmentImage {
+  id: string;
+  src: string;
+  segmentSlug: string;
+  segmentMessageKey: string;
+}
+
+export function getAllImages(): SegmentImage[] {
+  return SEGMENTS.flatMap((segment) =>
+    segment.images.map((src, index) => ({
+      id: `${segment.slug}-${index}`,
+      src,
+      segmentSlug: segment.slug,
+      segmentMessageKey: segment.messageKey,
+    }))
+  );
+}
