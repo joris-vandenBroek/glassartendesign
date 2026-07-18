@@ -72,5 +72,16 @@
         "status": "Livré"
       }
     }
+  },
+  "cart": {
+    "title": "Panier",
+    "addToCart": "Ajouter au panier",
+    "size": "Taille",
+    "quantity": "Quantité",
+    "confirm": "Ajouter",
+    "empty": "Votre panier est vide.",
+    "placeOrder": "Ajouter à la commande",
+    "remove": "Supprimer",
+    "requestedStatus": "Demandée"
   }
 }

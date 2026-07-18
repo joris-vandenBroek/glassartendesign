@@ -72,5 +72,16 @@
         "status": "Geliefert"
       }
     }
+  },
+  "cart": {
+    "title": "Warenkorb",
+    "addToCart": "In den Warenkorb",
+    "size": "Größe",
+    "quantity": "Anzahl",
+    "confirm": "Hinzufügen",
+    "empty": "Ihr Warenkorb ist leer.",
+    "placeOrder": "Zur Bestellung hinzufügen",
+    "remove": "Entfernen",
+    "requestedStatus": "Angefragt"
   }
 }

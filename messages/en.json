@@ -72,5 +72,16 @@
         "status": "Delivered"
       }
     }
+  },
+  "cart": {
+    "title": "Cart",
+    "addToCart": "Add to cart",
+    "size": "Size",
+    "quantity": "Quantity",
+    "confirm": "Add",
+    "empty": "Your cart is empty.",
+    "placeOrder": "Add to order",
+    "remove": "Remove",
+    "requestedStatus": "Requested"
   }
 }

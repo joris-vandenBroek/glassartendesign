@@ -72,5 +72,16 @@
         "status": "Geleverd"
       }
     }
+  },
+  "cart": {
+    "title": "Mandje",
+    "addToCart": "Toevoegen aan mandje",
+    "size": "Maat",
+    "quantity": "Aantal",
+    "confirm": "Toevoegen",
+    "empty": "Je mandje is leeg.",
+    "placeOrder": "Toevoegen aan bestelling",
+    "remove": "Verwijderen",
+    "requestedStatus": "Aangevraagd"
   }
 }
