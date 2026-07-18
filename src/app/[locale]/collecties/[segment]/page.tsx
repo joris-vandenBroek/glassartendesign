@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { GlassPanel } from '@/components/GlassPanel';
 import { getSegment, SEGMENTS } from '@/data/segments';
@@ -13,6 +13,7 @@ export default async function SegmentPage({
   params: { locale: string; segment: string };
 }) {
   const { locale, segment: slug } = params;
+  setRequestLocale(locale);
   const segment = getSegment(slug);
   if (!segment) {
     notFound();

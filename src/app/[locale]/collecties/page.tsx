@@ -1,9 +1,14 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { GlassPanel } from '@/components/GlassPanel';
 import { Link } from '@/i18n/navigation';
 import { SEGMENTS } from '@/data/segments';
 
-export default async function CollectiesPage() {
+export default async function CollectiesPage({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  setRequestLocale(params.locale);
   const t = await getTranslations('collectionsPage');
   const tSegments = await getTranslations('segments');
 
