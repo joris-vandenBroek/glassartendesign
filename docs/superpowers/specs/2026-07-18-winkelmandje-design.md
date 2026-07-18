@@ -24,12 +24,14 @@ Drie vaste maten, consistent met de bestaande voorbeeld-bestelgeschiedenis:
 
 ## Toevoegen aan mandje
 
-- Op elke segmentpagina (`/collecties/[segment]`) verschijnt bij hoveren/tikken op een sfeerfoto een "Toevoegen aan mandje"-knop over de foto heen.
+> **Bijgewerkt:** de losse segmentpagina's uit dit document bestaan niet meer — die zijn vervangen door één gefilterde productenpagina (`/collecties`, zie `docs/superpowers/specs/2026-07-18-producten-pagina-design.md`). De onderstaande interactie verplaatst dus van "elke segmentpagina" naar "elke afbeeldingskaart op de productenpagina", inhoudelijk ongewijzigd.
+
+- Op de productenpagina (`/collecties`) verschijnt bij hoveren/tikken op een afbeeldingskaart (`ProductsGrid`) een "Toevoegen aan mandje"-knop over de foto heen — ongeacht welk filter actief is.
 - Klikken opent een klein paneel met:
   - Maatkeuze (dropdown met de 3 standaardmaten, standaard de eerste optie geselecteerd).
   - Aantal-stepper (+/- knoppen, standaard 1, minimaal 1).
   - Een bevestigknop die de regel aan het mandje toevoegt en het paneel sluit.
-- De homepage-placeholders ("Uitgelichte werken") en de collectie-overzichtstegels krijgen geen toevoegknop — dit blijft beperkt tot de segmentpagina's, waar de sfeerfoto's het dichtst bij een "kunstwerk" komen.
+- De homepage-placeholders ("Uitgelichte werken") krijgen geen toevoegknop — dit blijft beperkt tot de echte sfeerbeelden op de productenpagina.
 
 ## Mandje bekijken
 
@@ -51,7 +53,7 @@ Drie vaste maten, consistent met de bestaande voorbeeld-bestelgeschiedenis:
 
 - Echte orderverwerking, betaling, voorraadcontrole of e-mailbevestiging.
 - Prijzen (blijven, zoals in de oorspronkelijke afspraken, achter login in het latere echte portaal).
-- Toevoegknoppen op de homepage-placeholders of collectie-overzichtstegels.
+- Toevoegknoppen op de homepage-placeholders ("Uitgelichte werken").
 - Inloggen vereisen om te bestellen (expliciet niet gewenst, zie hierboven).
 - Beheerfunctie om geplaatste bestellingen te verwerken (aparte, latere toekomstige deelproject, zoals door de klant zelf aangegeven).
 
