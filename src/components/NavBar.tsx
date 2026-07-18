@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { SEGMENTS } from '@/data/segments';
 import { useMockAuth } from '@/lib/useMockAuth';
+import { BASE_PATH } from '@/lib/basePath';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { AccountMenu } from './AccountMenu';
 
@@ -14,7 +15,7 @@ export function NavBar() {
   const tSegments = useTranslations('segments');
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
   const { isLoggedIn, isHydrated, login } = useMockAuth();
-  const contactHref = `/${locale}/#contact`;
+  const contactHref = `${BASE_PATH}/${locale}/#contact`;
 
   return (
     <nav

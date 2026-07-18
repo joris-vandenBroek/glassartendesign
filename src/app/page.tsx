@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { routing } from '@/i18n/routing';
 import { detectLocale } from '@/lib/detectLocale';
+import { BASE_PATH } from '@/lib/basePath';
 
 export default function RootRedirectPage() {
   useEffect(() => {
@@ -11,7 +12,7 @@ export default function RootRedirectPage() {
       routing.locales,
       routing.defaultLocale
     );
-    window.location.replace(`/${locale}/`);
+    window.location.replace(`${BASE_PATH}/${locale}/`);
   }, []);
 
   return null;

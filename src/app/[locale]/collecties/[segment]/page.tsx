@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { GlassPanel } from '@/components/GlassPanel';
 import { getSegment, SEGMENTS } from '@/data/segments';
+import { BASE_PATH } from '@/lib/basePath';
 
 export function generateStaticParams() {
   return SEGMENTS.map((segment) => ({ segment: segment.slug }));
@@ -21,7 +22,7 @@ export default async function SegmentPage({
 
   const t = await getTranslations(`segments.${segment.messageKey}`);
   const tNav = await getTranslations('nav');
-  const contactHref = `/${locale}/#contact`;
+  const contactHref = `${BASE_PATH}/${locale}/#contact`;
 
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-ink via-charcoal to-graphite px-4 pb-16 pt-24 sm:px-8">
