@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useMockAuth } from '@/lib/useMockAuth';
 
-export function SegmentCta({ contactHref }: { contactHref: string }) {
+export function BecomeClientCta({ contactHref }: { contactHref: string }) {
   const t = useTranslations('nav');
   const { isHydrated, isLoggedIn } = useMockAuth();
 
