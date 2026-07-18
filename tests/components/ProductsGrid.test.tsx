@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { ProductsGrid } from '@/components/ProductsGrid';
+import { CartProvider } from '@/lib/useCart';
 import messages from '../../messages/nl.json';
 
 function renderProductsGrid() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <ProductsGrid />
+      <CartProvider>
+        <ProductsGrid />
+      </CartProvider>
     </NextIntlClientProvider>
   );
 }
@@ -44,5 +47,12 @@ describe('ProductsGrid', () => {
     fireEvent.click(screen.getByTestId('filter-office'));
     expect(screen.getByTestId('filter-office')).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByTestId('filter-all')).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('renders an add-to-cart button on every visible product card', () => {
+    renderProductsGrid();
+    expect(screen.getAllByTestId('add-to-cart-button')).toHaveLength(36);
+    fireEvent.click(screen.getByTestId('filter-wellness'));
+    expect(screen.getAllByTestId('add-to-cart-button')).toHaveLength(6);
   });
 });

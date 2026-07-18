@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { SEGMENTS, getAllImages } from '@/data/segments';
+import { AddToCartButton } from './AddToCartButton';
 
 const ALL_FILTER = 'all';
 
@@ -67,6 +68,11 @@ export function ProductsGrid() {
             <span className="absolute left-2 top-2 rounded-sm bg-black/70 px-2 py-1 text-[0.6rem] uppercase tracking-wide text-white">
               {tSegments(`${image.segmentMessageKey}.title`)}
             </span>
+            <AddToCartButton
+              segmentSlug={image.segmentSlug}
+              segmentMessageKey={image.segmentMessageKey}
+              imageSrc={image.src}
+            />
           </div>
         ))}
       </div>
