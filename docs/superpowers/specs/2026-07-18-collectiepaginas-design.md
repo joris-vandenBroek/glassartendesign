@@ -50,6 +50,19 @@ Elke segmentpagina bevat:
 
 De overzichtspagina (`/collecties`) toont voor elk van de 6 segmenten een tegel met titel en het eerste sfeerbeeld van dat segment, doorlinkend naar de bijbehorende segmentpagina.
 
+## Login-mockup + bestelgeschiedenis (nep-data)
+
+Vooruitlopend op het latere, echte B2B-portaal (aparte, toekomstige architectuur met backend/database/authenticatie) krijgt de navigatiebalk een **puur visuele mockup** van de ingelogde staat, met hardgecodeerde voorbeelddata. Geen backend, geen echte authenticatie, geen dataopslag buiten de browser.
+
+- **Uitgelogde staat (standaard):** navigatiebalk toont "Word klant" + een knop "Inloggen".
+- **Inloggen:** klik op "Inloggen" zet direct (zonder formulier) de mock-ingelogde staat aan. Deze staat wordt bewaard in `localStorage` van de browser, zodat hij bij een paginaverversing behouden blijft totdat de bezoeker uitlogt.
+- **Ingelogde staat:** "Word klant" verdwijnt uit de navigatiebalk; in plaats van "Inloggen" verschijnt een rond "ingelogd"-icoon (bv. initialen/avatar) naast de bestaande taalkeuzeknop.
+- **Bestelgeschiedenis-dropdown:** klik op het ingelogd-icoon opent een dropdown-paneel direct onder de navigatiebalk met:
+  - 3–4 vaste voorbeeldbestellingen: ordernummer, datum, korte omschrijving, status (bv. "In behandeling", "In productie", "Verzonden", "Geleverd").
+  - Per bestelling een knop "Bestel opnieuw" (puur visueel, geen echte actie).
+  - Een "Uitloggen"-optie die de mock-staat terugzet naar uitgelogd (en `localStorage` opschoont).
+- Deze mockup is uitdrukkelijk tijdelijk en illustratief — de werkende versie (echte login, echte klantdata, echte orderstatus) is een apart, toekomstig deelproject met een eigen architectuurkeuze (auth-provider, database, hosting die dit ondersteunt).
+
 ## Visueel ontwerp
 
 Consistent met de bestaande "Glass Reflection"-stijl: doorlopende zwart-naar-antraciet achtergrond, glasmorphism overlay-panelen (hergebruik van de bestaande `GlassPanel`-component), zilverkleurige tekst-accenten. De sfeerbeelden worden getoond binnen dezelfde soort afgeronde, subtiel omrande panelen als de huidige "Uitgelichte werken"-tegels, nu gevuld met echte foto's in plaats van gradient-placeholders.
@@ -60,9 +73,11 @@ Consistent met de bestaande "Glass Reflection"-stijl: doorlopende zwart-naar-ant
 - Prijzen of bestelmogelijkheden (blijven achter login, zoals in de oorspronkelijke afspraken).
 - Downloaden/lokaal opslaan van de stockfoto's — er wordt gelinkt naar de externe URL's.
 - Vertaalde URL-slugs per taal.
+- Echte authenticatie, echte klantdata, echte orderstatus of een echte "bestel opnieuw"-actie — de login/bestelgeschiedenis is uitsluitend een visuele mockup met vaste voorbeelddata (zie hierboven); het werkende B2B-portaal is een apart, toekomstig deelproject.
 
 ## Risico's / aandachtspunten
 
 - Omdat de site `output: 'export'` gebruikt met `images: { unoptimized: true }`, worden externe afbeeldingen als gewone `<img>`-tags ingeladen (geen Next.js Image-optimalisatie) — dit is consistent met de bestaande aanpak en vereist geen extra configuratie.
 - De gekozen stockfoto's moeten expliciet vrij zijn voor commercieel gebruik (Unsplash/Pexels-licenties voldoen hieraan); dit wordt bij de implementatie per gekozen foto geverifieerd.
 - 24 statische pagina's (6 segmenten × 4 talen) plus de overzichtspagina (4 talen) vergroten de build enigszins, maar blijven binnen de bestaande statische-export architectuur (geen middleware, geen server nodig).
+- De login-mockup gebruikt `localStorage`, dus de "ingelogde" staat is puur lokaal aan één browser/apparaat, verdwijnt bij het wissen van browserdata, en heeft geen enkele betekenis voor echte beveiliging — dit is bewust, want het is uitsluitend een visuele demonstratie.
