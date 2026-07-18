@@ -1,0 +1,21 @@
+{
+  "hero": {
+    "eyebrow": "GLASSART & DESIGN",
+    "title": "Kunst op glas,",
+    "titleAccent": "vakkundig gemonteerd",
+    "subtitle": "Gehard veiligheidsglas · 4mm · incl. montagehaken",
+    "cta": "Neem contact op"
+  },
+  "about": {
+    "label": "Over ons",
+    "text": "Glassart and Design vervaardigt kunstwerken op 4mm veiligheidsglas voor hotels, restaurants, wellness, kantoren en particuliere collecties. Elk werk wordt compleet geleverd met montagehaken, klaar om op te hangen."
+  },
+  "works": {
+    "label": "Uitgelichte werken"
+  },
+  "contact": {
+    "label": "Contact",
+    "email": "info@glassartanddesign.nl",
+    "phone": "+31 (0)6 12345678"
+  }
+}

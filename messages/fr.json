@@ -1,0 +1,21 @@
+{
+  "hero": {
+    "eyebrow": "GLASSART & DESIGN",
+    "title": "L'art sur verre,",
+    "titleAccent": "monté avec expertise",
+    "subtitle": "Verre de sécurité trempé · 4mm · crochets de fixation inclus",
+    "cta": "Nous contacter"
+  },
+  "about": {
+    "label": "À propos",
+    "text": "Glassart and Design réalise des œuvres d'art sur verre de sécurité trempé de 4mm pour hôtels, restaurants, espaces bien-être, bureaux et collections privées. Chaque œuvre est livrée complète avec crochets de fixation, prête à être installée."
+  },
+  "works": {
+    "label": "Œuvres en vedette"
+  },
+  "contact": {
+    "label": "Contact",
+    "email": "info@glassartanddesign.nl",
+    "phone": "+31 (0)6 12345678"
+  }
+}

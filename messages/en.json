@@ -1,0 +1,21 @@
+{
+  "hero": {
+    "eyebrow": "GLASSART & DESIGN",
+    "title": "Art on glass,",
+    "titleAccent": "expertly mounted",
+    "subtitle": "Tempered safety glass · 4mm · mounting hooks included",
+    "cta": "Get in touch"
+  },
+  "about": {
+    "label": "About us",
+    "text": "Glassart and Design creates artwork on 4mm tempered safety glass for hotels, restaurants, wellness centers, offices and private collections. Every piece is delivered complete with mounting hooks, ready to hang."
+  },
+  "works": {
+    "label": "Featured works"
+  },
+  "contact": {
+    "label": "Contact",
+    "email": "info@glassartanddesign.nl",
+    "phone": "+31 (0)6 12345678"
+  }
+}

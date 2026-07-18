@@ -1,0 +1,21 @@
+{
+  "hero": {
+    "eyebrow": "GLASSART & DESIGN",
+    "title": "Kunst auf Glas,",
+    "titleAccent": "fachgerecht montiert",
+    "subtitle": "Gehärtetes Sicherheitsglas · 4mm · inkl. Montagehaken",
+    "cta": "Kontakt aufnehmen"
+  },
+  "about": {
+    "label": "Über uns",
+    "text": "Glassart and Design fertigt Kunstwerke auf 4mm gehärtetem Sicherheitsglas für Hotels, Restaurants, Wellnessbereiche, Büros und private Sammlungen. Jedes Werk wird komplett mit Montagehaken geliefert, bereit zum Aufhängen."
+  },
+  "works": {
+    "label": "Ausgewählte Werke"
+  },
+  "contact": {
+    "label": "Kontakt",
+    "email": "info@glassartanddesign.nl",
+    "phone": "+31 (0)6 12345678"
+  }
+}
