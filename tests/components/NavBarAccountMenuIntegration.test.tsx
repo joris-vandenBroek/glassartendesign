@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { NavBar } from '@/components/NavBar';
 import { MockAuthProvider } from '@/lib/useMockAuth';
+import { OrdersProvider } from '@/lib/useOrders';
 import messages from '../../messages/nl.json';
 
 // Unlike tests/components/NavBar.test.tsx, this file does NOT mock
@@ -27,9 +28,11 @@ vi.mock('@/components/CartPanel', () => ({
 function renderNavBarWithSharedAuth() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <MockAuthProvider>
-        <NavBar />
-      </MockAuthProvider>
+      <OrdersProvider>
+        <MockAuthProvider>
+          <NavBar />
+        </MockAuthProvider>
+      </OrdersProvider>
     </NextIntlClientProvider>
   );
 }
