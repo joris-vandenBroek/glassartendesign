@@ -29,32 +29,27 @@
   },
   "collectionsPage": {
     "title": "Kollektionen",
-    "intro": "Entdecken Sie unsere Kunstwerke auf Glas, gegliedert nach Einsatzbereich."
+    "intro": "Entdecken Sie unsere Kunstwerke auf Glas, gegliedert nach Einsatzbereich.",
+    "filterAll": "Alle"
   },
   "segments": {
     "hotel": {
-      "title": "Hotel",
-      "intro": "Kunst auf Glas verleiht Lobbys, Fluren und Gästezimmern eine zeitlose Ausstrahlung und hält intensiver Nutzung stand."
+      "title": "Hotel"
     },
     "restaurant": {
-      "title": "Restaurant",
-      "intro": "Ein stimmungsvolles Interieur beginnt mit den Details — Kunst auf Glas bringt Charakter, ohne bei Hygiene und Pflege Kompromisse einzugehen."
+      "title": "Restaurant"
     },
     "wellness": {
-      "title": "Wellness",
-      "intro": "Beruhigende Kunstwerke auf feuchtigkeitsbeständigem Glas, speziell geeignet für Spas, Saunabereiche und Behandlungsräume."
+      "title": "Wellness"
     },
     "office": {
-      "title": "Office",
-      "intro": "Verleihen Sie Büroräumen mit maßgeschneiderter Kunst, die zu Ihrer Corporate Identity passt, eine professionelle und inspirierende Ausstrahlung."
+      "title": "Office"
     },
     "abstract": {
-      "title": "Abstrakt",
-      "intro": "Kräftige Farben und Formen, gedruckt auf 4mm Sicherheitsglas — abstrakte Kunst, die in jedem Raum ein Statement setzt."
+      "title": "Abstrakt"
     },
     "artistCollections": {
-      "title": "Artist Collections",
-      "intro": "Zusammenarbeit mit Künstlern: exklusive, in limitierter Auflage produzierte Werke auf Glas."
+      "title": "Artist Collections"
     }
   },
   "orders": {

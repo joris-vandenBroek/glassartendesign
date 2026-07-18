@@ -29,32 +29,27 @@
   },
   "collectionsPage": {
     "title": "Collecties",
-    "intro": "Ontdek onze kunstwerken op glas, gerangschikt per toepassing."
+    "intro": "Ontdek onze kunstwerken op glas, gerangschikt per toepassing.",
+    "filterAll": "Alle"
   },
   "segments": {
     "hotel": {
-      "title": "Hotel",
-      "intro": "Kunst op glas voegt een tijdloze uitstraling toe aan lobby's, gangen en gastenkamers, en is bestand tegen intensief gebruik."
+      "title": "Hotel"
     },
     "restaurant": {
-      "title": "Restaurant",
-      "intro": "Een sfeervol interieur begint bij de details — kunst op glas brengt karakter zonder in te leveren op hygiëne en onderhoud."
+      "title": "Restaurant"
     },
     "wellness": {
-      "title": "Wellness",
-      "intro": "Rustgevende kunstwerken op vochtbestendig glas, speciaal geschikt voor spa's, saunaruimtes en behandelkamers."
+      "title": "Wellness"
     },
     "office": {
-      "title": "Office",
-      "intro": "Geef kantoorruimtes een professionele en inspirerende uitstraling met kunst op maat, passend bij uw huisstijl."
+      "title": "Office"
     },
     "abstract": {
-      "title": "Abstract",
-      "intro": "Gedurfde kleuren en vormen, gedrukt op 4mm veiligheidsglas — abstracte kunst die in elke ruimte een statement maakt."
+      "title": "Abstract"
     },
     "artistCollections": {
-      "title": "Artist Collections",
-      "intro": "Samenwerkingen met kunstenaars: exclusieve, in gelimiteerde oplage geproduceerde werken op glas."
+      "title": "Artist Collections"
     }
   },
   "orders": {

@@ -29,32 +29,27 @@
   },
   "collectionsPage": {
     "title": "Collections",
-    "intro": "Découvrez nos œuvres sur verre, classées par application."
+    "intro": "Découvrez nos œuvres sur verre, classées par application.",
+    "filterAll": "Tous"
   },
   "segments": {
     "hotel": {
-      "title": "Hôtel",
-      "intro": "L'art sur verre apporte une touche intemporelle aux halls, couloirs et chambres, tout en résistant à un usage intensif."
+      "title": "Hôtel"
     },
     "restaurant": {
-      "title": "Restaurant",
-      "intro": "Un intérieur chaleureux commence par les détails — l'art sur verre apporte du caractère sans compromis sur l'hygiène et l'entretien."
+      "title": "Restaurant"
     },
     "wellness": {
-      "title": "Bien-être",
-      "intro": "Des œuvres apaisantes sur verre résistant à l'humidité, spécialement adaptées aux spas, saunas et salles de soins."
+      "title": "Bien-être"
     },
     "office": {
-      "title": "Bureaux",
-      "intro": "Donnez à vos espaces de bureau une allure professionnelle et inspirante grâce à des œuvres sur mesure, assorties à votre identité visuelle."
+      "title": "Bureaux"
     },
     "abstract": {
-      "title": "Abstrait",
-      "intro": "Couleurs et formes audacieuses, imprimées sur verre de sécurité de 4mm — un art abstrait qui affirme sa présence dans tout espace."
+      "title": "Abstrait"
     },
     "artistCollections": {
-      "title": "Artist Collections",
-      "intro": "Collaborations avec des artistes : œuvres exclusives, produites en édition limitée sur verre."
+      "title": "Artist Collections"
     }
   },
   "orders": {
