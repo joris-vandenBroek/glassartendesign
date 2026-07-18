@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { NavBar } from '@/components/NavBar';
+import { MockAuthProvider } from '@/lib/useMockAuth';
 import messages from '../../messages/nl.json';
 
 vi.mock('@/i18n/navigation', () => ({
@@ -21,7 +22,9 @@ vi.mock('@/components/AccountMenu', () => ({
 function renderNavBar() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <NavBar />
+      <MockAuthProvider>
+        <NavBar />
+      </MockAuthProvider>
     </NextIntlClientProvider>
   );
 }

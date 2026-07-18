@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useMockAuth } from '@/lib/useMockAuth';
+import { useMockAuth, MockAuthProvider } from '@/lib/useMockAuth';
 
 describe('useMockAuth', () => {
   beforeEach(() => {
@@ -8,13 +8,13 @@ describe('useMockAuth', () => {
   });
 
   it('starts logged out and marks itself hydrated after mount', () => {
-    const { result } = renderHook(() => useMockAuth());
+    const { result } = renderHook(() => useMockAuth(), { wrapper: MockAuthProvider });
     expect(result.current.isHydrated).toBe(true);
     expect(result.current.isLoggedIn).toBe(false);
   });
 
   it('logs in and persists the state to localStorage', () => {
-    const { result } = renderHook(() => useMockAuth());
+    const { result } = renderHook(() => useMockAuth(), { wrapper: MockAuthProvider });
     act(() => {
       result.current.login();
     });
@@ -23,7 +23,7 @@ describe('useMockAuth', () => {
   });
 
   it('logs out and clears localStorage', () => {
-    const { result } = renderHook(() => useMockAuth());
+    const { result } = renderHook(() => useMockAuth(), { wrapper: MockAuthProvider });
     act(() => {
       result.current.login();
     });
@@ -36,7 +36,7 @@ describe('useMockAuth', () => {
 
   it('reads a pre-existing logged-in state from localStorage on mount', () => {
     window.localStorage.setItem('glassart-mock-logged-in', 'true');
-    const { result } = renderHook(() => useMockAuth());
+    const { result } = renderHook(() => useMockAuth(), { wrapper: MockAuthProvider });
     expect(result.current.isLoggedIn).toBe(true);
   });
 });

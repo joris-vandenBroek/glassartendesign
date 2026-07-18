@@ -2,12 +2,15 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { AccountMenu } from '@/components/AccountMenu';
+import { MockAuthProvider } from '@/lib/useMockAuth';
 import messages from '../../messages/nl.json';
 
 function renderAccountMenu() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <AccountMenu />
+      <MockAuthProvider>
+        <AccountMenu />
+      </MockAuthProvider>
     </NextIntlClientProvider>
   );
 }
