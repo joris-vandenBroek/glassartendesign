@@ -137,5 +137,41 @@
     "submit": "Anfrage senden",
     "confirmationTitle": "Anfrage erhalten",
     "confirmationMessage": "Wir melden uns innerhalb von 2 Werktagen bei Ihnen."
+  },
+  "whyUs": {
+    "title": "Warum Glassart & Design",
+    "usp": {
+      "quality": "Gallery Quality",
+      "safetyGlass": "4mm Sicherheitsglas",
+      "uvResistant": "UV-beständig & farbecht",
+      "sharpDetails": "Gestochen scharfe Details",
+      "durable": "Langlebig & umweltfreundlich"
+    },
+    "materials": {
+      "safetyGlass": {
+        "name": "4mm Sicherheitsglas",
+        "description": "Unsere Spezialität. Kristallklar, stark und sicher."
+      },
+      "dibond": {
+        "name": "Dibond 3mm",
+        "description": "Leicht, steif und formstabil mit mattem Finish."
+      },
+      "acrylic3": {
+        "name": "Acryl 3mm",
+        "description": "Leicht und klar mit einem luxuriösen Glanz."
+      },
+      "acrylic5": {
+        "name": "Acryl 5mm",
+        "description": "Zusätzliche Tiefe und Stabilität für einen beeindruckenden Effekt."
+      },
+      "acrylic10": {
+        "name": "Acryl 10mm",
+        "description": "Maximale Tiefenwirkung für eine exklusive Präsentation."
+      },
+      "acousticFabric": {
+        "name": "Akustikstoff",
+        "description": "Verbessert die Akustik und sorgt für ein warmes, modernes Erscheinungsbild."
+      }
+    }
   }
 }

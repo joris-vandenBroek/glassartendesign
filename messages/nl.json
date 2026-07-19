@@ -137,5 +137,41 @@
     "submit": "Aanvraag versturen",
     "confirmationTitle": "Aanvraag ontvangen",
     "confirmationMessage": "We nemen binnen 2 werkdagen contact met u op."
+  },
+  "whyUs": {
+    "title": "Waarom Glassart & Design",
+    "usp": {
+      "quality": "Gallery Quality",
+      "safetyGlass": "4mm Veiligheidsglas",
+      "uvResistant": "UV-bestendig & kleurvast",
+      "sharpDetails": "Haarscherpe details",
+      "durable": "Duurzaam & milieuvriendelijk"
+    },
+    "materials": {
+      "safetyGlass": {
+        "name": "4mm Veiligheidsglas",
+        "description": "Onze specialiteit. Kristalhelder, sterk en veilig."
+      },
+      "dibond": {
+        "name": "Dibond 3mm",
+        "description": "Lichtgewicht, stijf en vormvast met een matte uitstraling."
+      },
+      "acrylic3": {
+        "name": "Acryl 3mm",
+        "description": "Licht en helder met een luxe glanzende look."
+      },
+      "acrylic5": {
+        "name": "Acryl 5mm",
+        "description": "Extra diepte en stevigheid voor een indrukwekkend effect."
+      },
+      "acrylic10": {
+        "name": "Acryl 10mm",
+        "description": "Maximale diepwerking voor exclusieve presentatie."
+      },
+      "acousticFabric": {
+        "name": "Akoestische stof",
+        "description": "Verbetert de akoestiek en geeft een warme, moderne uitstraling."
+      }
+    }
   }
 }
