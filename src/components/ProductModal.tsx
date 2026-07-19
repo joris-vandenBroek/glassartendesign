@@ -63,7 +63,7 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
   }
 
   function handleConfirm() {
-    if (isConfirmed) {
+    if (isConfirmed || !image) {
       return;
     }
     addItem({
