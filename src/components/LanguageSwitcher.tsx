@@ -4,13 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocale } from 'next-intl';
 import { routing } from '@/i18n/routing';
 import { usePathname, useRouter } from '@/i18n/navigation';
-
-const LOCALE_META: Record<string, { label: string; flag: string }> = {
-  nl: { label: 'NL', flag: '🇳🇱' },
-  en: { label: 'EN', flag: '🇬🇧' },
-  de: { label: 'DE', flag: '🇩🇪' },
-  fr: { label: 'FR', flag: '🇫🇷' },
-};
+import { LOCALE_META } from '@/lib/localeMeta';
 
 export function LanguageSwitcher() {
   const activeLocale = useLocale();
