@@ -63,4 +63,15 @@ describe('ProductsGrid', () => {
     fireEvent.click(screen.getByTestId('product-modal-backdrop'));
     expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
   });
+
+  it('opens the product modal when Enter or Space is pressed on a focused card', () => {
+    renderProductsGrid();
+    expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getAllByTestId('product-card')[0], { key: 'Enter' });
+    expect(screen.getByTestId('product-modal')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('product-modal-backdrop'));
+
+    fireEvent.keyDown(screen.getAllByTestId('product-card')[1], { key: ' ' });
+    expect(screen.getByTestId('product-modal')).toBeInTheDocument();
+  });
 });

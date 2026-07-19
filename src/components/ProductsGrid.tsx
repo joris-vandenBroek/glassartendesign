@@ -59,7 +59,18 @@ export function ProductsGrid() {
           <div
             key={image.id}
             data-testid="product-card"
+            role="button"
+            tabIndex={0}
+            aria-label={tSegments(`${image.segmentMessageKey}.title`)}
             onClick={() => setSelectedImage(image)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                if (event.key === ' ') {
+                  event.preventDefault();
+                }
+                setSelectedImage(image);
+              }
+            }}
             className="relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:brightness-110"
           >
             <img
