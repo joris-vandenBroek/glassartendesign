@@ -5,7 +5,7 @@ import LocalePage from '@/app/[locale]/page';
 import messages from '../../messages/nl.json';
 
 describe('LocalePage', () => {
-  it('renders all four sections for the nl locale', () => {
+  it('renders all five sections for the nl locale', () => {
     render(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <LocalePage />
@@ -14,6 +14,7 @@ describe('LocalePage', () => {
 
     expect(screen.getByText('Kunst op glas,')).toBeInTheDocument();
     expect(screen.getByText('Over ons')).toBeInTheDocument();
+    expect(screen.getByText('Waarom Glassart & Design')).toBeInTheDocument();
     expect(screen.getByText('Uitgelichte werken')).toBeInTheDocument();
     expect(screen.getAllByTestId('work-placeholder')).toHaveLength(3);
   });
