@@ -2298,16 +2298,19 @@ git commit -m "feat: add AccountDashboard and /account page"
 - Modify: `tests/components/NavBar.test.tsx`
 - Delete: `src/components/AccountMenu.tsx`
 - Delete: `tests/components/AccountMenu.test.tsx`
+- Delete: `tests/components/NavBarAccountMenuIntegration.test.tsx`
 
 **Interfaces:**
 - Consumes: `nav.myAccount` translation key (Task 1).
 - Produces: nothing new — this is the final wiring point; nothing later depends on it.
 
-- [ ] **Step 1: Delete the superseded dropdown component and its test**
+- [ ] **Step 1: Delete the superseded dropdown component and its tests**
 
 ```bash
-git rm src/components/AccountMenu.tsx tests/components/AccountMenu.test.tsx
+git rm src/components/AccountMenu.tsx tests/components/AccountMenu.test.tsx tests/components/NavBarAccountMenuIntegration.test.tsx
 ```
+
+`NavBarAccountMenuIntegration.test.tsx` is a regression test guarding a historical bug where `NavBar` and `AccountMenu` each held their own separate `isLoggedIn` copy that could desync. After this task, `NavBar` makes the only `useMockAuth()` call in this area (no child component with its own auth copy), so that desync is structurally impossible — the test's premise no longer applies and it is deleted rather than adapted.
 
 - [ ] **Step 2: Update `NavBar.tsx` to link "GD" straight to `/account`**
 
