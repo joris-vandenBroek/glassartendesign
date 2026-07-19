@@ -13,19 +13,19 @@ function renderForm() {
 }
 
 describe('RegistrationForm', () => {
-  it('defaults to "Particulier" selected, with no business fields shown', () => {
+  it('defaults to "Zakelijk" selected, with the 3 business fields shown', () => {
     renderForm();
-    expect(screen.getByTestId('word-klant-type-particulier')).toHaveAttribute(
+    expect(screen.getByTestId('word-klant-type-zakelijk')).toHaveAttribute(
       'aria-pressed',
       'true'
     );
-    expect(screen.getByTestId('word-klant-type-zakelijk')).toHaveAttribute(
+    expect(screen.getByTestId('word-klant-type-particulier')).toHaveAttribute(
       'aria-pressed',
       'false'
     );
-    expect(screen.queryByTestId('word-klant-company-name')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('word-klant-kvk')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('word-klant-contact-person')).not.toBeInTheDocument();
+    expect(screen.getByTestId('word-klant-company-name')).toBeRequired();
+    expect(screen.getByTestId('word-klant-kvk')).toBeRequired();
+    expect(screen.getByTestId('word-klant-contact-person')).toBeRequired();
   });
 
   it('marks the shared fields as required', () => {
@@ -39,20 +39,19 @@ describe('RegistrationForm', () => {
     expect(screen.getByTestId('word-klant-city')).toBeRequired();
   });
 
-  it('shows the 3 required business fields when "Zakelijk" is selected, hides them again when switching back', () => {
+  it('hides the 3 business fields when switching to "Particulier", shows them again when switching back to "Zakelijk"', () => {
     renderForm();
-    fireEvent.click(screen.getByTestId('word-klant-type-zakelijk'));
-
-    expect(screen.getByTestId('word-klant-type-zakelijk')).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
-    expect(screen.getByTestId('word-klant-company-name')).toBeRequired();
-    expect(screen.getByTestId('word-klant-kvk')).toBeRequired();
-    expect(screen.getByTestId('word-klant-contact-person')).toBeRequired();
+    expect(screen.getByTestId('word-klant-company-name')).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('word-klant-type-particulier'));
     expect(screen.queryByTestId('word-klant-company-name')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('word-klant-kvk')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('word-klant-contact-person')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('word-klant-type-zakelijk'));
+    expect(screen.getByTestId('word-klant-company-name')).toBeRequired();
+    expect(screen.getByTestId('word-klant-kvk')).toBeRequired();
+    expect(screen.getByTestId('word-klant-contact-person')).toBeRequired();
   });
 
   it('shows the 3 delivery-address fields only when the "different delivery address" checkbox is checked', () => {
@@ -70,6 +69,7 @@ describe('RegistrationForm', () => {
 
   it('shows the confirmation screen and hides the form after submit, without a real submission', () => {
     renderForm();
+    fireEvent.click(screen.getByTestId('word-klant-type-particulier'));
     fireEvent.change(screen.getByTestId('word-klant-name'), { target: { value: 'Jan Jansen' } });
     fireEvent.change(screen.getByTestId('word-klant-email'), {
       target: { value: 'jan@example.com' },

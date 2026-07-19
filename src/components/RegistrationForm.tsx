@@ -7,7 +7,7 @@ type ClientType = 'particulier' | 'zakelijk';
 
 export function RegistrationForm() {
   const t = useTranslations('registrationPage');
-  const [clientType, setClientType] = useState<ClientType>('particulier');
+  const [clientType, setClientType] = useState<ClientType>('zakelijk');
   const [showDeliveryAddress, setShowDeliveryAddress] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -33,19 +33,6 @@ export function RegistrationForm() {
       <div className="flex gap-2">
         <button
           type="button"
-          data-testid="word-klant-type-particulier"
-          aria-pressed={clientType === 'particulier'}
-          onClick={() => setClientType('particulier')}
-          className={
-            clientType === 'particulier'
-              ? 'flex-1 rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink'
-              : 'flex-1 rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white'
-          }
-        >
-          {t('typeParticulier')}
-        </button>
-        <button
-          type="button"
           data-testid="word-klant-type-zakelijk"
           aria-pressed={clientType === 'zakelijk'}
           onClick={() => setClientType('zakelijk')}
@@ -56,6 +43,19 @@ export function RegistrationForm() {
           }
         >
           {t('typeZakelijk')}
+        </button>
+        <button
+          type="button"
+          data-testid="word-klant-type-particulier"
+          aria-pressed={clientType === 'particulier'}
+          onClick={() => setClientType('particulier')}
+          className={
+            clientType === 'particulier'
+              ? 'flex-1 rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink'
+              : 'flex-1 rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white'
+          }
+        >
+          {t('typeParticulier')}
         </button>
       </div>
 
