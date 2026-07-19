@@ -28,9 +28,13 @@ describe('RegistrationForm', () => {
     expect(screen.getByTestId('word-klant-contact-person')).toBeRequired();
   });
 
+  it('has no separate Naam field', () => {
+    renderForm();
+    expect(screen.queryByTestId('word-klant-name')).not.toBeInTheDocument();
+  });
+
   it('marks the shared fields as required', () => {
     renderForm();
-    expect(screen.getByTestId('word-klant-name')).toBeRequired();
     expect(screen.getByTestId('word-klant-email')).toBeRequired();
     expect(screen.getByTestId('word-klant-phone')).toBeRequired();
     expect(screen.getByTestId('word-klant-password')).toBeRequired();
@@ -67,10 +71,22 @@ describe('RegistrationForm', () => {
     expect(screen.queryByTestId('word-klant-delivery-address')).not.toBeInTheDocument();
   });
 
+  it('shows the 3 invoice-address fields only when the "different invoice address" checkbox is checked', () => {
+    renderForm();
+    expect(screen.queryByTestId('word-klant-invoice-address')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('word-klant-different-invoice'));
+    expect(screen.getByTestId('word-klant-invoice-address')).toBeInTheDocument();
+    expect(screen.getByTestId('word-klant-invoice-postcode')).toBeInTheDocument();
+    expect(screen.getByTestId('word-klant-invoice-city')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('word-klant-different-invoice'));
+    expect(screen.queryByTestId('word-klant-invoice-address')).not.toBeInTheDocument();
+  });
+
   it('shows the confirmation screen and hides the form after submit, without a real submission', () => {
     renderForm();
     fireEvent.click(screen.getByTestId('word-klant-type-particulier'));
-    fireEvent.change(screen.getByTestId('word-klant-name'), { target: { value: 'Jan Jansen' } });
     fireEvent.change(screen.getByTestId('word-klant-email'), {
       target: { value: 'jan@example.com' },
     });

@@ -9,6 +9,7 @@ export function RegistrationForm() {
   const t = useTranslations('registrationPage');
   const [clientType, setClientType] = useState<ClientType>('zakelijk');
   const [showDeliveryAddress, setShowDeliveryAddress] = useState(false);
+  const [showInvoiceAddress, setShowInvoiceAddress] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -59,10 +60,36 @@ export function RegistrationForm() {
         </button>
       </div>
 
-      <label className={labelClassName}>
-        {t('labelName')}
-        <input type="text" name="name" required data-testid="word-klant-name" className={fieldClassName} />
-      </label>
+      {clientType === 'zakelijk' && (
+        <>
+          <label className={labelClassName}>
+            {t('labelCompanyName')}
+            <input
+              type="text"
+              name="companyName"
+              required
+              data-testid="word-klant-company-name"
+              className={fieldClassName}
+            />
+          </label>
+
+          <label className={labelClassName}>
+            {t('labelKvk')}
+            <input type="text" name="kvk" required data-testid="word-klant-kvk" className={fieldClassName} />
+          </label>
+
+          <label className={labelClassName}>
+            {t('labelContactPerson')}
+            <input
+              type="text"
+              name="contactPerson"
+              required
+              data-testid="word-klant-contact-person"
+              className={fieldClassName}
+            />
+          </label>
+        </>
+      )}
 
       <label className={labelClassName}>
         {t('labelEmail')}
@@ -150,31 +177,44 @@ export function RegistrationForm() {
         </>
       )}
 
-      {clientType === 'zakelijk' && (
+      <label className="flex items-center gap-2 text-xs uppercase tracking-wide text-white/60">
+        <input
+          type="checkbox"
+          data-testid="word-klant-different-invoice"
+          checked={showInvoiceAddress}
+          onChange={(event) => setShowInvoiceAddress(event.target.checked)}
+        />
+        {t('differentInvoiceLabel')}
+      </label>
+
+      {showInvoiceAddress && (
         <>
           <label className={labelClassName}>
-            {t('labelCompanyName')}
+            {t('labelInvoiceAddress')}
             <input
               type="text"
-              name="companyName"
-              required
-              data-testid="word-klant-company-name"
+              name="invoiceAddress"
+              data-testid="word-klant-invoice-address"
               className={fieldClassName}
             />
           </label>
 
           <label className={labelClassName}>
-            {t('labelKvk')}
-            <input type="text" name="kvk" required data-testid="word-klant-kvk" className={fieldClassName} />
+            {t('labelInvoicePostcode')}
+            <input
+              type="text"
+              name="invoicePostcode"
+              data-testid="word-klant-invoice-postcode"
+              className={fieldClassName}
+            />
           </label>
 
           <label className={labelClassName}>
-            {t('labelContactPerson')}
+            {t('labelInvoiceCity')}
             <input
               type="text"
-              name="contactPerson"
-              required
-              data-testid="word-klant-contact-person"
+              name="invoiceCity"
+              data-testid="word-klant-invoice-city"
               className={fieldClassName}
             />
           </label>
