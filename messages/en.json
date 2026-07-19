@@ -82,6 +82,8 @@
     "empty": "Your cart is empty.",
     "placeOrder": "Add to order",
     "remove": "Remove",
-    "requestedStatus": "Requested"
+    "requestedStatus": "Requested",
+    "added": "Added!",
+    "close": "Close"
   }
 }

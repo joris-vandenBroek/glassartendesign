@@ -10,6 +10,8 @@ const config: Config = {
         graphite: '#2a2d33',
         silver: '#e2e4e8',
         'silver-dim': '#9aa0aa',
+        gold: '#D4AF37',
+        'gold-bright': '#E8C468',
       },
     },
   },

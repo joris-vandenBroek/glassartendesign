@@ -82,6 +82,8 @@
     "empty": "Je mandje is leeg.",
     "placeOrder": "Toevoegen aan bestelling",
     "remove": "Verwijderen",
-    "requestedStatus": "Aangevraagd"
+    "requestedStatus": "Aangevraagd",
+    "added": "Toegevoegd!",
+    "close": "Sluiten"
   }
 }

@@ -82,6 +82,8 @@
     "empty": "Votre panier est vide.",
     "placeOrder": "Ajouter à la commande",
     "remove": "Supprimer",
-    "requestedStatus": "Demandée"
+    "requestedStatus": "Demandée",
+    "added": "Ajouté !",
+    "close": "Fermer"
   }
 }

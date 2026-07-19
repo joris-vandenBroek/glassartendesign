@@ -82,6 +82,8 @@
     "empty": "Ihr Warenkorb ist leer.",
     "placeOrder": "Zur Bestellung hinzufügen",
     "remove": "Entfernen",
-    "requestedStatus": "Angefragt"
+    "requestedStatus": "Angefragt",
+    "added": "Hinzugefügt!",
+    "close": "Schließen"
   }
 }
