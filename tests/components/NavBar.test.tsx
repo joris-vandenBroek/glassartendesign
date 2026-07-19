@@ -15,10 +15,6 @@ vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ replace: vi.fn() }),
 }));
 
-vi.mock('@/components/AccountMenu', () => ({
-  AccountMenu: () => <div data-testid="account-menu-stub" />,
-}));
-
 vi.mock('@/components/CartPanel', () => ({
   CartPanel: () => <div data-testid="cart-panel-stub" />,
 }));
@@ -38,11 +34,11 @@ beforeEach(() => {
 });
 
 describe('NavBar', () => {
-  it('shows "Word klant" and "Inloggen" when logged out, no account menu', () => {
+  it('shows "Word klant" and "Inloggen" when logged out, no account link', () => {
     renderNavBar();
     expect(screen.getByTestId('nav-become-client')).toBeInTheDocument();
     expect(screen.getByTestId('nav-login')).toBeInTheDocument();
-    expect(screen.queryByTestId('account-menu-stub')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('account-icon')).not.toBeInTheDocument();
   });
 
   it('renders Collecties as a single direct link, no dropdown', () => {
@@ -51,10 +47,10 @@ describe('NavBar', () => {
     expect(screen.queryByTestId('collections-dropdown')).not.toBeInTheDocument();
   });
 
-  it('shows the account menu instead of "Word klant"/"Inloggen" after clicking login', () => {
+  it('shows a link to /account instead of "Word klant"/"Inloggen" after clicking login', () => {
     renderNavBar();
     fireEvent.click(screen.getByTestId('nav-login'));
-    expect(screen.getByTestId('account-menu-stub')).toBeInTheDocument();
+    expect(screen.getByTestId('account-icon')).toHaveAttribute('href', '/account');
     expect(screen.queryByTestId('nav-become-client')).not.toBeInTheDocument();
     expect(screen.queryByTestId('nav-login')).not.toBeInTheDocument();
   });

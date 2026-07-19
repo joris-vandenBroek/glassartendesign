@@ -5,7 +5,6 @@ import { Link } from '@/i18n/navigation';
 import { useMockAuth } from '@/lib/useMockAuth';
 import { Logo } from './Logo';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { AccountMenu } from './AccountMenu';
 import { CartPanel } from './CartPanel';
 
 export function NavBar() {
@@ -34,7 +33,14 @@ export function NavBar() {
 
       <div className="flex items-center gap-3">
         {isHydrated && isLoggedIn ? (
-          <AccountMenu />
+          <Link
+            href="/account"
+            data-testid="account-icon"
+            aria-label={t('myAccount')}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-silver text-xs font-semibold text-ink"
+          >
+            GD
+          </Link>
         ) : (
           <>
             <Link
