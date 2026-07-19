@@ -18,4 +18,10 @@ describe('Logo', () => {
     expect(logo).toHaveTextContent('GLASSART');
     expect(logo).toHaveTextContent('& DESIGN');
   });
+
+  it('renders the real logo image', () => {
+    render(<Logo />);
+    const image = screen.getByTestId('logo').querySelector('img');
+    expect(image).toHaveAttribute('src', expect.stringContaining('logo.png'));
+  });
 });
