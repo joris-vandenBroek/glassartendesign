@@ -114,5 +114,28 @@
     "formMessage": "Nachricht",
     "formSubmit": "Senden",
     "formSubmitted": "Gesendet!"
+  },
+  "registrationPage": {
+    "title": "Kunde werden",
+    "intro": "Beantragen Sie ein Kundenkonto, wir melden uns anschließend bei Ihnen.",
+    "typeParticulier": "Privat",
+    "typeZakelijk": "Geschäftlich",
+    "labelName": "Name",
+    "labelEmail": "E-Mail-Adresse",
+    "labelPhone": "Telefonnummer",
+    "labelPassword": "Passwort",
+    "labelAddress": "Adresse",
+    "labelPostcode": "Postleitzahl",
+    "labelCity": "Ort",
+    "differentDeliveryLabel": "Abweichende Lieferadresse",
+    "labelDeliveryAddress": "Lieferadresse",
+    "labelDeliveryPostcode": "Liefer-Postleitzahl",
+    "labelDeliveryCity": "Lieferort",
+    "labelCompanyName": "Firmenname",
+    "labelKvk": "Handelsregisternummer",
+    "labelContactPerson": "Ansprechpartner",
+    "submit": "Anfrage senden",
+    "confirmationTitle": "Anfrage erhalten",
+    "confirmationMessage": "Wir melden uns innerhalb von 2 Werktagen bei Ihnen."
   }
 }

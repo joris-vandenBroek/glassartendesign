@@ -114,5 +114,28 @@
     "formMessage": "Message",
     "formSubmit": "Send",
     "formSubmitted": "Sent!"
+  },
+  "registrationPage": {
+    "title": "Become a client",
+    "intro": "Request a customer account, we'll get in touch with you afterwards.",
+    "typeParticulier": "Individual",
+    "typeZakelijk": "Business",
+    "labelName": "Name",
+    "labelEmail": "Email address",
+    "labelPhone": "Phone number",
+    "labelPassword": "Password",
+    "labelAddress": "Address",
+    "labelPostcode": "Postal code",
+    "labelCity": "City",
+    "differentDeliveryLabel": "Different delivery address",
+    "labelDeliveryAddress": "Delivery address",
+    "labelDeliveryPostcode": "Delivery postal code",
+    "labelDeliveryCity": "Delivery city",
+    "labelCompanyName": "Company name",
+    "labelKvk": "Chamber of Commerce no.",
+    "labelContactPerson": "Contact person",
+    "submit": "Send request",
+    "confirmationTitle": "Request received",
+    "confirmationMessage": "We'll get in touch within 2 business days."
   }
 }

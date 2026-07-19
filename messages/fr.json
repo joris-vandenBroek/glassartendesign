@@ -114,5 +114,28 @@
     "formMessage": "Message",
     "formSubmit": "Envoyer",
     "formSubmitted": "Envoyé !"
+  },
+  "registrationPage": {
+    "title": "Devenir client",
+    "intro": "Demandez un compte client, nous vous contacterons ensuite.",
+    "typeParticulier": "Particulier",
+    "typeZakelijk": "Professionnel",
+    "labelName": "Nom",
+    "labelEmail": "Adresse e-mail",
+    "labelPhone": "Numéro de téléphone",
+    "labelPassword": "Mot de passe",
+    "labelAddress": "Adresse",
+    "labelPostcode": "Code postal",
+    "labelCity": "Ville",
+    "differentDeliveryLabel": "Adresse de livraison différente",
+    "labelDeliveryAddress": "Adresse de livraison",
+    "labelDeliveryPostcode": "Code postal de livraison",
+    "labelDeliveryCity": "Ville de livraison",
+    "labelCompanyName": "Nom de l'entreprise",
+    "labelKvk": "Numéro de registre du commerce",
+    "labelContactPerson": "Personne de contact",
+    "submit": "Envoyer la demande",
+    "confirmationTitle": "Demande reçue",
+    "confirmationMessage": "Nous vous contacterons sous 2 jours ouvrés."
   }
 }

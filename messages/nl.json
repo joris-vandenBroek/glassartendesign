@@ -114,5 +114,28 @@
     "formMessage": "Bericht",
     "formSubmit": "Versturen",
     "formSubmitted": "Verzonden!"
+  },
+  "registrationPage": {
+    "title": "Word klant",
+    "intro": "Vraag een klantaccount aan, wij nemen daarna contact met u op.",
+    "typeParticulier": "Particulier",
+    "typeZakelijk": "Zakelijk",
+    "labelName": "Naam",
+    "labelEmail": "E-mailadres",
+    "labelPhone": "Telefoonnummer",
+    "labelPassword": "Wachtwoord",
+    "labelAddress": "Adres",
+    "labelPostcode": "Postcode",
+    "labelCity": "Plaats",
+    "differentDeliveryLabel": "Afwijkend afleveradres",
+    "labelDeliveryAddress": "Afleveradres",
+    "labelDeliveryPostcode": "Afleverpostcode",
+    "labelDeliveryCity": "Afleverplaats",
+    "labelCompanyName": "Bedrijfsnaam",
+    "labelKvk": "KvK-nummer",
+    "labelContactPerson": "Contactpersoon",
+    "submit": "Aanvraag versturen",
+    "confirmationTitle": "Aanvraag ontvangen",
+    "confirmationMessage": "We nemen binnen 2 werkdagen contact met u op."
   }
 }
