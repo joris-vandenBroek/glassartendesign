@@ -11,9 +11,16 @@ export function RegistrationForm() {
   const [showDeliveryAddress, setShowDeliveryAddress] = useState(false);
   const [showInvoiceAddress, setShowInvoiceAddress] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    if (formData.get('password') !== formData.get('passwordConfirm')) {
+      setPasswordError(t('passwordMismatch'));
+      return;
+    }
+    setPasswordError(null);
     setIsSubmitted(true);
   }
 
@@ -102,6 +109,23 @@ export function RegistrationForm() {
       </label>
 
       <label className={labelClassName}>
+        {t('labelContactPreference')}
+        <select
+          name="contactPreference"
+          defaultValue=""
+          data-testid="word-klant-contact-preference"
+          className={fieldClassName}
+        >
+          <option value="" disabled>
+            {t('labelContactPreference')}
+          </option>
+          <option value="email">{t('contactPreferenceEmail')}</option>
+          <option value="phone">{t('contactPreferencePhone')}</option>
+          <option value="whatsapp">{t('contactPreferenceWhatsapp')}</option>
+        </select>
+      </label>
+
+      <label className={labelClassName}>
         {t('labelPassword')}
         <input
           type="password"
@@ -111,6 +135,23 @@ export function RegistrationForm() {
           className={fieldClassName}
         />
       </label>
+
+      <label className={labelClassName}>
+        {t('labelPasswordConfirm')}
+        <input
+          type="password"
+          name="passwordConfirm"
+          required
+          data-testid="word-klant-password-confirm"
+          className={fieldClassName}
+        />
+      </label>
+
+      {passwordError && (
+        <p data-testid="word-klant-password-error" className="text-xs text-red-400">
+          {passwordError}
+        </p>
+      )}
 
       <label className={labelClassName}>
         {t('labelAddress')}
