@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { STANDARD_SIZES } from '@/data/sizes';
 import { useCart } from '@/lib/useCart';
@@ -20,6 +20,7 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
   const [quantity, setQuantity] = useState(1);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { addItem } = useCart();
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!image) {
@@ -28,6 +29,18 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
     setSize(STANDARD_SIZES[0]);
     setQuantity(1);
     setIsConfirmed(false);
+  }, [image]);
+
+  // Ensure a pending "close after confirm" timer never fires for a stale
+  // product: clear it whenever `image` changes to a different value, and
+  // on unmount.
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+        closeTimeoutRef.current = null;
+      }
+    };
   }, [image]);
 
   useEffect(() => {
@@ -50,6 +63,9 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
   }
 
   function handleConfirm() {
+    if (isConfirmed) {
+      return;
+    }
     addItem({
       segmentSlug: image.segmentSlug,
       segmentMessageKey: image.segmentMessageKey,
@@ -58,7 +74,8 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
       quantity,
     });
     setIsConfirmed(true);
-    setTimeout(() => {
+    closeTimeoutRef.current = setTimeout(() => {
+      closeTimeoutRef.current = null;
       onClose();
     }, CONFIRM_FEEDBACK_MS);
   }
@@ -134,9 +151,10 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
             type="button"
             data-testid="product-modal-confirm"
             onClick={handleConfirm}
+            disabled={isConfirmed}
             className={`rounded-sm px-4 py-2.5 text-xs tracking-[0.15em] transition ${
               isConfirmed
-                ? 'bg-green-500 text-white'
+                ? 'cursor-default bg-green-500 text-white'
                 : 'bg-gold text-ink hover:-translate-y-0.5 hover:bg-gold-bright'
             }`}
           >
