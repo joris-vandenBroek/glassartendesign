@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { SEGMENTS, getAllImages } from '@/data/segments';
-import { AddToCartButton } from './AddToCartButton';
+import { SEGMENTS, getAllImages, type SegmentImage } from '@/data/segments';
+import { ProductModal } from './ProductModal';
 
 const ALL_FILTER = 'all';
 
@@ -11,6 +11,7 @@ export function ProductsGrid() {
   const tSegments = useTranslations('segments');
   const tCollections = useTranslations('collectionsPage');
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
+  const [selectedImage, setSelectedImage] = useState<SegmentImage | null>(null);
   const allImages = useMemo(() => getAllImages(), []);
 
   const visibleImages =
@@ -58,7 +59,8 @@ export function ProductsGrid() {
           <div
             key={image.id}
             data-testid="product-card"
-            className="relative overflow-hidden rounded border border-white/10"
+            onClick={() => setSelectedImage(image)}
+            className="relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:brightness-110"
           >
             <img
               src={image.src}
@@ -68,14 +70,11 @@ export function ProductsGrid() {
             <span className="absolute left-2 top-2 rounded-sm bg-black/70 px-2 py-1 text-[0.6rem] uppercase tracking-wide text-white">
               {tSegments(`${image.segmentMessageKey}.title`)}
             </span>
-            <AddToCartButton
-              segmentSlug={image.segmentSlug}
-              segmentMessageKey={image.segmentMessageKey}
-              imageSrc={image.src}
-            />
           </div>
         ))}
       </div>
+
+      <ProductModal image={selectedImage} onClose={() => setSelectedImage(null)} />
     </>
   );
 }

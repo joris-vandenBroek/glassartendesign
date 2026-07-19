@@ -49,10 +49,18 @@ describe('ProductsGrid', () => {
     expect(screen.getByTestId('filter-all')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('renders an add-to-cart button on every visible product card', () => {
+  it('opens the product modal when a card is clicked, closed by default', () => {
     renderProductsGrid();
-    expect(screen.getAllByTestId('add-to-cart-button')).toHaveLength(36);
-    fireEvent.click(screen.getByTestId('filter-wellness'));
-    expect(screen.getAllByTestId('add-to-cart-button')).toHaveLength(6);
+    expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
+    fireEvent.click(screen.getAllByTestId('product-card')[0]);
+    expect(screen.getByTestId('product-modal')).toBeInTheDocument();
+  });
+
+  it('closes the product modal when its backdrop is clicked', () => {
+    renderProductsGrid();
+    fireEvent.click(screen.getAllByTestId('product-card')[0]);
+    expect(screen.getByTestId('product-modal')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('product-modal-backdrop'));
+    expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
   });
 });
