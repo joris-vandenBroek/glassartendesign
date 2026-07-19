@@ -9,7 +9,7 @@ export function FeaturedWorks() {
   const t = useTranslations('works');
 
   return (
-    <GlassPanel>
+    <GlassPanel className="!max-w-5xl">
       <p className="text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
         {t('label')}
       </p>

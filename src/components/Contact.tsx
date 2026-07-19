@@ -7,7 +7,7 @@ export function Contact() {
   const t = useTranslations('contact');
 
   return (
-    <GlassPanel id="contact" className="text-center">
+    <GlassPanel id="contact" className="!max-w-5xl text-center">
       <p className="text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
         {t('label')}
       </p>

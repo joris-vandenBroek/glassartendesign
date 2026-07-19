@@ -12,7 +12,7 @@ describe('LocalePage', () => {
       </NextIntlClientProvider>
     );
 
-    expect(screen.getByText('Kunst op glas,')).toBeInTheDocument();
+    expect(screen.getByText('Kunst op glas')).toBeInTheDocument();
     expect(screen.getByText('Over ons')).toBeInTheDocument();
     expect(screen.getByText('Waarom Glassart & Design')).toBeInTheDocument();
     expect(screen.getByText('Uitgelichte werken')).toBeInTheDocument();

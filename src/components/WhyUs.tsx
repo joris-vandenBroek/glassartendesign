@@ -87,7 +87,7 @@ export function WhyUs() {
   const t = useTranslations('whyUs');
 
   return (
-    <GlassPanel>
+    <GlassPanel className="!max-w-5xl">
       <p className="text-center text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
         {t('title')}
       </p>
