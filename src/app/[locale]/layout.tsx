@@ -6,6 +6,7 @@ import { NavBar } from '@/components/NavBar';
 import { MockAuthProvider } from '@/lib/useMockAuth';
 import { CartProvider } from '@/lib/useCart';
 import { OrdersProvider } from '@/lib/useOrders';
+import { ReturnsProvider } from '@/lib/useReturns';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -30,8 +31,10 @@ export default async function LocaleLayout({
       <MockAuthProvider>
         <CartProvider>
           <OrdersProvider>
-            <NavBar />
-            {children}
+            <ReturnsProvider>
+              <NavBar />
+              {children}
+            </ReturnsProvider>
           </OrdersProvider>
         </CartProvider>
       </MockAuthProvider>
