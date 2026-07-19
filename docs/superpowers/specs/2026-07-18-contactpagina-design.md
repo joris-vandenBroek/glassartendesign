@@ -10,9 +10,14 @@ Bezoekers kunnen op één centrale plek alle manieren vinden om contact op te ne
 
 ## Inhoud — linkerkolom
 
-- Bezoekadres (placeholder) + link "Plan route" (Google Maps) + ingesloten kaart (Google Maps embed, placeholder locatie).
-- Telefoonnummer (placeholder, `tel:`-link).
-- E-mailadres (bestaande `info@glassartanddesign.nl`, `mailto:`-link).
+> **Bijgewerkt:** de klant heeft de echte bedrijfsgegevens aangeleverd (brochure, 2026-07-18). Adres, e-mailadres en de twee contactpersonen zijn nu echte gegevens, geen placeholders meer. WhatsApp-nummer, openingstijden en KvK/BTW/IBAN zijn niet aangeleverd en blijven placeholders.
+
+- Bezoekadres: **Den Heuvel 21, 5688 EM Oirschot** + link "Plan route" (Google Maps) + ingesloten kaart (Google Maps embed op dit adres).
+- Twee contactpersonen, net als in de brochure (niet één generiek telefoonnummer):
+  - **Paul van den Hout** — 06 51404089 — voor projecten, hotels etc.
+  - **Hem Brekoo** — 06 53736756 — voor zakelijke klanten (B2B)
+  - Beide telefoonnummers als `tel:`-link.
+- E-mailadres: **info@glassartdesign.nl** (gecorrigeerd — de site gebruikte per abuis `info@glassartanddesign.nl`, met "and"), `mailto:`-link.
 - WhatsApp-knop/link (placeholder nummer, `https://wa.me/<nummer>`-link, opent WhatsApp-chat).
 - Openingstijden (placeholder).
 - Bedrijfsgegevens-blok: KvK-nummer, BTW-nummer, IBAN (alle placeholders).
