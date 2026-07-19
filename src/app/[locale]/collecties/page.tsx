@@ -2,7 +2,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { GlassPanel } from '@/components/GlassPanel';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { BecomeClientCta } from '@/components/BecomeClientCta';
-import { BASE_PATH } from '@/lib/basePath';
 
 export default async function CollectiesPage({
   params,
@@ -12,7 +11,6 @@ export default async function CollectiesPage({
   const { locale } = params;
   setRequestLocale(locale);
   const t = await getTranslations('collectionsPage');
-  const contactHref = `${BASE_PATH}/${locale}/#contact`;
 
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-ink via-charcoal to-graphite px-4 pb-16 pt-24 sm:px-8">
@@ -24,7 +22,7 @@ export default async function CollectiesPage({
       <ProductsGrid />
 
       <div className="mx-auto mt-10 max-w-3xl text-center">
-        <BecomeClientCta contactHref={contactHref} />
+        <BecomeClientCta />
       </div>
     </main>
   );
