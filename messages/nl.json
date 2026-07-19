@@ -23,7 +23,8 @@
     "becomeClient": "Word klant",
     "login": "Inloggen",
     "logout": "Uitloggen",
-    "myOrders": "Mijn bestellingen"
+    "myOrders": "Mijn bestellingen",
+    "myAccount": "Mijn account"
   },
   "collectionsPage": {
     "title": "Collecties",
@@ -179,6 +180,70 @@
         "name": "Akoestische stof",
         "description": "Verbetert de akoestiek en geeft een warme, moderne uitstraling."
       }
+    }
+  },
+  "accountPage": {
+    "navOrders": "Bestellingen",
+    "navInvoicesDue": "Te betalen facturen",
+    "navInvoicesPaid": "Betaalde facturen",
+    "navReturns": "Retourneren",
+    "navConversations": "Gesprekgeschiedenis",
+    "navSettings": "Instellingen",
+    "logout": "Uitloggen",
+    "invoices": {
+      "empty": "Geen facturen gevonden.",
+      "downloadPdf": "Download PDF",
+      "items": {
+        "invoice1": { "description": "Hotel lobby set – 3 panelen" },
+        "invoice2": { "description": "Abstract paneel 60x90cm" },
+        "invoice3": { "description": "Kantoorproject – 5 panelen" },
+        "invoice4": { "description": "Wellness paneel 40x60cm" },
+        "invoice5": { "description": "Restaurant wandpaneel 80x120cm" },
+        "invoice6": { "description": "Losse haken set" }
+      }
+    },
+    "returns": {
+      "selectOrderLabel": "Selecteer een bestelling",
+      "reasonLabel": "Reden",
+      "reasonDamaged": "Beschadigd",
+      "reasonNotAsExpected": "Voldoet niet aan verwachting",
+      "reasonWrongOrder": "Verkeerd besteld",
+      "reasonOther": "Anders",
+      "noteLabel": "Toelichting",
+      "submit": "Meld aan voor retour",
+      "confirmationTitle": "Retour aangemeld",
+      "confirmationMessage": "We nemen contact met u op over de afhandeling.",
+      "noEligibleOrders": "Er zijn geen bestellingen beschikbaar om te retourneren.",
+      "existingReturnsTitle": "Eerder aangemelde retouren",
+      "statusRegistered": "Retour aangemeld"
+    },
+    "conversations": {
+      "empty": "Geen gesprekken gevonden.",
+      "items": {
+        "conversation1": { "topic": "Vraag over levertijd" },
+        "conversation2": { "topic": "Offerte hotelproject" },
+        "conversation3": { "topic": "Vraag over montage" },
+        "conversation4": { "topic": "Wijziging afleveradres" }
+      }
+    },
+    "settings": {
+      "labelCompanyName": "Bedrijfsnaam",
+      "labelContactPerson": "Contactpersoon",
+      "labelEmail": "E-mailadres",
+      "labelPhone": "Telefoonnummer",
+      "labelAddress": "Adres",
+      "labelPostcode": "Postcode",
+      "labelCity": "Plaats",
+      "labelContactPreference": "Hoe wilt u gecontacteerd worden?",
+      "contactPreferenceEmail": "E-mail",
+      "contactPreferencePhone": "Telefonisch",
+      "contactPreferenceWhatsapp": "WhatsApp",
+      "labelLanguagePreference": "Taalvoorkeur",
+      "labelPassword": "Wachtwoord",
+      "labelPasswordConfirm": "Wachtwoord opnieuw",
+      "passwordMismatch": "Wachtwoorden komen niet overeen.",
+      "save": "Opslaan",
+      "saved": "Opgeslagen!"
     }
   }
 }

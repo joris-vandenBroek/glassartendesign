@@ -23,7 +23,8 @@
     "becomeClient": "Kunde werden",
     "login": "Anmelden",
     "logout": "Abmelden",
-    "myOrders": "Meine Bestellungen"
+    "myOrders": "Meine Bestellungen",
+    "myAccount": "Mein Konto"
   },
   "collectionsPage": {
     "title": "Kollektionen",
@@ -179,6 +180,70 @@
         "name": "Akustikstoff",
         "description": "Verbessert die Akustik und sorgt für ein warmes, modernes Erscheinungsbild."
       }
+    }
+  },
+  "accountPage": {
+    "navOrders": "Bestellungen",
+    "navInvoicesDue": "Offene Rechnungen",
+    "navInvoicesPaid": "Bezahlte Rechnungen",
+    "navReturns": "Retouren",
+    "navConversations": "Gesprächsverlauf",
+    "navSettings": "Einstellungen",
+    "logout": "Abmelden",
+    "invoices": {
+      "empty": "Keine Rechnungen gefunden.",
+      "downloadPdf": "PDF herunterladen",
+      "items": {
+        "invoice1": { "description": "Hotel-Lobby-Set – 3 Paneele" },
+        "invoice2": { "description": "Abstraktes Panel 60x90cm" },
+        "invoice3": { "description": "Büroprojekt – 5 Paneele" },
+        "invoice4": { "description": "Wellness-Panel 40x60cm" },
+        "invoice5": { "description": "Restaurant-Wandpaneel 80x120cm" },
+        "invoice6": { "description": "Lose Haken-Set" }
+      }
+    },
+    "returns": {
+      "selectOrderLabel": "Bestellung auswählen",
+      "reasonLabel": "Grund",
+      "reasonDamaged": "Beschädigt",
+      "reasonNotAsExpected": "Entspricht nicht den Erwartungen",
+      "reasonWrongOrder": "Versehentlich bestellt",
+      "reasonOther": "Sonstiges",
+      "noteLabel": "Anmerkung",
+      "submit": "Für Retoure anmelden",
+      "confirmationTitle": "Retoure angemeldet",
+      "confirmationMessage": "Wir melden uns bezüglich der weiteren Schritte.",
+      "noEligibleOrders": "Es sind keine Bestellungen für eine Retoure verfügbar.",
+      "existingReturnsTitle": "Bisher angemeldete Retouren",
+      "statusRegistered": "Retoure angemeldet"
+    },
+    "conversations": {
+      "empty": "Keine Gespräche gefunden.",
+      "items": {
+        "conversation1": { "topic": "Frage zur Lieferzeit" },
+        "conversation2": { "topic": "Angebot Hotelprojekt" },
+        "conversation3": { "topic": "Frage zur Montage" },
+        "conversation4": { "topic": "Änderung der Lieferadresse" }
+      }
+    },
+    "settings": {
+      "labelCompanyName": "Firmenname",
+      "labelContactPerson": "Ansprechpartner",
+      "labelEmail": "E-Mail-Adresse",
+      "labelPhone": "Telefonnummer",
+      "labelAddress": "Adresse",
+      "labelPostcode": "Postleitzahl",
+      "labelCity": "Ort",
+      "labelContactPreference": "Wie möchten Sie kontaktiert werden?",
+      "contactPreferenceEmail": "E-Mail",
+      "contactPreferencePhone": "Telefonisch",
+      "contactPreferenceWhatsapp": "WhatsApp",
+      "labelLanguagePreference": "Sprachpräferenz",
+      "labelPassword": "Passwort",
+      "labelPasswordConfirm": "Passwort wiederholen",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+      "save": "Speichern",
+      "saved": "Gespeichert!"
     }
   }
 }

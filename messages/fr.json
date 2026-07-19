@@ -23,7 +23,8 @@
     "becomeClient": "Devenir client",
     "login": "Connexion",
     "logout": "Déconnexion",
-    "myOrders": "Mes commandes"
+    "myOrders": "Mes commandes",
+    "myAccount": "Mon compte"
   },
   "collectionsPage": {
     "title": "Collections",
@@ -179,6 +180,70 @@
         "name": "Tissu acoustique",
         "description": "Améliore l'acoustique et apporte une touche chaleureuse et moderne."
       }
+    }
+  },
+  "accountPage": {
+    "navOrders": "Commandes",
+    "navInvoicesDue": "Factures à payer",
+    "navInvoicesPaid": "Factures payées",
+    "navReturns": "Retours",
+    "navConversations": "Historique des conversations",
+    "navSettings": "Paramètres",
+    "logout": "Déconnexion",
+    "invoices": {
+      "empty": "Aucune facture trouvée.",
+      "downloadPdf": "Télécharger le PDF",
+      "items": {
+        "invoice1": { "description": "Ensemble hall d'hôtel – 3 panneaux" },
+        "invoice2": { "description": "Panneau abstrait 60x90cm" },
+        "invoice3": { "description": "Projet de bureau – 5 panneaux" },
+        "invoice4": { "description": "Panneau bien-être 40x60cm" },
+        "invoice5": { "description": "Panneau mural restaurant 80x120cm" },
+        "invoice6": { "description": "Jeu de crochets supplémentaires" }
+      }
+    },
+    "returns": {
+      "selectOrderLabel": "Sélectionnez une commande",
+      "reasonLabel": "Motif",
+      "reasonDamaged": "Endommagé",
+      "reasonNotAsExpected": "Ne correspond pas aux attentes",
+      "reasonWrongOrder": "Commandé par erreur",
+      "reasonOther": "Autre",
+      "noteLabel": "Remarque",
+      "submit": "Signaler pour retour",
+      "confirmationTitle": "Retour enregistré",
+      "confirmationMessage": "Nous vous contacterons pour la suite.",
+      "noEligibleOrders": "Aucune commande n'est disponible pour un retour.",
+      "existingReturnsTitle": "Retours signalés précédemment",
+      "statusRegistered": "Retour enregistré"
+    },
+    "conversations": {
+      "empty": "Aucune conversation trouvée.",
+      "items": {
+        "conversation1": { "topic": "Question sur le délai de livraison" },
+        "conversation2": { "topic": "Devis projet hôtel" },
+        "conversation3": { "topic": "Question sur le montage" },
+        "conversation4": { "topic": "Changement d'adresse de livraison" }
+      }
+    },
+    "settings": {
+      "labelCompanyName": "Nom de l'entreprise",
+      "labelContactPerson": "Personne de contact",
+      "labelEmail": "Adresse e-mail",
+      "labelPhone": "Numéro de téléphone",
+      "labelAddress": "Adresse",
+      "labelPostcode": "Code postal",
+      "labelCity": "Ville",
+      "labelContactPreference": "Comment souhaitez-vous être contacté(e) ?",
+      "contactPreferenceEmail": "E-mail",
+      "contactPreferencePhone": "Téléphone",
+      "contactPreferenceWhatsapp": "WhatsApp",
+      "labelLanguagePreference": "Préférence linguistique",
+      "labelPassword": "Mot de passe",
+      "labelPasswordConfirm": "Confirmer le mot de passe",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "save": "Enregistrer",
+      "saved": "Enregistré !"
     }
   }
 }

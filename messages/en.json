@@ -23,7 +23,8 @@
     "becomeClient": "Become a client",
     "login": "Log in",
     "logout": "Log out",
-    "myOrders": "My orders"
+    "myOrders": "My orders",
+    "myAccount": "My account"
   },
   "collectionsPage": {
     "title": "Collections",
@@ -179,6 +180,70 @@
         "name": "Acoustic fabric",
         "description": "Improves acoustics and adds a warm, modern look."
       }
+    }
+  },
+  "accountPage": {
+    "navOrders": "Orders",
+    "navInvoicesDue": "Invoices due",
+    "navInvoicesPaid": "Paid invoices",
+    "navReturns": "Returns",
+    "navConversations": "Conversation history",
+    "navSettings": "Settings",
+    "logout": "Log out",
+    "invoices": {
+      "empty": "No invoices found.",
+      "downloadPdf": "Download PDF",
+      "items": {
+        "invoice1": { "description": "Hotel lobby set – 3 panels" },
+        "invoice2": { "description": "Abstract panel 60x90cm" },
+        "invoice3": { "description": "Office project – 5 panels" },
+        "invoice4": { "description": "Wellness panel 40x60cm" },
+        "invoice5": { "description": "Restaurant wall panel 80x120cm" },
+        "invoice6": { "description": "Loose hooks set" }
+      }
+    },
+    "returns": {
+      "selectOrderLabel": "Select an order",
+      "reasonLabel": "Reason",
+      "reasonDamaged": "Damaged",
+      "reasonNotAsExpected": "Not as expected",
+      "reasonWrongOrder": "Ordered by mistake",
+      "reasonOther": "Other",
+      "noteLabel": "Note",
+      "submit": "Register for return",
+      "confirmationTitle": "Return registered",
+      "confirmationMessage": "We'll get in touch about the next steps.",
+      "noEligibleOrders": "No orders are available for return.",
+      "existingReturnsTitle": "Previously registered returns",
+      "statusRegistered": "Return registered"
+    },
+    "conversations": {
+      "empty": "No conversations found.",
+      "items": {
+        "conversation1": { "topic": "Question about delivery time" },
+        "conversation2": { "topic": "Hotel project quote" },
+        "conversation3": { "topic": "Question about mounting" },
+        "conversation4": { "topic": "Delivery address change" }
+      }
+    },
+    "settings": {
+      "labelCompanyName": "Company name",
+      "labelContactPerson": "Contact person",
+      "labelEmail": "Email address",
+      "labelPhone": "Phone number",
+      "labelAddress": "Address",
+      "labelPostcode": "Postal code",
+      "labelCity": "City",
+      "labelContactPreference": "How would you like to be contacted?",
+      "contactPreferenceEmail": "Email",
+      "contactPreferencePhone": "Phone",
+      "contactPreferenceWhatsapp": "WhatsApp",
+      "labelLanguagePreference": "Language preference",
+      "labelPassword": "Password",
+      "labelPasswordConfirm": "Confirm password",
+      "passwordMismatch": "Passwords do not match.",
+      "save": "Save",
+      "saved": "Saved!"
     }
   }
 }
