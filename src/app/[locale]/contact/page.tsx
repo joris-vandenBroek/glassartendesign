@@ -20,10 +20,10 @@ export default async function ContactPage({
       </GlassPanel>
 
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-2">
-        <GlassPanel>
+        <GlassPanel className="w-full">
           <ContactInfo />
         </GlassPanel>
-        <GlassPanel>
+        <GlassPanel className="w-full">
           <ContactForm />
         </GlassPanel>
       </div>
