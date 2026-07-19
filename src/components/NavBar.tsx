@@ -1,18 +1,15 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useMockAuth } from '@/lib/useMockAuth';
-import { BASE_PATH } from '@/lib/basePath';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { AccountMenu } from './AccountMenu';
 import { CartPanel } from './CartPanel';
 
 export function NavBar() {
-  const locale = useLocale();
   const t = useTranslations('nav');
   const { isLoggedIn, isHydrated, login } = useMockAuth();
-  const contactHref = `${BASE_PATH}/${locale}/#contact`;
 
   return (
     <nav
@@ -36,13 +33,13 @@ export function NavBar() {
           <AccountMenu />
         ) : (
           <>
-            <a
-              href={contactHref}
+            <Link
+              href="/word-klant"
               data-testid="nav-become-client"
               className="hidden text-xs tracking-[0.15em] text-white/70 hover:text-white sm:inline"
             >
               {t('becomeClient')}
-            </a>
+            </Link>
             <button
               type="button"
               data-testid="nav-login"

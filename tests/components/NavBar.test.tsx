@@ -59,9 +59,9 @@ describe('NavBar', () => {
     expect(screen.queryByTestId('nav-login')).not.toBeInTheDocument();
   });
 
-  it('points Contact at the /contact page, and Word klant at the homepage contact anchor', () => {
+  it('points Contact at /contact and Word klant at /word-klant', () => {
     renderNavBar();
     expect(screen.getByTestId('nav-contact')).toHaveAttribute('href', '/contact');
-    expect(screen.getByTestId('nav-become-client')).toHaveAttribute('href', '/nl/#contact');
+    expect(screen.getByTestId('nav-become-client')).toHaveAttribute('href', '/word-klant');
   });
 });
