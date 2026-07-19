@@ -64,4 +64,9 @@ describe('NavBar', () => {
     expect(screen.getByTestId('nav-contact')).toHaveAttribute('href', '/contact');
     expect(screen.getByTestId('nav-become-client')).toHaveAttribute('href', '/word-klant');
   });
+
+  it('renders the logo linking to the homepage', () => {
+    renderNavBar();
+    expect(screen.getByTestId('logo')).toHaveAttribute('href', '/');
+  });
 });
