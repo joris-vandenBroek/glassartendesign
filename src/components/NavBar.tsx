@@ -26,9 +26,9 @@ export function NavBar() {
         <Link href="/collecties" data-testid="nav-collections" className="hover:text-white">
           {t('collections')}
         </Link>
-        <a href={contactHref} data-testid="nav-contact" className="hover:text-white">
+        <Link href="/contact" data-testid="nav-contact" className="hover:text-white">
           {t('contact')}
-        </a>
+        </Link>
       </div>
 
       <div className="flex items-center gap-3">
