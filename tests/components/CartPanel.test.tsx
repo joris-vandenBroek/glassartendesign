@@ -98,4 +98,39 @@ describe('CartPanel', () => {
     fireEvent.click(screen.getByTestId('cart-icon'));
     expect(screen.getByTestId('cart-place-order')).toBeDisabled();
   });
+
+  it('closes the panel when Escape is pressed', () => {
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    expect(screen.getByTestId('cart-panel')).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByTestId('cart-panel')).not.toBeInTheDocument();
+  });
+
+  it('closes the panel when the backdrop is clicked', () => {
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    fireEvent.click(screen.getByTestId('cart-backdrop'));
+    expect(screen.queryByTestId('cart-panel')).not.toBeInTheDocument();
+  });
+
+  it('empties the cart via "Bestelling leegmaken" without placing an order, and keeps the panel open', () => {
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    fireEvent.click(screen.getByTestId('cart-clear'));
+
+    expect(screen.getByTestId('cart-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('cart-empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('cart-badge')).not.toBeInTheDocument();
+
+    const placedOrders = JSON.parse(screen.getByTestId('orders-probe').textContent ?? '[]');
+    expect(placedOrders).toHaveLength(0);
+  });
+
+  it('disables "Bestelling leegmaken" when the cart is empty', () => {
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    expect(screen.getByTestId('cart-clear')).toBeDisabled();
+  });
 });

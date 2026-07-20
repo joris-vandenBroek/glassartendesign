@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useCart } from '@/lib/useCart';
 import { useOrders } from '@/lib/useOrders';
+import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 
 export function CartPanel() {
   const t = useTranslations('cart');
@@ -11,6 +12,15 @@ export function CartPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const { items, isHydrated, totalQuantity, removeItem, clear } = useCart();
   const { placeOrder } = useOrders();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useOverlayDismiss({
+    isOpen,
+    onClose: () => setIsOpen(false),
+    containerRef: panelRef,
+    initialFocusRef: closeButtonRef,
+  });
 
   function handlePlaceOrder() {
     const description = items
@@ -44,55 +54,92 @@ export function CartPanel() {
       </button>
 
       {isOpen && (
-        <div
-          data-testid="cart-panel"
-          className="absolute right-0 top-full mt-2 w-80 rounded-md border border-white/10 bg-black/90 p-3"
-        >
-          <p className="mb-2 text-[0.65rem] uppercase tracking-[0.2em] text-white/50">
-            {t('title')}
-          </p>
-          {items.length === 0 ? (
-            <p data-testid="cart-empty" className="text-xs text-white/60">
-              {t('empty')}
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-3">
-              {items.map((item) => (
-                <li
-                  key={item.id}
-                  data-testid={`cart-item-${item.id}`}
-                  className="flex gap-2 text-xs text-white/80"
-                >
-                  <img src={item.imageSrc} alt="" className="h-12 w-12 rounded object-cover" />
-                  <div className="flex-1">
-                    <p>{tSegments(`${item.segmentMessageKey}.title`)}</p>
-                    <p className="text-white/50">
-                      {item.size} · ×{item.quantity}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    data-testid={`cart-item-remove-${item.id}`}
-                    onClick={() => removeItem(item.id)}
-                    aria-label={t('remove')}
-                    className="text-white/50 hover:text-white"
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <button
-            type="button"
-            data-testid="cart-place-order"
-            disabled={items.length === 0}
-            onClick={handlePlaceOrder}
-            className="mt-3 w-full rounded-sm bg-silver px-3 py-1.5 text-xs tracking-wide text-ink disabled:opacity-40"
+        <>
+          <div
+            data-testid="cart-backdrop"
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          />
+          <div
+            ref={panelRef}
+            data-testid="cart-panel"
+            role="dialog"
+            aria-modal="true"
+            className="fixed bottom-0 right-0 top-0 z-50 flex w-full max-w-[400px] flex-col border-l border-white/10 bg-charcoal"
           >
-            {t('placeOrder')}
-          </button>
-        </div>
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+              <p className="font-head text-[0.65rem] uppercase tracking-[0.2em] text-white/50">
+                {t('title')}
+              </p>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                data-testid="cart-close"
+                aria-label={t('close')}
+                onClick={() => setIsOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:text-white"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              {items.length === 0 ? (
+                <p data-testid="cart-empty" className="text-center text-xs text-white/60">
+                  {t('empty')}
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {items.map((item) => (
+                    <li
+                      key={item.id}
+                      data-testid={`cart-item-${item.id}`}
+                      className="flex gap-3 rounded-md border border-white/10 bg-graphite/60 p-3 text-xs text-white/80"
+                    >
+                      <img src={item.imageSrc} alt="" className="h-12 w-12 rounded object-cover" />
+                      <div className="flex-1">
+                        <p>{tSegments(`${item.segmentMessageKey}.title`)}</p>
+                        <p className="text-white/50">
+                          {item.size} · ×{item.quantity}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        data-testid={`cart-item-remove-${item.id}`}
+                        onClick={() => removeItem(item.id)}
+                        aria-label={t('remove')}
+                        className="text-white/50 hover:text-white"
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2 border-t border-white/10 px-5 py-4">
+              <button
+                type="button"
+                data-testid="cart-place-order"
+                disabled={items.length === 0}
+                onClick={handlePlaceOrder}
+                className="btn-gold w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide disabled:opacity-40"
+              >
+                {t('placeOrder')}
+              </button>
+              <button
+                type="button"
+                data-testid="cart-clear"
+                disabled={items.length === 0}
+                onClick={clear}
+                className="text-xs text-white/50 transition hover:text-red-400 disabled:opacity-40"
+              >
+                {t('clearOrder')}
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
