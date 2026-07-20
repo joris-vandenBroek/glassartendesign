@@ -6,3 +6,4 @@ out/
 next-env.d.ts
 tsconfig.tsbuildinfo
 .claude/
+.env*.local
