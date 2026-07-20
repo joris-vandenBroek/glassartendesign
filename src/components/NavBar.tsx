@@ -9,7 +9,7 @@ import { CartPanel } from './CartPanel';
 
 export function NavBar() {
   const t = useTranslations('nav');
-  const { isLoggedIn, isHydrated, login } = useMockAuth();
+  const { isLoggedIn, isHydrated } = useMockAuth();
 
   return (
     <nav
@@ -50,14 +50,13 @@ export function NavBar() {
             >
               {t('becomeClient')}
             </Link>
-            <button
-              type="button"
+            <Link
+              href="/inloggen"
               data-testid="nav-login"
-              onClick={login}
               className="btn-gold rounded-sm px-4 py-2 text-xs font-head tracking-[0.15em]"
             >
               {t('login')}
-            </button>
+            </Link>
           </>
         )}
         <Link
