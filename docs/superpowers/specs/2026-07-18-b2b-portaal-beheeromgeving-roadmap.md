@@ -8,11 +8,12 @@ Zodra dit deelproject aan de beurt is, doorloopt het alsnog het volledige trajec
 
 ## Beheerfunctie (voor het bedrijf)
 
-- Beoordelen van nieuwe klantaanvragen (goedkeuren/afwijzen, koppelen aan een prijsgroep — zie de oorspronkelijke afspraken).
-- Beoordelen van aangevraagde bestellingen (de bestellingen die klanten vanuit het winkelmandje plaatsen, status "Aangevraagd").
+- Beoordelen van nieuwe klantaanvragen (goedkeuren/afwijzen, koppelen aan een prijsgroep — zie de oorspronkelijke afspraken) en daarmee vrijgeven dat die klant prijzen mag zien (prijzen blijven verborgen/afgeschermd totdat een klant is goedgekeurd).
+- Beoordelen van nieuwe orderaanvragen (de bestellingen die klanten vanuit het winkelmandje plaatsen, status "Aangevraagd").
 - Een order aanmaken voor de drukker op basis van een aangevraagde bestelling.
 - Zodra een bestelling is doorgezet naar de drukker: status wijzigt automatisch van "Aangevraagd" naar "In productie".
 - Factuur maken voor een bestelling, met keuze van prijsgroep (hoe dit zich verhoudt tot de per-klant-prijsgroep uit de goedkeuringsstap moet nog worden uitgewerkt bij de daadwerkelijke brainstorm/spec).
+- Betaling van een factuur kunnen afhandelen: status van de factuur wijzigen naar "Betaald".
 - Afhandelen van retouren die klanten via hun accountpagina aanmelden (de mock-versie in de huidige site registreert alleen de aanvraag zelf — een echte beheerkant om retouren te beoordelen/verwerken ontbreekt nog).
 
 ### Beheer maten, kunstwerken, segmenten en materiaalsoorten
