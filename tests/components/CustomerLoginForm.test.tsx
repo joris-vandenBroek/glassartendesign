@@ -104,4 +104,18 @@ describe('CustomerLoginForm', () => {
     );
     expect(loginMock).not.toHaveBeenCalled();
   });
+
+  it('signs out and shows generic error when getDoc fails after successful sign-in', async () => {
+    signInMock.mockResolvedValue({ user: { uid: 'uid-4' } });
+    getDocMock.mockRejectedValue(new Error('permission-denied'));
+    signOutMock.mockResolvedValue(undefined);
+    renderForm();
+    submitWith('klant@example.com', 'geheim123');
+
+    expect(await screen.findByTestId('login-error')).toHaveTextContent(
+      'E-mailadres of wachtwoord onjuist.'
+    );
+    expect(signOutMock).toHaveBeenCalledWith({});
+    expect(loginMock).not.toHaveBeenCalled();
+  });
 });

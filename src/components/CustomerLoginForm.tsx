@@ -22,20 +22,22 @@ export function CustomerLoginForm() {
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
       const uid = credential.user.uid;
-      const klantDoc = await getDoc(doc(db, 'klanten', uid));
-      const status = klantDoc.exists() ? (klantDoc.data() as { status?: string }).status : null;
+      try {
+        const klantDoc = await getDoc(doc(db, 'klanten', uid));
+        const status = klantDoc.exists() ? (klantDoc.data() as { status?: string }).status : null;
 
-      await signOut(auth);
-
-      if (status === 'Goedgekeurd') {
-        login(email, uid);
-        router.replace('/account');
-      } else if (status === 'Beoordelen') {
-        setError(t('pendingMessage'));
-      } else if (status === 'Afgewezen') {
-        setError(t('rejectedMessage'));
-      } else {
-        setError(t('loginError'));
+        if (status === 'Goedgekeurd') {
+          login(email, uid);
+          router.replace('/account');
+        } else if (status === 'Beoordelen') {
+          setError(t('pendingMessage'));
+        } else if (status === 'Afgewezen') {
+          setError(t('rejectedMessage'));
+        } else {
+          setError(t('loginError'));
+        }
+      } finally {
+        await signOut(auth);
       }
     } catch {
       setError(t('loginError'));
