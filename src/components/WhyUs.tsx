@@ -99,9 +99,11 @@ export function WhyUs() {
             <div
               key={key}
               data-testid={`usp-${key}`}
-              className="flex w-24 flex-col items-center text-center"
+              className="group flex w-24 flex-col items-center text-center"
             >
-              <Icon />
+              <div className="transition duration-300 group-hover:scale-110">
+                <Icon />
+              </div>
               <p className="mt-2 text-[0.65rem] leading-tight text-white/70">{t(`usp.${key}`)}</p>
             </div>
           );
@@ -113,7 +115,7 @@ export function WhyUs() {
           <div
             key={material.id}
             data-testid={`material-${material.id}`}
-            className="rounded-md border border-white/10 bg-graphite/60 p-4 text-center"
+            className="rounded-md border border-white/10 bg-graphite/60 p-4 text-center transition hover:-translate-y-1 hover:border-gold/40"
           >
             <p className="text-xs font-semibold text-white">
               {t(`materials.${material.messageKey}.name`)}
