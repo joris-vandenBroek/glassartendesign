@@ -6,6 +6,19 @@
 
 Zodra dit deelproject aan de beurt is, doorloopt het alsnog het volledige traject: brainstorm → architectuurkeuze (auth-provider, database, hosting die een backend ondersteunt) → spec → implementatieplan.
 
+## Website — paginastructuur en functionaliteit
+
+Voor een compleet beeld: dit is de volledige paginastructuur en functionaliteit die de website moet bieden. De echte backend/beheeromgeving hieronder moet al deze onderdelen ondersteunen, niet alleen de nieuwe beheerfunctie-punten.
+
+- **Homepage** — hero met korte pitch, "Over ons"-sectie, "Waarom Glassart & Design" met USP-iconen en een overzicht van materiaalsoorten, uitgelichte werken, contactsamenvatting.
+- **Collecties-pagina** — overzicht van kunstwerken, gefilterd per segment (Hotel, Restaurant, Wellness, Kantoor, Abstract, Artist Collections). Klikken op een kunstwerk opent een detailweergave (maat kiezen, aantal, toevoegen aan winkelmandje).
+- **Winkelmandje** — icoon met aantal-badge in de navigatiebalk, overzicht van gekozen items, bestelling plaatsen (resulteert in een orderaanvraag met status "Aangevraagd").
+- **Contactpagina** — bezoekadres met routebeschrijving, contactpersonen per doelgroep (projecten/hotels vs. zakelijke klanten), e-mail, WhatsApp, openingstijden, bedrijfsgegevens (KvK, BTW, IBAN), contactformulier.
+- **"Word klant"-pagina** — aanvraagformulier voor een nieuw klantaccount: keuze Zakelijk/Particulier (Zakelijk standaard), bedrijfsgegevens (naam, KvK, contactpersoon), adres met optioneel afwijkend aflever- en factuuradres, e-mailadres, telefoonnummer, wachtwoord (met bevestiging), voorkeur voor contactvorm (e-mail/telefonisch/WhatsApp).
+- **Klant-accountpagina** — bereikbaar via het account-icoon na inloggen, met een linker menu en zes onderdelen: Bestellingen, Te betalen facturen, Betaalde facturen, Retourneren (bestelling selecteren + reden en toelichting opgeven), Gesprekgeschiedenis (WhatsApp-gesprekken), Instellingen (klantgegevens, wachtwoord, contactvoorkeur en taalvoorkeur wijzigen).
+- **Taalkeuze** — bezoeker kan schakelen tussen Nederlands, Engels, Duits en Frans; de hele site, inclusief alle bovenstaande pagina's, moet in alle vier de talen beschikbaar zijn.
+- **Merkidentiteit** — logo en merknaam in de navigatiebalk, consistente huisstijl (zwart/zilver met goud accent) door de hele site heen.
+
 ## Beheerfunctie (voor het bedrijf)
 
 - Beoordelen van nieuwe klantaanvragen (goedkeuren/afwijzen, koppelen aan een prijsgroep — zie de oorspronkelijke afspraken) en daarmee vrijgeven dat die klant prijzen mag zien (prijzen blijven verborgen/afgeschermd totdat een klant is goedgekeurd).
