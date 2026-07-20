@@ -6,4 +6,5 @@ html,
 body {
   background-color: #060607;
   color: #f5f6f8;
+  font-family: var(--font-body);
 }

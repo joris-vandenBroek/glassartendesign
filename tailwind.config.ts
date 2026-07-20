@@ -13,6 +13,10 @@ const config: Config = {
         gold: '#D4AF37',
         'gold-bright': '#E8C468',
       },
+      fontFamily: {
+        head: ['var(--font-head)', 'sans-serif'],
+        body: ['var(--font-body)', 'sans-serif'],
+      },
     },
   },
   plugins: [],
