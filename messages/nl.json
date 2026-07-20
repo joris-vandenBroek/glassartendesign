@@ -24,7 +24,8 @@
     "login": "Inloggen",
     "logout": "Uitloggen",
     "myOrders": "Mijn bestellingen",
-    "myAccount": "Mijn account"
+    "myAccount": "Mijn account",
+    "beheer": "Beheer"
   },
   "collectionsPage": {
     "title": "Collecties",
@@ -246,5 +247,18 @@
       "save": "Opslaan",
       "saved": "Opgeslagen!"
     }
+  },
+  "beheer": {
+    "title": "Beheer",
+    "labelEmail": "E-mailadres",
+    "labelPassword": "Wachtwoord",
+    "submit": "Inloggen",
+    "loginError": "E-mailadres of wachtwoord onjuist.",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "forgotPasswordMissingEmail": "Vul eerst je e-mailadres in.",
+    "forgotPasswordSent": "Er is een e-mail verstuurd om je wachtwoord opnieuw in te stellen.",
+    "unauthorized": "Dit account heeft geen toegang tot de beheeromgeving.",
+    "loggedInAs": "Ingelogd als {email}",
+    "logout": "Uitloggen"
   }
 }
