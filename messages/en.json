@@ -254,7 +254,11 @@
       "labelPasswordConfirm": "Confirm password",
       "passwordMismatch": "Passwords do not match.",
       "save": "Save",
-      "saved": "Saved!"
+      "saved": "Saved!",
+      "deleteAccountTitle": "Delete account",
+      "deleteAccountLabelPassword": "Password (to confirm)",
+      "deleteAccountSubmit": "Permanently delete",
+      "deleteAccountError": "Incorrect password, account not deleted."
     }
   }
 }

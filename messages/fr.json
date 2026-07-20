@@ -254,7 +254,11 @@
       "labelPasswordConfirm": "Confirmer le mot de passe",
       "passwordMismatch": "Les mots de passe ne correspondent pas.",
       "save": "Enregistrer",
-      "saved": "Enregistré !"
+      "saved": "Enregistré !",
+      "deleteAccountTitle": "Supprimer le compte",
+      "deleteAccountLabelPassword": "Mot de passe (pour confirmer)",
+      "deleteAccountSubmit": "Supprimer définitivement",
+      "deleteAccountError": "Mot de passe incorrect, compte non supprimé."
     }
   }
 }

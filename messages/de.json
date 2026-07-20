@@ -254,7 +254,11 @@
       "labelPasswordConfirm": "Passwort wiederholen",
       "passwordMismatch": "Die Passwörter stimmen nicht überein.",
       "save": "Speichern",
-      "saved": "Gespeichert!"
+      "saved": "Gespeichert!",
+      "deleteAccountTitle": "Konto löschen",
+      "deleteAccountLabelPassword": "Passwort (zur Bestätigung)",
+      "deleteAccountSubmit": "Endgültig löschen",
+      "deleteAccountError": "Falsches Passwort, Konto wurde nicht gelöscht."
     }
   }
 }

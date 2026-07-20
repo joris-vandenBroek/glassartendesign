@@ -10,10 +10,15 @@ import {
   type ContactPreference,
   type LanguagePreference,
 } from '@/lib/useMockProfile';
+import { signInWithEmailAndPassword, deleteUser } from 'firebase/auth';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+import { useMockAuth } from '@/lib/useMockAuth';
 
 export function SettingsSection() {
   const t = useTranslations('accountPage.settings');
   const { profile, updateProfile } = useMockProfile();
+  const { email: authEmail, uid, logout } = useMockAuth();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -34,6 +39,8 @@ export function SettingsSection() {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,15 +71,32 @@ export function SettingsSection() {
     }
   }
 
+  async function handleDeleteAccount(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setDeleteError(null);
+    try {
+      const response = await signInWithEmailAndPassword(auth, authEmail ?? '', deletePassword);
+      await deleteDoc(doc(db, 'klanten', uid ?? ''));
+      if (response.user) {
+        await deleteUser(response.user);
+      }
+      logout();
+      router.replace('/');
+    } catch {
+      setDeleteError(t('deleteAccountError'));
+    }
+  }
+
   const fieldClassName = 'rounded-sm bg-black/40 px-3 py-2 text-sm text-white';
   const labelClassName = 'flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60';
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      data-testid="settings-section"
-      className="flex flex-col gap-4 text-sm text-white/80"
-    >
+    <div className="flex flex-col gap-8">
+      <form
+        onSubmit={handleSubmit}
+        data-testid="settings-section"
+        className="flex flex-col gap-4 text-sm text-white/80"
+      >
       <label className={labelClassName}>
         {t('labelCompanyName')}
         <input
@@ -213,6 +237,37 @@ export function SettingsSection() {
       >
         {t('save')}
       </button>
-    </form>
+      </form>
+
+      <form
+        onSubmit={handleDeleteAccount}
+        data-testid="delete-account-section"
+        className="flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-white/80"
+      >
+        <p className="text-white">{t('deleteAccountTitle')}</p>
+        <label className={labelClassName}>
+          {t('deleteAccountLabelPassword')}
+          <input
+            type="password"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            data-testid="delete-account-password"
+            className={fieldClassName}
+          />
+        </label>
+        {deleteError && (
+          <p data-testid="delete-account-error" className="text-xs text-red-400">
+            {deleteError}
+          </p>
+        )}
+        <button
+          type="submit"
+          data-testid="delete-account-submit"
+          className="self-start rounded-sm border border-red-400/40 px-4 py-2 text-xs tracking-wide text-red-400 hover:border-red-400 hover:bg-red-400/10"
+        >
+          {t('deleteAccountSubmit')}
+        </button>
+      </form>
+    </div>
   );
 }

@@ -254,7 +254,11 @@
       "labelPasswordConfirm": "Wachtwoord opnieuw",
       "passwordMismatch": "Wachtwoorden komen niet overeen.",
       "save": "Opslaan",
-      "saved": "Opgeslagen!"
+      "saved": "Opgeslagen!",
+      "deleteAccountTitle": "Account verwijderen",
+      "deleteAccountLabelPassword": "Wachtwoord (ter bevestiging)",
+      "deleteAccountSubmit": "Definitief verwijderen",
+      "deleteAccountError": "Wachtwoord onjuist, account niet verwijderd."
     }
   },
   "beheer": {
