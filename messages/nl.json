@@ -148,6 +148,15 @@
     "weakPasswordError": "Wachtwoord moet minimaal 6 tekens bevatten.",
     "submitError": "Er is iets misgegaan, probeer het opnieuw."
   },
+  "loginPage": {
+    "title": "Inloggen",
+    "labelEmail": "E-mailadres",
+    "labelPassword": "Wachtwoord",
+    "submit": "Inloggen",
+    "loginError": "E-mailadres of wachtwoord onjuist.",
+    "pendingMessage": "Uw aanvraag wordt nog beoordeeld.",
+    "rejectedMessage": "Uw aanvraag is helaas afgewezen."
+  },
   "whyUs": {
     "title": "Waarom Glassart & Design",
     "usp": {

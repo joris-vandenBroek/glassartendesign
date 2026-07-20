@@ -148,6 +148,15 @@
     "weakPasswordError": "Le mot de passe doit contenir au moins 6 caractères.",
     "submitError": "Une erreur s'est produite, veuillez réessayer."
   },
+  "loginPage": {
+    "title": "Connexion",
+    "labelEmail": "Adresse e-mail",
+    "labelPassword": "Mot de passe",
+    "submit": "Connexion",
+    "loginError": "Adresse e-mail ou mot de passe incorrect.",
+    "pendingMessage": "Votre demande est en cours d'examen.",
+    "rejectedMessage": "Malheureusement, votre demande a été refusée."
+  },
   "whyUs": {
     "title": "Pourquoi Glassart & Design",
     "usp": {

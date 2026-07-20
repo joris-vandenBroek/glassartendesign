@@ -148,6 +148,15 @@
     "weakPasswordError": "Das Passwort muss mindestens 6 Zeichen enthalten.",
     "submitError": "Etwas ist schiefgelaufen, bitte versuchen Sie es erneut."
   },
+  "loginPage": {
+    "title": "Anmelden",
+    "labelEmail": "E-Mail-Adresse",
+    "labelPassword": "Passwort",
+    "submit": "Anmelden",
+    "loginError": "E-Mail-Adresse oder Passwort falsch.",
+    "pendingMessage": "Ihre Anfrage wird noch geprüft.",
+    "rejectedMessage": "Ihre Anfrage wurde leider abgelehnt."
+  },
   "whyUs": {
     "title": "Warum Glassart & Design",
     "usp": {
