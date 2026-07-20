@@ -21,55 +21,80 @@ interface KlantAanvraag {
 export function KlantAanvragenSection() {
   const t = useTranslations('beheer');
   const [aanvragen, setAanvragen] = useState<KlantAanvraag[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [prijsgroepen, setPrijsgroepen] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let cancelled = false;
     async function loadAanvragen() {
-      const snapshot = await getDocs(
-        query(collection(db, 'klanten'), where('status', '==', 'Beoordelen'))
-      );
-      if (cancelled) return;
-      setAanvragen(
-        snapshot.docs.map((docSnapshot) => {
-          const data = docSnapshot.data();
-          return {
-            id: docSnapshot.id,
-            companyName: data.companyName,
-            kvk: data.kvk,
-            contactPerson: data.contactPerson,
-            email: data.email,
-            phone: data.phone,
-            contactPreference: data.contactPreference,
-            address: data.address,
-            postcode: data.postcode,
-            city: data.city,
-          };
-        })
-      );
+      try {
+        const snapshot = await getDocs(
+          query(collection(db, 'klanten'), where('status', '==', 'Beoordelen'))
+        );
+        if (cancelled) return;
+        setAanvragen(
+          snapshot.docs.map((docSnapshot) => {
+            const data = docSnapshot.data();
+            return {
+              id: docSnapshot.id,
+              companyName: data.companyName,
+              kvk: data.kvk,
+              contactPerson: data.contactPerson,
+              email: data.email,
+              phone: data.phone,
+              contactPreference: data.contactPreference,
+              address: data.address,
+              postcode: data.postcode,
+              city: data.city,
+            };
+          })
+        );
+        setError(null);
+      } catch (err) {
+        if (!cancelled) {
+          setError(t('klantaanvragenLoadError'));
+        }
+      }
     }
     loadAanvragen();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   async function handleGoedkeuren(id: string) {
-    const prijsgroep = prijsgroepen[id] ?? '';
-    await updateDoc(doc(db, 'klanten', id), { status: 'Goedgekeurd', prijsgroep });
-    setAanvragen((current) => (current ?? []).filter((aanvraag) => aanvraag.id !== id));
+    try {
+      const prijsgroep = prijsgroepen[id] ?? '';
+      await updateDoc(doc(db, 'klanten', id), { status: 'Goedgekeurd', prijsgroep });
+      setError(null);
+      setAanvragen((current) => (current ?? []).filter((aanvraag) => aanvraag.id !== id));
+    } catch (err) {
+      setError(t('klantaanvragenActionError'));
+    }
   }
 
   async function handleAfwijzen(id: string) {
-    await updateDoc(doc(db, 'klanten', id), { status: 'Afgewezen' });
-    setAanvragen((current) => (current ?? []).filter((aanvraag) => aanvraag.id !== id));
+    try {
+      await updateDoc(doc(db, 'klanten', id), { status: 'Afgewezen' });
+      setError(null);
+      setAanvragen((current) => (current ?? []).filter((aanvraag) => aanvraag.id !== id));
+    } catch (err) {
+      setError(t('klantaanvragenActionError'));
+    }
   }
 
   if (aanvragen === null) {
+    if (error) {
+      return (
+        <p data-testid="klantaanvragen-error" className="text-xs text-red-400">
+          {error}
+        </p>
+      );
+    }
     return null;
   }
 
-  if (aanvragen.length === 0) {
+  if (aanvragen.length === 0 && !error) {
     return (
       <p data-testid="klantaanvragen-empty" className="text-sm text-white/60">
         {t('klantaanvragenEmpty')}
@@ -79,8 +104,13 @@ export function KlantAanvragenSection() {
 
   return (
     <div data-testid="klantaanvragen-section" className="flex flex-col gap-6">
+      {error && (
+        <p data-testid="klantaanvragen-error" className="text-xs text-red-400">
+          {error}
+        </p>
+      )}
       <h2 className="text-lg text-white">{t('klantaanvragenTitle')}</h2>
-      {aanvragen.map((aanvraag) => (
+      {aanvragen.length > 0 && aanvragen.map((aanvraag) => (
         <div
           key={aanvraag.id}
           data-testid={`klantaanvraag-${aanvraag.id}`}

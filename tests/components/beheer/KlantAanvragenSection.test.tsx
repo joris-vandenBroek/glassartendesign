@@ -146,4 +146,51 @@ describe('KlantAanvragenSection', () => {
     );
     await waitFor(() => expect(screen.queryByTestId('klantaanvraag-uid-2')).not.toBeInTheDocument());
   });
+
+  it('shows load error when getDocs fails and does not show empty state', async () => {
+    getDocsMock.mockRejectedValue(new Error('offline'));
+    renderSection();
+
+    expect(await screen.findByTestId('klantaanvragen-error')).toBeInTheDocument();
+    expect(screen.getByTestId('klantaanvragen-error')).toHaveTextContent(
+      'Kon de klantaanvragen niet laden. Probeer de pagina te verversen.'
+    );
+    expect(screen.queryByTestId('klantaanvragen-empty')).not.toBeInTheDocument();
+  });
+
+  it('shows action error when updateDoc fails and keeps the row in place', async () => {
+    getDocsMock.mockResolvedValue(
+      makeSnapshot([
+        {
+          id: 'uid-3',
+          data: {
+            companyName: 'Testbedrijf BV',
+            kvk: '12345678',
+            contactPerson: 'Jan Jansen',
+            email: 'jan@example.com',
+            phone: '0612345678',
+            contactPreference: 'email',
+            address: 'Teststraat 1',
+            postcode: '1234 AB',
+            city: 'Teststad',
+          },
+        },
+      ])
+    );
+    updateDocMock.mockRejectedValue(new Error('permission-denied'));
+    renderSection();
+    await screen.findByTestId('klantaanvraag-uid-3');
+
+    fireEvent.change(screen.getByTestId('klantaanvraag-prijsgroep-uid-3'), {
+      target: { value: 'Standaard' },
+    });
+
+    fireEvent.click(screen.getByTestId('klantaanvraag-goedkeuren-uid-3'));
+
+    expect(await screen.findByTestId('klantaanvragen-error')).toBeInTheDocument();
+    expect(screen.getByTestId('klantaanvragen-error')).toHaveTextContent(
+      'Er is iets misgegaan. Probeer het opnieuw.'
+    );
+    expect(screen.getByTestId('klantaanvraag-uid-3')).toBeInTheDocument();
+  });
 });

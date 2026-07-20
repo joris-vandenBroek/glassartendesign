@@ -278,6 +278,8 @@
     "klantaanvragenContactPreference": "Contactvoorkeur",
     "klantaanvragenLabelPrijsgroep": "Prijsgroep",
     "klantaanvragenGoedkeuren": "Goedkeuren",
-    "klantaanvragenAfwijzen": "Afwijzen"
+    "klantaanvragenAfwijzen": "Afwijzen",
+    "klantaanvragenLoadError": "Kon de klantaanvragen niet laden. Probeer de pagina te verversen.",
+    "klantaanvragenActionError": "Er is iets misgegaan. Probeer het opnieuw."
   }
 }
