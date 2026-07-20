@@ -15,6 +15,11 @@ vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ replace: replaceMock }),
 }));
 
+vi.mock('@/lib/firebase', () => ({
+  auth: {},
+  db: {},
+}));
+
 function renderDashboard() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
