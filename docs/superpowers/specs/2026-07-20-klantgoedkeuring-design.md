@@ -35,7 +35,9 @@ Security Rules (uitbreiding van `firestore.rules`):
 
 ```
 match /klanten/{uid} {
-  allow create: if request.auth != null && request.auth.uid == uid;
+  allow create: if request.auth != null && request.auth.uid == uid &&
+    request.resource.data.status == 'Beoordelen' &&
+    request.resource.data.prijsgroep == '';
   allow read: if request.auth != null &&
     (request.auth.uid == uid || exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
   allow update: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));

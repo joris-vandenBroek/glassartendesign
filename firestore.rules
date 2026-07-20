@@ -5,5 +5,14 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
     }
+    match /klanten/{uid} {
+      allow create: if request.auth != null && request.auth.uid == uid &&
+        request.resource.data.status == 'Beoordelen' &&
+        request.resource.data.prijsgroep == '';
+      allow read: if request.auth != null &&
+        (request.auth.uid == uid || exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
+      allow update: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
   }
 }

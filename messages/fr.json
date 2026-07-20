@@ -118,8 +118,6 @@
   "registrationPage": {
     "title": "Devenir client",
     "intro": "Demandez un compte client, nous vous contacterons ensuite.",
-    "typeParticulier": "Particulier",
-    "typeZakelijk": "Professionnel",
     "labelEmail": "Adresse e-mail",
     "labelPhone": "Numéro de téléphone",
     "labelContactPreference": "Comment souhaitez-vous être contacté(e) ?",
@@ -145,7 +143,20 @@
     "labelContactPerson": "Personne de contact",
     "submit": "Envoyer la demande",
     "confirmationTitle": "Demande reçue",
-    "confirmationMessage": "Nous vous contacterons sous 2 jours ouvrés."
+    "confirmationMessage": "Nous vous contacterons sous 2 jours ouvrés.",
+    "emailInUseError": "Cette adresse e-mail est déjà utilisée.",
+    "weakPasswordError": "Le mot de passe doit contenir au moins 6 caractères.",
+    "submitError": "Une erreur s'est produite, veuillez réessayer."
+  },
+  "loginPage": {
+    "title": "Connexion",
+    "labelEmail": "Adresse e-mail",
+    "labelPassword": "Mot de passe",
+    "submit": "Connexion",
+    "loginError": "Adresse e-mail ou mot de passe incorrect.",
+    "pendingMessage": "Votre demande est en cours d'examen.",
+    "rejectedMessage": "Malheureusement, votre demande a été refusée.",
+    "accountIncompleteMessage": "Un problème est survenu avec votre demande précédente. Veuillez nous contacter."
   },
   "whyUs": {
     "title": "Pourquoi Glassart & Design",
@@ -244,7 +255,12 @@
       "labelPasswordConfirm": "Confirmer le mot de passe",
       "passwordMismatch": "Les mots de passe ne correspondent pas.",
       "save": "Enregistrer",
-      "saved": "Enregistré !"
+      "saved": "Enregistré !",
+      "deleteAccountTitle": "Supprimer le compte",
+      "deleteAccountLabelPassword": "Mot de passe (pour confirmer)",
+      "deleteAccountSubmit": "Supprimer définitivement",
+      "deleteAccountError": "Mot de passe incorrect, compte non supprimé.",
+      "deleteAccountPartialError": "Vos données ont été supprimées, mais un problème est survenu lors de la suppression complète de votre compte. Veuillez nous contacter."
     }
   }
 }

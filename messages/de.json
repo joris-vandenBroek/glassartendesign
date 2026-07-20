@@ -118,8 +118,6 @@
   "registrationPage": {
     "title": "Kunde werden",
     "intro": "Beantragen Sie ein Kundenkonto, wir melden uns anschließend bei Ihnen.",
-    "typeParticulier": "Privat",
-    "typeZakelijk": "Geschäftlich",
     "labelEmail": "E-Mail-Adresse",
     "labelPhone": "Telefonnummer",
     "labelContactPreference": "Wie möchten Sie kontaktiert werden?",
@@ -145,7 +143,20 @@
     "labelContactPerson": "Ansprechpartner",
     "submit": "Anfrage senden",
     "confirmationTitle": "Anfrage erhalten",
-    "confirmationMessage": "Wir melden uns innerhalb von 2 Werktagen bei Ihnen."
+    "confirmationMessage": "Wir melden uns innerhalb von 2 Werktagen bei Ihnen.",
+    "emailInUseError": "Diese E-Mail-Adresse ist bereits registriert.",
+    "weakPasswordError": "Das Passwort muss mindestens 6 Zeichen enthalten.",
+    "submitError": "Etwas ist schiefgelaufen, bitte versuchen Sie es erneut."
+  },
+  "loginPage": {
+    "title": "Anmelden",
+    "labelEmail": "E-Mail-Adresse",
+    "labelPassword": "Passwort",
+    "submit": "Anmelden",
+    "loginError": "E-Mail-Adresse oder Passwort falsch.",
+    "pendingMessage": "Ihre Anfrage wird noch geprüft.",
+    "rejectedMessage": "Ihre Anfrage wurde leider abgelehnt.",
+    "accountIncompleteMessage": "Bei Ihrer vorherigen Anfrage ist etwas schiefgelaufen. Bitte kontaktieren Sie uns."
   },
   "whyUs": {
     "title": "Warum Glassart & Design",
@@ -244,7 +255,12 @@
       "labelPasswordConfirm": "Passwort wiederholen",
       "passwordMismatch": "Die Passwörter stimmen nicht überein.",
       "save": "Speichern",
-      "saved": "Gespeichert!"
+      "saved": "Gespeichert!",
+      "deleteAccountTitle": "Konto löschen",
+      "deleteAccountLabelPassword": "Passwort (zur Bestätigung)",
+      "deleteAccountSubmit": "Endgültig löschen",
+      "deleteAccountError": "Falsches Passwort, Konto wurde nicht gelöscht.",
+      "deleteAccountPartialError": "Ihre Daten wurden gelöscht, aber beim vollständigen Löschen Ihres Kontos ist etwas schiefgelaufen. Bitte kontaktieren Sie uns."
     }
   }
 }

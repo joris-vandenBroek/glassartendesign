@@ -5,6 +5,7 @@ import { AdminDashboard } from '@/components/beheer/AdminDashboard';
 import messages from '../../../messages/nl.json';
 
 const logoutMock = vi.fn();
+const getDocsMock = vi.fn();
 let mockAuthState: {
   user: { uid: string; email: string | null } | null;
   isAdmin: boolean;
@@ -20,6 +21,19 @@ vi.mock('@/lib/useAdminAuth', () => ({
   }),
 }));
 
+vi.mock('@/lib/firebase', () => ({
+  db: {},
+}));
+
+vi.mock('firebase/firestore', () => ({
+  collection: vi.fn((_db, name) => ({ name })),
+  query: vi.fn((ref, whereClause) => ({ ref, whereClause })),
+  where: vi.fn((field, op, value) => ({ field, op, value })),
+  doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
+  getDocs: (...args: unknown[]) => getDocsMock(...args),
+  updateDoc: vi.fn(),
+}));
+
 function renderDashboard() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
@@ -30,6 +44,8 @@ function renderDashboard() {
 
 beforeEach(() => {
   logoutMock.mockReset();
+  getDocsMock.mockReset();
+  getDocsMock.mockResolvedValue({ docs: [] });
 });
 
 describe('AdminDashboard', () => {
@@ -46,7 +62,7 @@ describe('AdminDashboard', () => {
     expect(screen.getByTestId('beheer-login-email')).toBeInTheDocument();
   });
 
-  it('shows the dashboard shell with the logged-in email when authorized', () => {
+  it('shows the dashboard shell with the logged-in email when authorized', async () => {
     mockAuthState = {
       user: { uid: 'uid-1', email: 'paul@glassartanddesign.com' },
       isAdmin: true,
@@ -57,6 +73,7 @@ describe('AdminDashboard', () => {
     expect(screen.getByTestId('beheer-logged-in-as')).toHaveTextContent(
       'paul@glassartanddesign.com'
     );
+    await waitFor(() => expect(getDocsMock).toHaveBeenCalled());
   });
 
   it('shows an access-denied message and signs out when logged in without a medewerkers document', async () => {

@@ -118,8 +118,6 @@
   "registrationPage": {
     "title": "Word klant",
     "intro": "Vraag een klantaccount aan, wij nemen daarna contact met u op.",
-    "typeParticulier": "Particulier",
-    "typeZakelijk": "Zakelijk",
     "labelEmail": "E-mailadres",
     "labelPhone": "Telefoonnummer",
     "labelContactPreference": "Hoe wilt u gecontacteerd worden?",
@@ -145,7 +143,20 @@
     "labelContactPerson": "Contactpersoon",
     "submit": "Aanvraag versturen",
     "confirmationTitle": "Aanvraag ontvangen",
-    "confirmationMessage": "We nemen binnen 2 werkdagen contact met u op."
+    "confirmationMessage": "We nemen binnen 2 werkdagen contact met u op.",
+    "emailInUseError": "Dit e-mailadres is al geregistreerd.",
+    "weakPasswordError": "Wachtwoord moet minimaal 6 tekens bevatten.",
+    "submitError": "Er is iets misgegaan, probeer het opnieuw."
+  },
+  "loginPage": {
+    "title": "Inloggen",
+    "labelEmail": "E-mailadres",
+    "labelPassword": "Wachtwoord",
+    "submit": "Inloggen",
+    "loginError": "E-mailadres of wachtwoord onjuist.",
+    "pendingMessage": "Uw aanvraag wordt nog beoordeeld.",
+    "rejectedMessage": "Uw aanvraag is helaas afgewezen.",
+    "accountIncompleteMessage": "Er ging iets mis bij uw eerdere aanvraag. Neem contact met ons op."
   },
   "whyUs": {
     "title": "Waarom Glassart & Design",
@@ -244,7 +255,12 @@
       "labelPasswordConfirm": "Wachtwoord opnieuw",
       "passwordMismatch": "Wachtwoorden komen niet overeen.",
       "save": "Opslaan",
-      "saved": "Opgeslagen!"
+      "saved": "Opgeslagen!",
+      "deleteAccountTitle": "Account verwijderen",
+      "deleteAccountLabelPassword": "Wachtwoord (ter bevestiging)",
+      "deleteAccountSubmit": "Definitief verwijderen",
+      "deleteAccountError": "Wachtwoord onjuist, account niet verwijderd.",
+      "deleteAccountPartialError": "Uw gegevens zijn verwijderd, maar er ging iets mis bij het volledig verwijderen van uw account. Neem contact met ons op."
     }
   },
   "beheer": {
@@ -258,6 +274,14 @@
     "forgotPasswordSent": "Er is een e-mail verstuurd om je wachtwoord opnieuw in te stellen.",
     "unauthorized": "Dit account heeft geen toegang tot de beheeromgeving.",
     "loggedInAs": "Ingelogd als {email}",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "klantaanvragenTitle": "Klantaanvragen",
+    "klantaanvragenEmpty": "Geen openstaande klantaanvragen.",
+    "klantaanvragenContactPreference": "Contactvoorkeur",
+    "klantaanvragenLabelPrijsgroep": "Prijsgroep",
+    "klantaanvragenGoedkeuren": "Goedkeuren",
+    "klantaanvragenAfwijzen": "Afwijzen",
+    "klantaanvragenLoadError": "Kon de klantaanvragen niet laden. Probeer de pagina te verversen.",
+    "klantaanvragenActionError": "Er is iets misgegaan. Probeer het opnieuw."
   }
 }

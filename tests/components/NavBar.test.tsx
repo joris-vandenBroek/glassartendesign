@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { NavBar } from '@/components/NavBar';
 import { MockAuthProvider } from '@/lib/useMockAuth';
@@ -47,9 +47,14 @@ describe('NavBar', () => {
     expect(screen.queryByTestId('collections-dropdown')).not.toBeInTheDocument();
   });
 
-  it('shows a link to /account instead of "Word klant"/"Inloggen" after clicking login', () => {
+  it('shows the "Inloggen" link pointing to /inloggen when logged out', () => {
     renderNavBar();
-    fireEvent.click(screen.getByTestId('nav-login'));
+    expect(screen.getByTestId('nav-login')).toHaveAttribute('href', '/inloggen');
+  });
+
+  it('shows a link to /account instead of "Word klant"/"Inloggen" when already logged in', () => {
+    window.localStorage.setItem('glassart-mock-logged-in', 'true');
+    renderNavBar();
     expect(screen.getByTestId('account-icon')).toHaveAttribute('href', '/account');
     expect(screen.queryByTestId('nav-become-client')).not.toBeInTheDocument();
     expect(screen.queryByTestId('nav-login')).not.toBeInTheDocument();

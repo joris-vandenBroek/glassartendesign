@@ -2,18 +2,19 @@
 
 import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-
-type ClientType = 'particulier' | 'zakelijk';
+import { createUserWithEmailAndPassword, deleteUser, signOut, type UserCredential } from 'firebase/auth';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
 export function RegistrationForm() {
   const t = useTranslations('registrationPage');
-  const [clientType, setClientType] = useState<ClientType>('zakelijk');
   const [showDeliveryAddress, setShowDeliveryAddress] = useState(false);
   const [showInvoiceAddress, setShowInvoiceAddress] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     if (formData.get('password') !== formData.get('passwordConfirm')) {
@@ -21,7 +22,56 @@ export function RegistrationForm() {
       return;
     }
     setPasswordError(null);
-    setIsSubmitted(true);
+    setSubmitError(null);
+
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    let credential: UserCredential | null = null;
+    try {
+      credential = await createUserWithEmailAndPassword(auth, email, password);
+      try {
+        await setDoc(doc(db, 'klanten', credential.user.uid), {
+          companyName: formData.get('companyName') as string,
+          kvk: formData.get('kvk') as string,
+          contactPerson: formData.get('contactPerson') as string,
+          email,
+          phone: formData.get('phone') as string,
+          contactPreference: formData.get('contactPreference') as string,
+          address: formData.get('address') as string,
+          postcode: formData.get('postcode') as string,
+          city: formData.get('city') as string,
+          deliveryAddress: (formData.get('deliveryAddress') as string) || '',
+          deliveryPostcode: (formData.get('deliveryPostcode') as string) || '',
+          deliveryCity: (formData.get('deliveryCity') as string) || '',
+          invoiceAddress: (formData.get('invoiceAddress') as string) || '',
+          invoicePostcode: (formData.get('invoicePostcode') as string) || '',
+          invoiceCity: (formData.get('invoiceCity') as string) || '',
+          status: 'Beoordelen',
+          prijsgroep: '',
+          createdAt: serverTimestamp(),
+        });
+      } catch (setDocError) {
+        try {
+          await deleteUser(credential.user);
+        } catch {
+          // Best-effort cleanup only; ignore failures here and fall through
+          // to the original error below.
+        }
+        throw setDocError;
+      }
+      await signOut(auth);
+      setIsSubmitted(true);
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code === 'auth/email-already-in-use') {
+        setSubmitError(t('emailInUseError'));
+      } else if (code === 'auth/weak-password') {
+        setSubmitError(t('weakPasswordError'));
+      } else {
+        setSubmitError(t('submitError'));
+      }
+    }
   }
 
   if (isSubmitted) {
@@ -38,65 +88,32 @@ export function RegistrationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm text-white/80">
-      <div className="flex gap-2">
-        <button
-          type="button"
-          data-testid="word-klant-type-zakelijk"
-          aria-pressed={clientType === 'zakelijk'}
-          onClick={() => setClientType('zakelijk')}
-          className={
-            clientType === 'zakelijk'
-              ? 'flex-1 rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink'
-              : 'flex-1 rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white'
-          }
-        >
-          {t('typeZakelijk')}
-        </button>
-        <button
-          type="button"
-          data-testid="word-klant-type-particulier"
-          aria-pressed={clientType === 'particulier'}
-          onClick={() => setClientType('particulier')}
-          className={
-            clientType === 'particulier'
-              ? 'flex-1 rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink'
-              : 'flex-1 rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white'
-          }
-        >
-          {t('typeParticulier')}
-        </button>
-      </div>
+      <label className={labelClassName}>
+        {t('labelCompanyName')}
+        <input
+          type="text"
+          name="companyName"
+          required
+          data-testid="word-klant-company-name"
+          className={fieldClassName}
+        />
+      </label>
 
-      {clientType === 'zakelijk' && (
-        <>
-          <label className={labelClassName}>
-            {t('labelCompanyName')}
-            <input
-              type="text"
-              name="companyName"
-              required
-              data-testid="word-klant-company-name"
-              className={fieldClassName}
-            />
-          </label>
+      <label className={labelClassName}>
+        {t('labelKvk')}
+        <input type="text" name="kvk" required data-testid="word-klant-kvk" className={fieldClassName} />
+      </label>
 
-          <label className={labelClassName}>
-            {t('labelKvk')}
-            <input type="text" name="kvk" required data-testid="word-klant-kvk" className={fieldClassName} />
-          </label>
-
-          <label className={labelClassName}>
-            {t('labelContactPerson')}
-            <input
-              type="text"
-              name="contactPerson"
-              required
-              data-testid="word-klant-contact-person"
-              className={fieldClassName}
-            />
-          </label>
-        </>
-      )}
+      <label className={labelClassName}>
+        {t('labelContactPerson')}
+        <input
+          type="text"
+          name="contactPerson"
+          required
+          data-testid="word-klant-contact-person"
+          className={fieldClassName}
+        />
+      </label>
 
       <label className={labelClassName}>
         {t('labelEmail')}
@@ -260,6 +277,12 @@ export function RegistrationForm() {
             />
           </label>
         </>
+      )}
+
+      {submitError && (
+        <p data-testid="word-klant-submit-error" className="text-xs text-red-400">
+          {submitError}
+        </p>
       )}
 
       <button
