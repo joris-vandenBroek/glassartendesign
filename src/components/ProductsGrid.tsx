@@ -71,12 +71,16 @@ export function ProductsGrid() {
                 setSelectedImage(image);
               }
             }}
-            className="relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:brightness-110"
+            className="group relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:-translate-y-1"
           >
             <img
               src={image.src}
               alt={tSegments(`${image.segmentMessageKey}.title`)}
               className="aspect-square w-full object-cover"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             />
             <span className="badge-gold absolute left-2 top-2">
               {tSegments(`${image.segmentMessageKey}.title`)}
