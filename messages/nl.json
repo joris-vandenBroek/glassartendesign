@@ -272,6 +272,12 @@
     "forgotPasswordSent": "Er is een e-mail verstuurd om je wachtwoord opnieuw in te stellen.",
     "unauthorized": "Dit account heeft geen toegang tot de beheeromgeving.",
     "loggedInAs": "Ingelogd als {email}",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "klantaanvragenTitle": "Klantaanvragen",
+    "klantaanvragenEmpty": "Geen openstaande klantaanvragen.",
+    "klantaanvragenContactPreference": "Contactvoorkeur",
+    "klantaanvragenLabelPrijsgroep": "Prijsgroep",
+    "klantaanvragenGoedkeuren": "Goedkeuren",
+    "klantaanvragenAfwijzen": "Afwijzen"
   }
 }

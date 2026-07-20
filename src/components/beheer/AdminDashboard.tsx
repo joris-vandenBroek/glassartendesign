@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAdminAuth } from '@/lib/useAdminAuth';
 import { AdminLoginForm } from './AdminLoginForm';
+import { KlantAanvragenSection } from './KlantAanvragenSection';
 
 export function AdminDashboard() {
   const t = useTranslations('beheer');
@@ -49,6 +50,7 @@ export function AdminDashboard() {
       >
         {t('logout')}
       </button>
+      <KlantAanvragenSection />
     </div>
   );
 }
