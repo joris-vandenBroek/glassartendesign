@@ -13,15 +13,19 @@ Zodra dit deelproject aan de beurt is, doorloopt het alsnog het volledige trajec
 - Een order aanmaken voor de drukker op basis van een aangevraagde bestelling.
 - Zodra een bestelling is doorgezet naar de drukker: status wijzigt automatisch van "Aangevraagd" naar "In productie".
 - Factuur maken voor een bestelling, met keuze van prijsgroep (hoe dit zich verhoudt tot de per-klant-prijsgroep uit de goedkeuringsstap moet nog worden uitgewerkt bij de daadwerkelijke brainstorm/spec).
-- Betaling van een factuur kunnen afhandelen: status van de factuur wijzigen naar "Betaald".
+- Betaling van een factuur kunnen afhandelen: status van de factuur wijzigen naar "Betaald" (open vraag voor de daadwerkelijke brainstorm: gebeurt dit handmatig na een bankoverschrijving, of via een koppeling met een online betaalprovider zoals iDEAL/Mollie die de status automatisch bijwerkt?).
 - Afhandelen van retouren die klanten via hun accountpagina aanmelden (de mock-versie in de huidige site registreert alleen de aanvraag zelf — een echte beheerkant om retouren te beoordelen/verwerken ontbreekt nog).
+- Rollen/rechten voor medewerkers die in de beheeromgeving werken (bv. iemand die alleen orders mag verwerken vs. iemand die ook klanten mag goedkeuren) — exacte rolindeling nog uit te werken.
+- Koppeling met een boekhoudpakket (bv. Exact, Moneybird) voor facturen/omzet/BTW, of blijft dit handmatig — nog te bepalen.
+- Automatische notificaties naar de klant bij statuswijzigingen (bv. "bestelling in productie", "factuur verstuurd", "retour verwerkt") — kanaal (e-mail/WhatsApp) nog te bepalen.
 
 ### Beheer maten, kunstwerken, segmenten en materiaalsoorten
 
 - **Maten:** beheerfunctie om maten (afmetingen) aan te maken/wijzigen, en te koppelen aan specifieke kunstwerken (niet elk kunstwerk is per se in elke maat leverbaar).
-- **Kunstwerken:** beheerfunctie om kunstwerken te beheren, inclusief een beschrijving per kunstwerk.
+- **Kunstwerken:** beheerfunctie om kunstwerken te beheren, inclusief een beschrijving per kunstwerk. Naast de webafbeelding (met watermerk, zie hieronder) moet ook het hoge-resolutie productiebestand voor de drukker beheerd/geüpload kunnen worden — dit is een apart bestand, niet dezelfde afbeelding als de (verwaterde) webweergave.
 - **Segmenten:** beheerfunctie om segmenten (Hotel, Restaurant, Wellness, etc.) te beheren met een beschrijving; een kunstwerk moet aan één of meerdere segmenten gekoppeld kunnen worden (dus een N-op-N-relatie, geen kunstwerk gebonden aan precies één segment).
 - **Materiaalsoorten:** beheerfunctie om materiaalsoorten (4mm veiligheidsglas, acryl 3/5/10mm, dibond, akoestische stof, etc.) te beheren, én om per kunstwerk vast te leggen welke materiaalsoorten daarvoor mogelijk zijn (niet elk kunstwerk is in elk materiaal leverbaar).
+- **Prijzen:** prijs kunnen toekennen aan een kunstwerk (basisprijs), plus extra kosten (toeslag) voor andere/grotere maten bovenop die basisprijs. Hoe dit precies samenhangt met de prijsgroepen (bv. is de basisprijs zelf al per prijsgroep verschillend, of is de prijsgroep een percentage/korting op één vaste basisprijs) moet nog worden uitgewerkt bij de daadwerkelijke brainstorm/spec.
 - **Copyright-watermerk:** kunstwerkafbeeldingen die getoond worden (in ieder geval publiek, buiten het afgeschermde bestelproces) moeten een watermerk krijgen ter bescherming van het copyright — exacte plek/uitvoering (bv. alleen op preview-afbeeldingen, of ook op de uiteindelijke besteldata) nog uit te werken bij de daadwerkelijke brainstorm/spec.
 
 ## Datamodel (voorlopige tabellen)
@@ -35,6 +39,8 @@ Zodra dit deelproject een echte backend krijgt, zijn in ieder geval de volgende 
 - **Klanten**.
 - **Prijsgroepen**.
 - **Koppeltabel prijsgroep ↔ klanten** (welke klant hoort bij welke prijsgroep).
+- **Prijzen** — basisprijs per kunstwerk, plus toeslagen per maat (en mogelijk per materiaalsoort/prijsgroep — exacte opzet nog te ontwerpen).
+- **Rollen** (voor medewerkers in de beheeromgeving) en een koppeling medewerker ↔ rol.
 - Impliciet, volgend uit de beheerfunctie hierboven: **Kunstwerken**, **Segmenten** en **Materiaalsoorten** als eigen tabellen, plus koppeltabellen kunstwerk↔segment (N-op-N) en kunstwerk↔materiaalsoort (N-op-N), en een koppeling kunstwerk↔maat.
 
 ## Klantaccount (voor de klant, ingelogd)
@@ -49,6 +55,10 @@ Zodra dit deelproject een echte backend krijgt, zijn in ieder geval de volgende 
 
 - Zodra er echte klantaccounts zijn: taalvoorkeur opslaan bij het account (niet alleen lokaal in de browser, zoals nu), zodat een klant bij het inloggen automatisch in de eerder gekozen taal terechtkomt.
 - Tot die tijd blijft taalkeuze werken zoals nu: per bezoek/browser, via de taalkeuze-knop in de navigatiebalk (zie het aparte deelproject "Taalkeuze-dropdown met vlaggen").
+
+## Privacy / AVG
+
+- Zodra er echte klantgegevens worden opgeslagen: een klant moet zijn account/gegevens kunnen laten verwijderen (recht op verwijdering onder de AVG). Exacte uitwerking (zelfbediening vs. aanvraag bij het bedrijf, bewaartermijn voor facturen i.v.m. boekhoudplicht) nog uit te werken bij de daadwerkelijke brainstorm/spec.
 
 ## Niet in scope van dit document
 
