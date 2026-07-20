@@ -13,6 +13,28 @@ Zodra dit deelproject aan de beurt is, doorloopt het alsnog het volledige trajec
 - Een order aanmaken voor de drukker op basis van een aangevraagde bestelling.
 - Zodra een bestelling is doorgezet naar de drukker: status wijzigt automatisch van "Aangevraagd" naar "In productie".
 - Factuur maken voor een bestelling, met keuze van prijsgroep (hoe dit zich verhoudt tot de per-klant-prijsgroep uit de goedkeuringsstap moet nog worden uitgewerkt bij de daadwerkelijke brainstorm/spec).
+- Afhandelen van retouren die klanten via hun accountpagina aanmelden (de mock-versie in de huidige site registreert alleen de aanvraag zelf — een echte beheerkant om retouren te beoordelen/verwerken ontbreekt nog).
+
+### Beheer maten, kunstwerken, segmenten en materiaalsoorten
+
+- **Maten:** beheerfunctie om maten (afmetingen) aan te maken/wijzigen, en te koppelen aan specifieke kunstwerken (niet elk kunstwerk is per se in elke maat leverbaar).
+- **Kunstwerken:** beheerfunctie om kunstwerken te beheren, inclusief een beschrijving per kunstwerk.
+- **Segmenten:** beheerfunctie om segmenten (Hotel, Restaurant, Wellness, etc.) te beheren met een beschrijving; een kunstwerk moet aan één of meerdere segmenten gekoppeld kunnen worden (dus een N-op-N-relatie, geen kunstwerk gebonden aan precies één segment).
+- **Materiaalsoorten:** beheerfunctie om materiaalsoorten (4mm veiligheidsglas, acryl 3/5/10mm, dibond, akoestische stof, etc.) te beheren, én om per kunstwerk vast te leggen welke materiaalsoorten daarvoor mogelijk zijn (niet elk kunstwerk is in elk materiaal leverbaar).
+- **Copyright-watermerk:** kunstwerkafbeeldingen die getoond worden (in ieder geval publiek, buiten het afgeschermde bestelproces) moeten een watermerk krijgen ter bescherming van het copyright — exacte plek/uitvoering (bv. alleen op preview-afbeeldingen, of ook op de uiteindelijke besteldata) nog uit te werken bij de daadwerkelijke brainstorm/spec.
+
+## Datamodel (voorlopige tabellen)
+
+Zodra dit deelproject een echte backend krijgt, zijn in ieder geval de volgende tabellen nodig (exact schema/kolommen nog te ontwerpen bij de daadwerkelijke brainstorm/spec):
+
+- **Maten** — de beschikbare afmetingen.
+- **Orders** — met een status (bv. Aangevraagd / In productie / Verzonden / Geleverd / Retour aangemeld).
+- **Orderitems** — de regels binnen een order (kunstwerk, maat, materiaalsoort, aantal).
+- **Facturen** — met een status (bv. Te betalen / Betaald).
+- **Klanten**.
+- **Prijsgroepen**.
+- **Koppeltabel prijsgroep ↔ klanten** (welke klant hoort bij welke prijsgroep).
+- Impliciet, volgend uit de beheerfunctie hierboven: **Kunstwerken**, **Segmenten** en **Materiaalsoorten** als eigen tabellen, plus koppeltabellen kunstwerk↔segment (N-op-N) en kunstwerk↔materiaalsoort (N-op-N), en een koppeling kunstwerk↔maat.
 
 ## Klantaccount (voor de klant, ingelogd)
 
