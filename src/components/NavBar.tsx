@@ -62,10 +62,11 @@ export function NavBar() {
         )}
         <Link
           href="/beheer"
+          locale="nl"
           data-testid="nav-beheer"
           className="hidden text-xs font-head tracking-[0.15em] text-white/50 hover:text-white sm:inline"
         >
-          {t('beheer')}
+          Beheer
         </Link>
         <CartPanel />
         <LanguageSwitcher />

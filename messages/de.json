@@ -24,8 +24,7 @@
     "login": "Anmelden",
     "logout": "Abmelden",
     "myOrders": "Meine Bestellungen",
-    "myAccount": "Mein Konto",
-    "beheer": "Verwaltung"
+    "myAccount": "Mein Konto"
   },
   "collectionsPage": {
     "title": "Kollektionen",
@@ -247,18 +246,5 @@
       "save": "Speichern",
       "saved": "Gespeichert!"
     }
-  },
-  "beheer": {
-    "title": "Verwaltung",
-    "labelEmail": "E-Mail-Adresse",
-    "labelPassword": "Passwort",
-    "submit": "Anmelden",
-    "loginError": "E-Mail-Adresse oder Passwort falsch.",
-    "forgotPassword": "Passwort vergessen?",
-    "forgotPasswordMissingEmail": "Bitte zuerst deine E-Mail-Adresse eingeben.",
-    "forgotPasswordSent": "Es wurde eine E-Mail zum Zurücksetzen deines Passworts gesendet.",
-    "unauthorized": "Dieses Konto hat keinen Zugriff auf den Verwaltungsbereich.",
-    "loggedInAs": "Angemeldet als {email}",
-    "logout": "Abmelden"
   }
 }

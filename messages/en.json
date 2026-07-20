@@ -24,8 +24,7 @@
     "login": "Log in",
     "logout": "Log out",
     "myOrders": "My orders",
-    "myAccount": "My account",
-    "beheer": "Admin"
+    "myAccount": "My account"
   },
   "collectionsPage": {
     "title": "Collections",
@@ -247,18 +246,5 @@
       "save": "Save",
       "saved": "Saved!"
     }
-  },
-  "beheer": {
-    "title": "Admin",
-    "labelEmail": "Email address",
-    "labelPassword": "Password",
-    "submit": "Log in",
-    "loginError": "Email address or password is incorrect.",
-    "forgotPassword": "Forgot password?",
-    "forgotPasswordMissingEmail": "Please fill in your email address first.",
-    "forgotPasswordSent": "An email has been sent to reset your password.",
-    "unauthorized": "This account does not have access to the admin area.",
-    "loggedInAs": "Logged in as {email}",
-    "logout": "Log out"
   }
 }

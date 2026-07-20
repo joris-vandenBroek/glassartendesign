@@ -2,6 +2,12 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { GlassPanel } from '@/components/GlassPanel';
 import { AdminDashboard } from '@/components/beheer/AdminDashboard';
 
+export function generateStaticParams() {
+  return [{ locale: 'nl' }];
+}
+
+export const dynamicParams = false;
+
 export default async function BeheerPage({
   params,
 }: {

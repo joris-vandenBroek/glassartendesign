@@ -24,8 +24,7 @@
     "login": "Connexion",
     "logout": "Déconnexion",
     "myOrders": "Mes commandes",
-    "myAccount": "Mon compte",
-    "beheer": "Gestion"
+    "myAccount": "Mon compte"
   },
   "collectionsPage": {
     "title": "Collections",
@@ -247,18 +246,5 @@
       "save": "Enregistrer",
       "saved": "Enregistré !"
     }
-  },
-  "beheer": {
-    "title": "Gestion",
-    "labelEmail": "Adresse e-mail",
-    "labelPassword": "Mot de passe",
-    "submit": "Connexion",
-    "loginError": "Adresse e-mail ou mot de passe incorrect.",
-    "forgotPassword": "Mot de passe oublié ?",
-    "forgotPasswordMissingEmail": "Veuillez d'abord saisir votre adresse e-mail.",
-    "forgotPasswordSent": "Un e-mail a été envoyé pour réinitialiser votre mot de passe.",
-    "unauthorized": "Ce compte n'a pas accès à l'espace de gestion.",
-    "loggedInAs": "Connecté en tant que {email}",
-    "logout": "Déconnexion"
   }
 }
