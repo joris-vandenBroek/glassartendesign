@@ -155,7 +155,8 @@
     "submit": "Anmelden",
     "loginError": "E-Mail-Adresse oder Passwort falsch.",
     "pendingMessage": "Ihre Anfrage wird noch geprüft.",
-    "rejectedMessage": "Ihre Anfrage wurde leider abgelehnt."
+    "rejectedMessage": "Ihre Anfrage wurde leider abgelehnt.",
+    "accountIncompleteMessage": "Bei Ihrer vorherigen Anfrage ist etwas schiefgelaufen. Bitte kontaktieren Sie uns."
   },
   "whyUs": {
     "title": "Warum Glassart & Design",
@@ -258,7 +259,8 @@
       "deleteAccountTitle": "Konto löschen",
       "deleteAccountLabelPassword": "Passwort (zur Bestätigung)",
       "deleteAccountSubmit": "Endgültig löschen",
-      "deleteAccountError": "Falsches Passwort, Konto wurde nicht gelöscht."
+      "deleteAccountError": "Falsches Passwort, Konto wurde nicht gelöscht.",
+      "deleteAccountPartialError": "Ihre Daten wurden gelöscht, aber beim vollständigen Löschen Ihres Kontos ist etwas schiefgelaufen. Bitte kontaktieren Sie uns."
     }
   }
 }

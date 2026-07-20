@@ -105,6 +105,19 @@ describe('CustomerLoginForm', () => {
     expect(loginMock).not.toHaveBeenCalled();
   });
 
+  it('shows the accountIncompleteMessage when the klant document does not exist', async () => {
+    signInMock.mockResolvedValue({ user: { uid: 'uid-5' } });
+    getDocMock.mockResolvedValue({ exists: () => false });
+    signOutMock.mockResolvedValue(undefined);
+    renderForm();
+    submitWith('klant@example.com', 'geheim123');
+
+    expect(await screen.findByTestId('login-error')).toHaveTextContent(
+      'Er ging iets mis bij uw eerdere aanvraag. Neem contact met ons op.'
+    );
+    expect(loginMock).not.toHaveBeenCalled();
+  });
+
   it('signs out and shows generic error when getDoc fails after successful sign-in', async () => {
     signInMock.mockResolvedValue({ user: { uid: 'uid-4' } });
     getDocMock.mockRejectedValue(new Error('permission-denied'));

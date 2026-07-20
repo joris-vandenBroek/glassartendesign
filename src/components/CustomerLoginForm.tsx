@@ -33,6 +33,8 @@ export function CustomerLoginForm() {
           setError(t('pendingMessage'));
         } else if (status === 'Afgewezen') {
           setError(t('rejectedMessage'));
+        } else if (!klantDoc.exists()) {
+          setError(t('accountIncompleteMessage'));
         } else {
           setError(t('loginError'));
         }

@@ -114,6 +114,23 @@ describe('SettingsSection', () => {
     expect(deleteUserMock).not.toHaveBeenCalled();
   });
 
+  it('shows a distinct partial-error message and stays on the page when deleteDoc succeeds but deleteUser fails', async () => {
+    signInMock.mockResolvedValue({ user: { uid: 'uid-1' } });
+    deleteDocMock.mockResolvedValue(undefined);
+    deleteUserMock.mockRejectedValue(new Error('requires-recent-login'));
+    renderSection();
+    fireEvent.change(screen.getByTestId('delete-account-password'), {
+      target: { value: 'geheim123' },
+    });
+    fireEvent.click(screen.getByTestId('delete-account-submit'));
+
+    expect(await screen.findByTestId('delete-account-error')).toHaveTextContent(
+      'Uw gegevens zijn verwijderd, maar er ging iets mis bij het volledig verwijderen van uw account. Neem contact met ons op.'
+    );
+    expect(replaceMock).not.toHaveBeenCalled();
+    expect(window.localStorage.getItem('glassart-mock-logged-in')).toBe('true');
+  });
+
   it('re-authenticates, deletes the klant document and Firebase account, logs out and redirects home', async () => {
     signInMock.mockResolvedValue({ user: { uid: 'uid-1' } });
     deleteDocMock.mockResolvedValue(undefined);

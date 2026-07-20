@@ -155,7 +155,8 @@
     "submit": "Log in",
     "loginError": "Email address or password is incorrect.",
     "pendingMessage": "Your application is still being reviewed.",
-    "rejectedMessage": "Unfortunately, your application has been rejected."
+    "rejectedMessage": "Unfortunately, your application has been rejected.",
+    "accountIncompleteMessage": "Something went wrong with your previous application. Please contact us."
   },
   "whyUs": {
     "title": "Why Glassart & Design",
@@ -258,7 +259,8 @@
       "deleteAccountTitle": "Delete account",
       "deleteAccountLabelPassword": "Password (to confirm)",
       "deleteAccountSubmit": "Permanently delete",
-      "deleteAccountError": "Incorrect password, account not deleted."
+      "deleteAccountError": "Incorrect password, account not deleted.",
+      "deleteAccountPartialError": "Your data has been deleted, but something went wrong completing account deletion. Please contact us."
     }
   }
 }

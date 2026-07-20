@@ -74,17 +74,32 @@ export function SettingsSection() {
   async function handleDeleteAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setDeleteError(null);
+    let response;
     try {
-      const response = await signInWithEmailAndPassword(auth, authEmail ?? '', deletePassword);
+      response = await signInWithEmailAndPassword(auth, authEmail ?? '', deletePassword);
+    } catch {
+      setDeleteError(t('deleteAccountError'));
+      return;
+    }
+
+    try {
       await deleteDoc(doc(db, 'klanten', uid ?? ''));
+    } catch {
+      setDeleteError(t('deleteAccountError'));
+      return;
+    }
+
+    try {
       if (response.user) {
         await deleteUser(response.user);
       }
-      logout();
-      router.replace('/');
     } catch {
-      setDeleteError(t('deleteAccountError'));
+      setDeleteError(t('deleteAccountPartialError'));
+      return;
     }
+
+    logout();
+    router.replace('/');
   }
 
   const fieldClassName = 'rounded-sm bg-black/40 px-3 py-2 text-sm text-white';

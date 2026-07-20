@@ -7,6 +7,7 @@ import messages from '../../messages/nl.json';
 const createUserMock = vi.fn();
 const signOutMock = vi.fn();
 const setDocMock = vi.fn();
+const deleteUserMock = vi.fn();
 
 vi.mock('@/lib/firebase', () => ({
   auth: {},
@@ -16,6 +17,7 @@ vi.mock('@/lib/firebase', () => ({
 vi.mock('firebase/auth', () => ({
   createUserWithEmailAndPassword: (...args: unknown[]) => createUserMock(...args),
   signOut: (...args: unknown[]) => signOutMock(...args),
+  deleteUser: (...args: unknown[]) => deleteUserMock(...args),
 }));
 
 vi.mock('firebase/firestore', () => ({
@@ -59,6 +61,7 @@ beforeEach(() => {
   createUserMock.mockReset();
   signOutMock.mockReset();
   setDocMock.mockReset();
+  deleteUserMock.mockReset();
 });
 
 describe('RegistrationForm', () => {
@@ -190,5 +193,20 @@ describe('RegistrationForm', () => {
     expect(await screen.findByTestId('word-klant-submit-error')).toHaveTextContent(
       'Er is iets misgegaan, probeer het opnieuw.'
     );
+  });
+
+  it('cleans up the orphaned Firebase account when setDoc fails after account creation', async () => {
+    const createdUser = { uid: 'uid-orphan' };
+    createUserMock.mockResolvedValue({ user: createdUser });
+    setDocMock.mockRejectedValue(new Error('firestore-unavailable'));
+    deleteUserMock.mockResolvedValue(undefined);
+    renderForm();
+    fillRequiredFields();
+    fireEvent.submit(screen.getByTestId('word-klant-submit').closest('form')!);
+
+    expect(await screen.findByTestId('word-klant-submit-error')).toHaveTextContent(
+      'Er is iets misgegaan, probeer het opnieuw.'
+    );
+    expect(deleteUserMock).toHaveBeenCalledWith(createdUser);
   });
 });

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, signOut, type UserCredential } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
@@ -27,28 +27,39 @@ export function RegistrationForm() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
+    let credential: UserCredential | null = null;
     try {
-      const credential = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'klanten', credential.user.uid), {
-        companyName: formData.get('companyName') as string,
-        kvk: formData.get('kvk') as string,
-        contactPerson: formData.get('contactPerson') as string,
-        email,
-        phone: formData.get('phone') as string,
-        contactPreference: formData.get('contactPreference') as string,
-        address: formData.get('address') as string,
-        postcode: formData.get('postcode') as string,
-        city: formData.get('city') as string,
-        deliveryAddress: (formData.get('deliveryAddress') as string) || '',
-        deliveryPostcode: (formData.get('deliveryPostcode') as string) || '',
-        deliveryCity: (formData.get('deliveryCity') as string) || '',
-        invoiceAddress: (formData.get('invoiceAddress') as string) || '',
-        invoicePostcode: (formData.get('invoicePostcode') as string) || '',
-        invoiceCity: (formData.get('invoiceCity') as string) || '',
-        status: 'Beoordelen',
-        prijsgroep: '',
-        createdAt: serverTimestamp(),
-      });
+      credential = await createUserWithEmailAndPassword(auth, email, password);
+      try {
+        await setDoc(doc(db, 'klanten', credential.user.uid), {
+          companyName: formData.get('companyName') as string,
+          kvk: formData.get('kvk') as string,
+          contactPerson: formData.get('contactPerson') as string,
+          email,
+          phone: formData.get('phone') as string,
+          contactPreference: formData.get('contactPreference') as string,
+          address: formData.get('address') as string,
+          postcode: formData.get('postcode') as string,
+          city: formData.get('city') as string,
+          deliveryAddress: (formData.get('deliveryAddress') as string) || '',
+          deliveryPostcode: (formData.get('deliveryPostcode') as string) || '',
+          deliveryCity: (formData.get('deliveryCity') as string) || '',
+          invoiceAddress: (formData.get('invoiceAddress') as string) || '',
+          invoicePostcode: (formData.get('invoicePostcode') as string) || '',
+          invoiceCity: (formData.get('invoiceCity') as string) || '',
+          status: 'Beoordelen',
+          prijsgroep: '',
+          createdAt: serverTimestamp(),
+        });
+      } catch (setDocError) {
+        try {
+          await deleteUser(credential.user);
+        } catch {
+          // Best-effort cleanup only; ignore failures here and fall through
+          // to the original error below.
+        }
+        throw setDocError;
+      }
       await signOut(auth);
       setIsSubmitted(true);
     } catch (error) {
