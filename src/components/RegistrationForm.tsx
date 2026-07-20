@@ -2,6 +2,9 @@
 
 import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
 export function RegistrationForm() {
   const t = useTranslations('registrationPage');
@@ -9,8 +12,9 @@ export function RegistrationForm() {
   const [showInvoiceAddress, setShowInvoiceAddress] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     if (formData.get('password') !== formData.get('passwordConfirm')) {
@@ -18,7 +22,45 @@ export function RegistrationForm() {
       return;
     }
     setPasswordError(null);
-    setIsSubmitted(true);
+    setSubmitError(null);
+
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, 'klanten', credential.user.uid), {
+        companyName: formData.get('companyName') as string,
+        kvk: formData.get('kvk') as string,
+        contactPerson: formData.get('contactPerson') as string,
+        email,
+        phone: formData.get('phone') as string,
+        contactPreference: formData.get('contactPreference') as string,
+        address: formData.get('address') as string,
+        postcode: formData.get('postcode') as string,
+        city: formData.get('city') as string,
+        deliveryAddress: (formData.get('deliveryAddress') as string) || '',
+        deliveryPostcode: (formData.get('deliveryPostcode') as string) || '',
+        deliveryCity: (formData.get('deliveryCity') as string) || '',
+        invoiceAddress: (formData.get('invoiceAddress') as string) || '',
+        invoicePostcode: (formData.get('invoicePostcode') as string) || '',
+        invoiceCity: (formData.get('invoiceCity') as string) || '',
+        status: 'Beoordelen',
+        prijsgroep: '',
+        createdAt: serverTimestamp(),
+      });
+      await signOut(auth);
+      setIsSubmitted(true);
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code === 'auth/email-already-in-use') {
+        setSubmitError(t('emailInUseError'));
+      } else if (code === 'auth/weak-password') {
+        setSubmitError(t('weakPasswordError'));
+      } else {
+        setSubmitError(t('submitError'));
+      }
+    }
   }
 
   if (isSubmitted) {
@@ -224,6 +266,12 @@ export function RegistrationForm() {
             />
           </label>
         </>
+      )}
+
+      {submitError && (
+        <p data-testid="word-klant-submit-error" className="text-xs text-red-400">
+          {submitError}
+        </p>
       )}
 
       <button
