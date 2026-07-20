@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { NavBar } from '@/components/NavBar';
 import { MockAuthProvider } from '@/lib/useMockAuth';
+import { AdminAuthProvider } from '@/lib/useAdminAuth';
 import { CartProvider } from '@/lib/useCart';
 import { OrdersProvider } from '@/lib/useOrders';
 import { ReturnsProvider } from '@/lib/useReturns';
@@ -29,18 +30,20 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <MockAuthProvider>
-        <CartProvider>
-          <OrdersProvider>
-            <ReturnsProvider>
-              <MockProfileProvider>
-                <NavBar />
-                {children}
-              </MockProfileProvider>
-            </ReturnsProvider>
-          </OrdersProvider>
-        </CartProvider>
-      </MockAuthProvider>
+      <AdminAuthProvider>
+        <MockAuthProvider>
+          <CartProvider>
+            <OrdersProvider>
+              <ReturnsProvider>
+                <MockProfileProvider>
+                  <NavBar />
+                  {children}
+                </MockProfileProvider>
+              </ReturnsProvider>
+            </OrdersProvider>
+          </CartProvider>
+        </MockAuthProvider>
+      </AdminAuthProvider>
     </NextIntlClientProvider>
   );
 }

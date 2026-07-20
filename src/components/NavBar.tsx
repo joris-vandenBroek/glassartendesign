@@ -60,6 +60,13 @@ export function NavBar() {
             </button>
           </>
         )}
+        <Link
+          href="/beheer"
+          data-testid="nav-beheer"
+          className="hidden text-xs font-head tracking-[0.15em] text-white/50 hover:text-white sm:inline"
+        >
+          {t('beheer')}
+        </Link>
         <CartPanel />
         <LanguageSwitcher />
       </div>

@@ -65,4 +65,9 @@ describe('NavBar', () => {
     renderNavBar();
     expect(screen.getByTestId('logo')).toHaveAttribute('href', '/');
   });
+
+  it('shows a Beheer link pointing to /beheer', () => {
+    renderNavBar();
+    expect(screen.getByTestId('nav-beheer')).toHaveAttribute('href', '/beheer');
+  });
 });
