@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { STANDARD_SIZES } from '@/data/sizes';
 import { useCart } from '@/lib/useCart';
+import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 import type { SegmentImage } from '@/data/segments';
 
 const CONFIRM_FEEDBACK_MS = 600;
@@ -23,7 +24,6 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!image) {
@@ -46,52 +46,12 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
     };
   }, [image]);
 
-  useEffect(() => {
-    if (!image) {
-      return;
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        onClose();
-        return;
-      }
-
-      if (event.key === 'Tab') {
-        const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (!focusable || focusable.length === 0) {
-          return;
-        }
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [image, onClose]);
-
-  // Move focus into the modal on open and restore it to whatever triggered
-  // the modal (e.g. the product card) once this image is no longer shown.
-  useEffect(() => {
-    if (!image) {
-      return;
-    }
-    previousFocusRef.current = document.activeElement as HTMLElement | null;
-    closeButtonRef.current?.focus();
-    return () => {
-      previousFocusRef.current?.focus();
-    };
-  }, [image]);
+  useOverlayDismiss({
+    isOpen: image !== null,
+    onClose,
+    containerRef: modalRef,
+    initialFocusRef: closeButtonRef,
+  });
 
   if (!image) {
     return null;
