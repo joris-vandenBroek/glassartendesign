@@ -21,6 +21,9 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { addItem } = useCart();
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!image) {
@@ -51,12 +54,44 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable || focusable.length === 0) {
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     }
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [image, onClose]);
+
+  // Move focus into the modal on open and restore it to whatever triggered
+  // the modal (e.g. the product card) once this image is no longer shown.
+  useEffect(() => {
+    if (!image) {
+      return;
+    }
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+    return () => {
+      previousFocusRef.current?.focus();
+    };
+  }, [image]);
 
   if (!image) {
     return null;
@@ -81,7 +116,13 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
   }
 
   return (
-    <div data-testid="product-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      ref={modalRef}
+      data-testid="product-modal"
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
       <div
         data-testid="product-modal-backdrop"
         onClick={onClose}
@@ -89,6 +130,7 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
       />
       <div className="relative z-10 grid w-full max-w-2xl grid-cols-1 overflow-hidden rounded-lg border border-white/10 bg-charcoal sm:grid-cols-2">
         <button
+          ref={closeButtonRef}
           type="button"
           data-testid="product-modal-close"
           aria-label={t('close')}

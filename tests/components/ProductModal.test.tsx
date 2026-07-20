@@ -198,4 +198,70 @@ describe('ProductModal', () => {
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByTestId('product-modal')).toBeInTheDocument();
   });
+
+  it('exposes dialog semantics for assistive tech', () => {
+    renderModal();
+    const modal = screen.getByTestId('product-modal');
+    expect(modal).toHaveAttribute('role', 'dialog');
+    expect(modal).toHaveAttribute('aria-modal', 'true');
+  });
+
+  it('moves focus into the modal (the close button) when it opens', () => {
+    renderModal();
+    expect(screen.getByTestId('product-modal-close')).toHaveFocus();
+  });
+
+  it('restores focus to the triggering element when it closes', () => {
+    const onClose = vi.fn();
+    const trigger = document.createElement('button');
+    trigger.textContent = 'Open product';
+    document.body.appendChild(trigger);
+    trigger.focus();
+    expect(trigger).toHaveFocus();
+
+    const { rerender } = render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CartProvider>
+          <ProductModal image={SAMPLE_IMAGE} onClose={onClose} />
+        </CartProvider>
+      </NextIntlClientProvider>
+    );
+
+    expect(screen.getByTestId('product-modal-close')).toHaveFocus();
+
+    rerender(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CartProvider>
+          <ProductModal image={null} onClose={onClose} />
+        </CartProvider>
+      </NextIntlClientProvider>
+    );
+
+    expect(trigger).toHaveFocus();
+    trigger.remove();
+  });
+
+  it('traps Tab focus within the modal, wrapping from the last to the first focusable element', () => {
+    renderModal();
+    const closeButton = screen.getByTestId('product-modal-close');
+    const confirmButton = screen.getByTestId('product-modal-confirm');
+
+    confirmButton.focus();
+    expect(confirmButton).toHaveFocus();
+
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(closeButton).toHaveFocus();
+  });
+
+  it('traps Shift+Tab focus within the modal, wrapping from the first to the last focusable element', () => {
+    renderModal();
+    const closeButton = screen.getByTestId('product-modal-close');
+    const confirmButton = screen.getByTestId('product-modal-confirm');
+
+    closeButton.focus();
+    expect(closeButton).toHaveFocus();
+
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+    expect(confirmButton).toHaveFocus();
+  });
 });
