@@ -3,11 +3,8 @@
 import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 
-type ClientType = 'particulier' | 'zakelijk';
-
 export function RegistrationForm() {
   const t = useTranslations('registrationPage');
-  const [clientType, setClientType] = useState<ClientType>('zakelijk');
   const [showDeliveryAddress, setShowDeliveryAddress] = useState(false);
   const [showInvoiceAddress, setShowInvoiceAddress] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -38,65 +35,32 @@ export function RegistrationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm text-white/80">
-      <div className="flex gap-2">
-        <button
-          type="button"
-          data-testid="word-klant-type-zakelijk"
-          aria-pressed={clientType === 'zakelijk'}
-          onClick={() => setClientType('zakelijk')}
-          className={
-            clientType === 'zakelijk'
-              ? 'flex-1 rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink'
-              : 'flex-1 rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white'
-          }
-        >
-          {t('typeZakelijk')}
-        </button>
-        <button
-          type="button"
-          data-testid="word-klant-type-particulier"
-          aria-pressed={clientType === 'particulier'}
-          onClick={() => setClientType('particulier')}
-          className={
-            clientType === 'particulier'
-              ? 'flex-1 rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink'
-              : 'flex-1 rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white'
-          }
-        >
-          {t('typeParticulier')}
-        </button>
-      </div>
+      <label className={labelClassName}>
+        {t('labelCompanyName')}
+        <input
+          type="text"
+          name="companyName"
+          required
+          data-testid="word-klant-company-name"
+          className={fieldClassName}
+        />
+      </label>
 
-      {clientType === 'zakelijk' && (
-        <>
-          <label className={labelClassName}>
-            {t('labelCompanyName')}
-            <input
-              type="text"
-              name="companyName"
-              required
-              data-testid="word-klant-company-name"
-              className={fieldClassName}
-            />
-          </label>
+      <label className={labelClassName}>
+        {t('labelKvk')}
+        <input type="text" name="kvk" required data-testid="word-klant-kvk" className={fieldClassName} />
+      </label>
 
-          <label className={labelClassName}>
-            {t('labelKvk')}
-            <input type="text" name="kvk" required data-testid="word-klant-kvk" className={fieldClassName} />
-          </label>
-
-          <label className={labelClassName}>
-            {t('labelContactPerson')}
-            <input
-              type="text"
-              name="contactPerson"
-              required
-              data-testid="word-klant-contact-person"
-              className={fieldClassName}
-            />
-          </label>
-        </>
-      )}
+      <label className={labelClassName}>
+        {t('labelContactPerson')}
+        <input
+          type="text"
+          name="contactPerson"
+          required
+          data-testid="word-klant-contact-person"
+          className={fieldClassName}
+        />
+      </label>
 
       <label className={labelClassName}>
         {t('labelEmail')}

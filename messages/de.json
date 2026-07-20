@@ -118,8 +118,6 @@
   "registrationPage": {
     "title": "Kunde werden",
     "intro": "Beantragen Sie ein Kundenkonto, wir melden uns anschließend bei Ihnen.",
-    "typeParticulier": "Privat",
-    "typeZakelijk": "Geschäftlich",
     "labelEmail": "E-Mail-Adresse",
     "labelPhone": "Telefonnummer",
     "labelContactPreference": "Wie möchten Sie kontaktiert werden?",

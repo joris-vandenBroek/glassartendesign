@@ -118,8 +118,6 @@
   "registrationPage": {
     "title": "Become a client",
     "intro": "Request a customer account, we'll get in touch with you afterwards.",
-    "typeParticulier": "Individual",
-    "typeZakelijk": "Business",
     "labelEmail": "Email address",
     "labelPhone": "Phone number",
     "labelContactPreference": "How would you like to be contacted?",

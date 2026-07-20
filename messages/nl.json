@@ -118,8 +118,6 @@
   "registrationPage": {
     "title": "Word klant",
     "intro": "Vraag een klantaccount aan, wij nemen daarna contact met u op.",
-    "typeParticulier": "Particulier",
-    "typeZakelijk": "Zakelijk",
     "labelEmail": "E-mailadres",
     "labelPhone": "Telefoonnummer",
     "labelContactPreference": "Hoe wilt u gecontacteerd worden?",

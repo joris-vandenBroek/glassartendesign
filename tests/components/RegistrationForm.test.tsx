@@ -13,19 +13,13 @@ function renderForm() {
 }
 
 describe('RegistrationForm', () => {
-  it('defaults to "Zakelijk" selected, with the 3 business fields shown', () => {
+  it('shows the 3 business fields as required, with no Particulier/Zakelijk toggle', () => {
     renderForm();
-    expect(screen.getByTestId('word-klant-type-zakelijk')).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
-    expect(screen.getByTestId('word-klant-type-particulier')).toHaveAttribute(
-      'aria-pressed',
-      'false'
-    );
     expect(screen.getByTestId('word-klant-company-name')).toBeRequired();
     expect(screen.getByTestId('word-klant-kvk')).toBeRequired();
     expect(screen.getByTestId('word-klant-contact-person')).toBeRequired();
+    expect(screen.queryByTestId('word-klant-type-zakelijk')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('word-klant-type-particulier')).not.toBeInTheDocument();
   });
 
   it('has no separate Naam field', () => {
@@ -44,30 +38,13 @@ describe('RegistrationForm', () => {
     expect(screen.getByTestId('word-klant-city')).toBeRequired();
   });
 
-  it('hides the 3 business fields when switching to "Particulier", shows them again when switching back to "Zakelijk"', () => {
-    renderForm();
-    expect(screen.getByTestId('word-klant-company-name')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByTestId('word-klant-type-particulier'));
-    expect(screen.queryByTestId('word-klant-company-name')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('word-klant-kvk')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('word-klant-contact-person')).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByTestId('word-klant-type-zakelijk'));
-    expect(screen.getByTestId('word-klant-company-name')).toBeRequired();
-    expect(screen.getByTestId('word-klant-kvk')).toBeRequired();
-    expect(screen.getByTestId('word-klant-contact-person')).toBeRequired();
-  });
-
   it('shows the 3 delivery-address fields only when the "different delivery address" checkbox is checked', () => {
     renderForm();
     expect(screen.queryByTestId('word-klant-delivery-address')).not.toBeInTheDocument();
-
     fireEvent.click(screen.getByTestId('word-klant-different-delivery'));
     expect(screen.getByTestId('word-klant-delivery-address')).toBeInTheDocument();
     expect(screen.getByTestId('word-klant-delivery-postcode')).toBeInTheDocument();
     expect(screen.getByTestId('word-klant-delivery-city')).toBeInTheDocument();
-
     fireEvent.click(screen.getByTestId('word-klant-different-delivery'));
     expect(screen.queryByTestId('word-klant-delivery-address')).not.toBeInTheDocument();
   });
@@ -75,12 +52,10 @@ describe('RegistrationForm', () => {
   it('shows the 3 invoice-address fields only when the "different invoice address" checkbox is checked', () => {
     renderForm();
     expect(screen.queryByTestId('word-klant-invoice-address')).not.toBeInTheDocument();
-
     fireEvent.click(screen.getByTestId('word-klant-different-invoice'));
     expect(screen.getByTestId('word-klant-invoice-address')).toBeInTheDocument();
     expect(screen.getByTestId('word-klant-invoice-postcode')).toBeInTheDocument();
     expect(screen.getByTestId('word-klant-invoice-city')).toBeInTheDocument();
-
     fireEvent.click(screen.getByTestId('word-klant-different-invoice'));
     expect(screen.queryByTestId('word-klant-invoice-address')).not.toBeInTheDocument();
   });
@@ -96,16 +71,11 @@ describe('RegistrationForm', () => {
 
   it('shows an error and does not submit when the passwords do not match', () => {
     renderForm();
-    fireEvent.click(screen.getByTestId('word-klant-type-particulier'));
-    fireEvent.change(screen.getByTestId('word-klant-password'), {
-      target: { value: 'geheim123' },
-    });
+    fireEvent.change(screen.getByTestId('word-klant-password'), { target: { value: 'geheim123' } });
     fireEvent.change(screen.getByTestId('word-klant-password-confirm'), {
       target: { value: 'anderswoord' },
     });
-
     fireEvent.submit(screen.getByTestId('word-klant-submit').closest('form')!);
-
     expect(screen.getByTestId('word-klant-password-error')).toHaveTextContent(
       'Wachtwoorden komen niet overeen.'
     );
@@ -114,7 +84,13 @@ describe('RegistrationForm', () => {
 
   it('shows the confirmation screen and hides the form after submit, without a real submission', () => {
     renderForm();
-    fireEvent.click(screen.getByTestId('word-klant-type-particulier'));
+    fireEvent.change(screen.getByTestId('word-klant-company-name'), {
+      target: { value: 'Testbedrijf BV' },
+    });
+    fireEvent.change(screen.getByTestId('word-klant-kvk'), { target: { value: '12345678' } });
+    fireEvent.change(screen.getByTestId('word-klant-contact-person'), {
+      target: { value: 'Jan Jansen' },
+    });
     fireEvent.change(screen.getByTestId('word-klant-email'), {
       target: { value: 'jan@example.com' },
     });

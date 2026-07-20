@@ -118,8 +118,6 @@
   "registrationPage": {
     "title": "Devenir client",
     "intro": "Demandez un compte client, nous vous contacterons ensuite.",
-    "typeParticulier": "Particulier",
-    "typeZakelijk": "Professionnel",
     "labelEmail": "Adresse e-mail",
     "labelPhone": "Numéro de téléphone",
     "labelContactPreference": "Comment souhaitez-vous être contacté(e) ?",
