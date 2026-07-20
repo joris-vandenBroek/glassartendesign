@@ -78,7 +78,7 @@ export function ProductsGrid() {
               alt={tSegments(`${image.segmentMessageKey}.title`)}
               className="aspect-square w-full object-cover"
             />
-            <span className="absolute left-2 top-2 rounded-sm bg-black/70 px-2 py-1 text-[0.6rem] uppercase tracking-wide text-white">
+            <span className="badge-gold absolute left-2 top-2">
               {tSegments(`${image.segmentMessageKey}.title`)}
             </span>
           </div>

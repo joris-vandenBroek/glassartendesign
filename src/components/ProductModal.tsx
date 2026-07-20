@@ -195,9 +195,7 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
             onClick={handleConfirm}
             disabled={isConfirmed}
             className={`rounded-sm px-4 py-2.5 text-xs tracking-[0.15em] transition ${
-              isConfirmed
-                ? 'cursor-default bg-green-500 text-white'
-                : 'bg-gold text-ink hover:-translate-y-0.5 hover:bg-gold-bright'
+              isConfirmed ? 'cursor-default bg-green-500 text-white' : 'btn-gold'
             }`}
           >
             {isConfirmed ? t('added') : t('confirm')}

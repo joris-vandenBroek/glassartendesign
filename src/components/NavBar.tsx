@@ -54,7 +54,7 @@ export function NavBar() {
               type="button"
               data-testid="nav-login"
               onClick={login}
-              className="rounded-sm bg-silver px-4 py-2 text-xs tracking-[0.15em] text-ink"
+              className="btn-gold rounded-sm px-4 py-2 text-xs font-head tracking-[0.15em]"
             >
               {t('login')}
             </button>
