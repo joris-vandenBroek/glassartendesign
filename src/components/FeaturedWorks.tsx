@@ -10,7 +10,7 @@ export function FeaturedWorks() {
 
   return (
     <GlassPanel className="!max-w-5xl text-center">
-      <p className="text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
+      <p className="font-head text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
         {t('label')}
       </p>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">

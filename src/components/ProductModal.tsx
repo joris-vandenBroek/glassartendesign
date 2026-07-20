@@ -145,7 +145,7 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
           className="h-56 w-full object-cover sm:h-full"
         />
         <div className="flex flex-col gap-4 p-6">
-          <p className="text-xs uppercase tracking-[0.2em] text-gold">
+          <p className="font-head text-xs uppercase tracking-[0.2em] text-gold">
             {tSegments(`${image.segmentMessageKey}.title`)}
           </p>
           <label className="flex flex-col gap-1 text-[0.65rem] uppercase tracking-wide text-white/60">

@@ -88,7 +88,7 @@ export function WhyUs() {
 
   return (
     <GlassPanel className="!max-w-5xl">
-      <p className="text-center text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
+      <p className="text-center font-head text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
         {t('title')}
       </p>
 

@@ -18,14 +18,14 @@ export function NavBar() {
     >
       <div className="flex items-center gap-8">
         <Logo />
-        <div className="flex items-center gap-6 text-xs tracking-[0.15em] text-white/70">
-          <Link href="/" data-testid="nav-home" className="hover:text-white">
+        <div className="flex items-center gap-6 text-xs font-head tracking-[0.15em] text-white/70">
+          <Link href="/" data-testid="nav-home" className="hover:text-gold">
             {t('home')}
           </Link>
-          <Link href="/collecties" data-testid="nav-collections" className="hover:text-white">
+          <Link href="/collecties" data-testid="nav-collections" className="hover:text-gold">
             {t('collections')}
           </Link>
-          <Link href="/contact" data-testid="nav-contact" className="hover:text-white">
+          <Link href="/contact" data-testid="nav-contact" className="hover:text-gold">
             {t('contact')}
           </Link>
         </div>
@@ -46,7 +46,7 @@ export function NavBar() {
             <Link
               href="/word-klant"
               data-testid="nav-become-client"
-              className="hidden text-xs tracking-[0.15em] text-white/70 hover:text-white sm:inline"
+              className="hidden text-xs font-head tracking-[0.15em] text-white/70 hover:text-gold sm:inline"
             >
               {t('becomeClient')}
             </Link>

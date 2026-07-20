@@ -12,7 +12,7 @@ export function Logo() {
         aria-hidden="true"
         className="h-7 w-7 shrink-0"
       />
-      <span className="text-xs tracking-[0.15em]">
+      <span className="font-head text-xs tracking-[0.15em]">
         <span className="text-gold">GLASSART</span> <span className="text-silver">&amp; DESIGN</span>
       </span>
     </Link>

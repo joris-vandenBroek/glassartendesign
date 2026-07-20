@@ -21,8 +21,8 @@ export function ProductsGrid() {
 
   function filterButtonClass(isActive: boolean) {
     return isActive
-      ? 'rounded-full bg-silver px-4 py-1.5 text-xs tracking-wide text-ink'
-      : 'rounded-full border border-white/20 px-4 py-1.5 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white';
+      ? 'rounded-full bg-silver px-4 py-1.5 text-xs font-head tracking-wide text-ink'
+      : 'rounded-full border border-white/20 px-4 py-1.5 text-xs font-head tracking-wide text-white/70 hover:border-gold/40 hover:text-gold';
   }
 
   return (
