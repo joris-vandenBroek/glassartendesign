@@ -32,7 +32,7 @@ Voor een compleet beeld: dit is de volledige paginastructuur en functionaliteit 
 - Koppeling met een boekhoudpakket (bv. Exact, Moneybird) voor facturen/omzet/BTW, of blijft dit handmatig — nog te bepalen.
 - Automatische notificaties naar de klant bij statuswijzigingen (bv. "bestelling in productie", "factuur verstuurd", "retour verwerkt") — kanaal (e-mail/WhatsApp) nog te bepalen.
 
-### Beheer maten, kunstwerken, segmenten en materiaalsoorten
+### Beheer maten, kunstwerken, segmenten, materiaalsoorten en prijzen
 
 - **Maten:** beheerfunctie om maten (afmetingen) aan te maken/wijzigen, en te koppelen aan specifieke kunstwerken (niet elk kunstwerk is per se in elke maat leverbaar).
 - **Kunstwerken:** beheerfunctie om kunstwerken te beheren, inclusief een beschrijving per kunstwerk. Naast de webafbeelding (met watermerk, zie hieronder) moet ook het hoge-resolutie productiebestand voor de drukker beheerd/geüpload kunnen worden — dit is een apart bestand, niet dezelfde afbeelding als de (verwaterde) webweergave.
@@ -46,7 +46,7 @@ Voor een compleet beeld: dit is de volledige paginastructuur en functionaliteit 
 Zodra dit deelproject een echte backend krijgt, zijn in ieder geval de volgende tabellen nodig (exact schema/kolommen nog te ontwerpen bij de daadwerkelijke brainstorm/spec):
 
 - **Maten** — de beschikbare afmetingen.
-- **Orders** — met een status (bv. Aangevraagd / In productie / Verzonden / Geleverd / Retour aangemeld).
+- **Orders** — met een status (bv. Aangevraagd / In productie / Verzonden / Geleverd). "Retour aangemeld" is geen aparte status in deze reeks, maar een overlay op een bestaande order zodra er een retour voor is geregistreerd (zo werkt het ook al in de huidige mock-versie) — vermoedelijk dus een apart veld/vlag, geen vervanging van de status.
 - **Orderitems** — de regels binnen een order (kunstwerk, maat, materiaalsoort, aantal).
 - **Facturen** — met een status (bv. Te betalen / Betaald).
 - **Klanten**.
@@ -56,13 +56,14 @@ Zodra dit deelproject een echte backend krijgt, zijn in ieder geval de volgende 
 - **Rollen** (voor medewerkers in de beheeromgeving) en een koppeling medewerker ↔ rol.
 - Impliciet, volgend uit de beheerfunctie hierboven: **Kunstwerken**, **Segmenten** en **Materiaalsoorten** als eigen tabellen, plus koppeltabellen kunstwerk↔segment (N-op-N) en kunstwerk↔materiaalsoort (N-op-N), en een koppeling kunstwerk↔maat.
 
-## Klantaccount (voor de klant, ingelogd)
+## Klantaccount (voor de klant, ingelogd) — van mock naar echt
 
-- Overzicht van bestellingen met status en een "opnieuw bestellen"-knop (functioneel al gemockt in de huidige site met neptdata in `localStorage`; moet in de echte versie backend-data worden).
-- Overzicht van te betalen facturen.
-- Overzicht van betaalde facturen.
-- Gesprekken via WhatsApp (vermoedelijk een geïntegreerde weergave van WhatsApp-conversaties met het bedrijf; exacte werking — eigen inbox vs. koppeling met WhatsApp Business API — moet nog worden uitgewerkt).
-- Gegevens wijzigen: wachtwoord, taalvoorkeur, contactpersoon, bedrijfsnaam, e-mailadres, telefoonnummer, adres, afleveradres.
+De zes onderdelen van de klant-accountpagina staan hierboven al beschreven (zie "Website — paginastructuur en functionaliteit"). Dit zijn de punten waarop de huidige mock-versie moet worden vervangen door echte data/functionaliteit:
+
+- **Bestellingen, Te betalen facturen, Betaalde facturen:** nu nepdata in `localStorage`, moet backend-data worden.
+- **Retourneren:** nu registreert de klant alleen zelf een retouraanvraag (ook nepdata); moet gekoppeld worden aan de echte beheerkant die deze retouren afhandelt (zie Beheerfunctie hierboven).
+- **Gesprekgeschiedenis:** nu volledig nepdata; moet een echte koppeling worden met WhatsApp-conversaties (eigen inbox vs. WhatsApp Business API — moet nog worden uitgewerkt).
+- **Instellingen:** nu een los mock-profiel zonder koppeling met de "Word klant"-aanvraag; moet één samenhangend, echt klantprofiel worden (wachtwoord, taalvoorkeur, contactpersoon, bedrijfsnaam, e-mailadres, telefoonnummer, adres, afleveradres, factuuradres, contactvoorkeur).
 
 ## Taalvoorkeur gekoppeld aan account
 
@@ -76,4 +77,4 @@ Zodra dit deelproject een echte backend krijgt, zijn in ieder geval de volgende 
 ## Niet in scope van dit document
 
 - Concrete technische keuzes (database, auth-provider, hosting) — dat gebeurt bij de daadwerkelijke brainstorm voor dit deelproject, niet hier.
-- Een tijdlijn of prioriteit t.o.v. de overige openstaande deelprojecten (mandje, contactpagina, registratiepagina, logo, visuele polijst, taal-dropdown) — deze blijven vóór dit deelproject staan, zoals eerder afgesproken.
+- Een tijdlijn of prioriteit t.o.v. de overige openstaande deelprojecten. Van de oorspronkelijke lijst (mandje, contactpagina, registratiepagina, logo, klant-accountpagina, visuele polijst, taal-dropdown) is inmiddels alles gebouwd behalve **visuele polijst** — die blijft, zoals eerder afgesproken, vóór dit deelproject staan.
