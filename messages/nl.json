@@ -76,6 +76,7 @@
     "title": "Mandje",
     "addToCart": "Toevoegen aan mandje",
     "size": "Maat",
+    "material": "Materiaal",
     "quantity": "Aantal",
     "confirm": "Toevoegen",
     "empty": "Je mandje is leeg.",

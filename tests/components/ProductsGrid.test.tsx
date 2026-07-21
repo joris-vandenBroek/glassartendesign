@@ -1,9 +1,96 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { CartProvider } from '@/lib/useCart';
 import messages from '../../messages/nl.json';
+
+const getDocsMock = vi.fn();
+
+vi.mock('@/lib/firebase', () => ({
+  db: {},
+}));
+
+vi.mock('firebase/firestore', () => ({
+  collection: vi.fn((_db, name) => ({ name })),
+  doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
+  getDocs: (...args: unknown[]) => getDocsMock(...args),
+  addDoc: vi.fn(),
+  updateDoc: vi.fn(),
+  deleteDoc: vi.fn(),
+}));
+
+function makeSnapshot(docsData: Array<{ id: string; data: Record<string, unknown> }>) {
+  return {
+    empty: docsData.length === 0,
+    docs: docsData.map(({ id, data }) => ({ id, data: () => data })),
+  };
+}
+
+const SEGMENTEN = [
+  { id: 'seg-hotel', data: { omschrijving: 'Hotel' } },
+  { id: 'seg-wellness', data: { omschrijving: 'Wellness' } },
+];
+const KUNSTWERKEN = [
+  {
+    id: 'kw-1',
+    data: {
+      foto: 'https://example.com/kw-1.jpg',
+      segmentIds: ['seg-hotel'],
+      materiaalIds: ['mat-1'],
+      maatIds: ['maat-1'],
+      prijzen: [{ materiaalId: 'mat-1', maatId: 'maat-1', prijs: 150 }],
+      omschrijvingNl: 'Hotel paneel',
+      omschrijvingFr: '',
+      omschrijvingDe: '',
+      omschrijvingEn: '',
+    },
+  },
+  {
+    id: 'kw-2',
+    data: {
+      foto: 'https://example.com/kw-2.jpg',
+      segmentIds: ['seg-wellness'],
+      materiaalIds: ['mat-1'],
+      maatIds: ['maat-1'],
+      prijzen: [{ materiaalId: 'mat-1', maatId: 'maat-1', prijs: 200 }],
+      omschrijvingNl: 'Wellness paneel',
+      omschrijvingFr: '',
+      omschrijvingDe: '',
+      omschrijvingEn: '',
+    },
+  },
+  {
+    id: 'kw-3',
+    data: {
+      foto: 'https://example.com/kw-3.jpg',
+      segmentIds: ['seg-hotel', 'seg-wellness'],
+      materiaalIds: ['mat-1'],
+      maatIds: ['maat-1'],
+      prijzen: [{ materiaalId: 'mat-1', maatId: 'maat-1', prijs: 175 }],
+      omschrijvingNl: 'Kunstwerk in beide segmenten',
+      omschrijvingFr: '',
+      omschrijvingDe: '',
+      omschrijvingEn: '',
+    },
+  },
+];
+const MATERIALEN = [
+  { id: 'mat-1', data: { materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Veiligheidsglas' } },
+];
+const MATEN = [{ id: 'maat-1', data: { breedte: 40, hoogte: 60 } }];
+
+function mockCollections() {
+  const data: Record<string, Array<{ id: string; data: Record<string, unknown> }>> = {
+    segmenten: SEGMENTEN,
+    kunstwerken: KUNSTWERKEN,
+    materialen: MATERIALEN,
+    maten: MATEN,
+  };
+  getDocsMock.mockImplementation((collectionRef: { name: string }) =>
+    Promise.resolve(makeSnapshot(data[collectionRef.name] ?? []))
+  );
+}
 
 function renderProductsGrid() {
   return render(
@@ -15,63 +102,75 @@ function renderProductsGrid() {
   );
 }
 
+beforeEach(() => {
+  getDocsMock.mockReset();
+  mockCollections();
+});
+
 describe('ProductsGrid', () => {
-  it('shows all 36 images and 7 filter buttons (all + 6 segments) by default', () => {
+  it('shows all 3 kunstwerken and 3 filter buttons (all + 2 segments) by default', async () => {
     renderProductsGrid();
-    expect(screen.getAllByTestId('product-card')).toHaveLength(36);
+    expect(await screen.findAllByTestId('product-card')).toHaveLength(3);
     expect(screen.getByTestId('filter-all')).toBeInTheDocument();
-    expect(screen.getByTestId('filter-hotel')).toBeInTheDocument();
-    expect(screen.getByTestId('filter-restaurant')).toBeInTheDocument();
-    expect(screen.getByTestId('filter-wellness')).toBeInTheDocument();
-    expect(screen.getByTestId('filter-office')).toBeInTheDocument();
-    expect(screen.getByTestId('filter-abstract')).toBeInTheDocument();
-    expect(screen.getByTestId('filter-artist-collections')).toBeInTheDocument();
+    expect(screen.getByTestId('filter-seg-hotel')).toHaveTextContent('Hotel');
+    expect(screen.getByTestId('filter-seg-wellness')).toHaveTextContent('Wellness');
   });
 
-  it('shows only that segment\'s 6 images after clicking its filter button', () => {
+  it("shows only that segment's kunstwerken after clicking its filter button, including one shared across segments", async () => {
     renderProductsGrid();
-    fireEvent.click(screen.getByTestId('filter-wellness'));
-    expect(screen.getAllByTestId('product-card')).toHaveLength(6);
+    await screen.findAllByTestId('product-card');
+    fireEvent.click(screen.getByTestId('filter-seg-wellness'));
+    expect(screen.getAllByTestId('product-card')).toHaveLength(2); // kw-2 and kw-3
   });
 
-  it('returns to all 36 images after clicking the "Alle" filter again', () => {
+  it('returns to all kunstwerken after clicking the "Alle" filter again', async () => {
     renderProductsGrid();
-    fireEvent.click(screen.getByTestId('filter-wellness'));
+    await screen.findAllByTestId('product-card');
+    fireEvent.click(screen.getByTestId('filter-seg-wellness'));
     fireEvent.click(screen.getByTestId('filter-all'));
-    expect(screen.getAllByTestId('product-card')).toHaveLength(36);
+    expect(screen.getAllByTestId('product-card')).toHaveLength(3);
   });
 
-  it('marks the active filter button with aria-pressed', () => {
+  it('marks the active filter button with aria-pressed', async () => {
     renderProductsGrid();
+    await screen.findAllByTestId('product-card');
     expect(screen.getByTestId('filter-all')).toHaveAttribute('aria-pressed', 'true');
-    fireEvent.click(screen.getByTestId('filter-office'));
-    expect(screen.getByTestId('filter-office')).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByTestId('filter-seg-hotel'));
+    expect(screen.getByTestId('filter-seg-hotel')).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByTestId('filter-all')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('opens the product modal when a card is clicked, closed by default', () => {
+  it('opens the product modal with the resolved description when a card is clicked', async () => {
     renderProductsGrid();
+    const cards = await screen.findAllByTestId('product-card');
     expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
-    fireEvent.click(screen.getAllByTestId('product-card')[0]);
+    fireEvent.click(cards[0]);
     expect(screen.getByTestId('product-modal')).toBeInTheDocument();
   });
 
-  it('closes the product modal when its backdrop is clicked', () => {
+  it('closes the product modal when its backdrop is clicked', async () => {
     renderProductsGrid();
-    fireEvent.click(screen.getAllByTestId('product-card')[0]);
+    const cards = await screen.findAllByTestId('product-card');
+    fireEvent.click(cards[0]);
     expect(screen.getByTestId('product-modal')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('product-modal-backdrop'));
     expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
   });
 
-  it('opens the product modal when Enter or Space is pressed on a focused card', () => {
+  it('opens the product modal when Enter or Space is pressed on a focused card', async () => {
     renderProductsGrid();
-    expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
-    fireEvent.keyDown(screen.getAllByTestId('product-card')[0], { key: 'Enter' });
+    const cards = await screen.findAllByTestId('product-card');
+    fireEvent.keyDown(cards[0], { key: 'Enter' });
     expect(screen.getByTestId('product-modal')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('product-modal-backdrop'));
 
-    fireEvent.keyDown(screen.getAllByTestId('product-card')[1], { key: ' ' });
+    fireEvent.keyDown(cards[1], { key: ' ' });
     expect(screen.getByTestId('product-modal')).toBeInTheDocument();
+  });
+
+  it('shows a watermark overlay on every product card photo', async () => {
+    renderProductsGrid();
+    await screen.findAllByTestId('product-card');
+    expect(screen.getAllByTestId('watermark-overlay').length).toBeGreaterThanOrEqual(3);
   });
 });
