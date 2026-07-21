@@ -3,8 +3,9 @@
 import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAdminAuth } from '@/lib/useAdminAuth';
+import { GlassPanel } from '@/components/GlassPanel';
 import { AdminLoginForm } from './AdminLoginForm';
-import { KlantAanvragenSection } from './KlantAanvragenSection';
+import { BeheerShell } from './BeheerShell';
 
 export function AdminDashboard() {
   const t = useTranslations('beheer');
@@ -29,28 +30,21 @@ export function AdminDashboard() {
 
   if (isUnauthorized) {
     return (
-      <p data-testid="beheer-unauthorized" className="text-sm text-white/80">
-        {t('unauthorized')}
-      </p>
+      <GlassPanel className="mx-auto !max-w-lg">
+        <p data-testid="beheer-unauthorized" className="text-sm text-white/80">
+          {t('unauthorized')}
+        </p>
+      </GlassPanel>
     );
   }
 
   if (!user) {
-    return <AdminLoginForm />;
+    return (
+      <GlassPanel className="mx-auto !max-w-lg">
+        <AdminLoginForm />
+      </GlassPanel>
+    );
   }
 
-  return (
-    <div data-testid="beheer-dashboard" className="flex flex-col gap-4 text-sm text-white/80">
-      <p data-testid="beheer-logged-in-as">{t('loggedInAs', { email: user.email ?? '' })}</p>
-      <button
-        type="button"
-        onClick={() => logout()}
-        data-testid="beheer-logout"
-        className="self-start rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white"
-      >
-        {t('logout')}
-      </button>
-      <KlantAanvragenSection />
-    </div>
-  );
+  return <BeheerShell email={user.email ?? ''} onLogout={() => logout()} />;
 }

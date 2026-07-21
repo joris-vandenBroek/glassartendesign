@@ -30,7 +30,7 @@ export function FacturenSection() {
 
   return (
     <div data-testid="facturen-section">
-      <DataTable
+      <DataTable<AdminInvoice>
         columns={columns}
         rows={MOCK_ADMIN_INVOICES}
         getRowId={(row) => row.invoiceNumber}

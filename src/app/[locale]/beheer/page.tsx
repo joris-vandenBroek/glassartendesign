@@ -23,9 +23,7 @@ export default async function BeheerPage({
         <h1 className="text-2xl font-light text-white sm:text-3xl">{t('title')}</h1>
       </GlassPanel>
 
-      <GlassPanel className="mx-auto !max-w-lg">
-        <AdminDashboard />
-      </GlassPanel>
+      <AdminDashboard />
     </main>
   );
 }

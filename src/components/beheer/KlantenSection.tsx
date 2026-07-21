@@ -58,7 +58,7 @@ export function KlantenSection({ klanten, loadError, onKlantUpdated }: KlantenSe
 
   return (
     <div data-testid="klanten-section">
-      <DataTable
+      <DataTable<Klant>
         columns={columns}
         rows={klanten}
         getRowId={(row) => row.id}
