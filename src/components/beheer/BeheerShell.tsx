@@ -12,10 +12,13 @@ import { BestellingenSection, type Bestelling, type BestellingLine } from './Bes
 import { MateriaalsoortenSection } from './MateriaalsoortenSection';
 import { MaterialenSection } from './MaterialenSection';
 import { MatenSection } from './MatenSection';
-import type { Materiaalsoort, Materiaal, Maat } from './materiaalTypes';
+import { SegmentenSection } from './SegmentenSection';
+import { KunstwerkenSection } from './KunstwerkenSection';
+import type { Materiaalsoort, Materiaal, Maat, Segment, Kunstwerk } from './materiaalTypes';
 import { MOCK_ADMIN_INVOICES } from '@/data/mockAdminInvoices';
 import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
 import { MATERIAALSOORTEN_SEED, buildMaterialenSeed } from '@/data/materiaalsoortenSeed';
+import { SEGMENTEN_SEED, MATEN_SEED, buildKunstwerkenSeed } from '@/data/kunstwerkenSeed';
 
 interface BeheerShellProps {
   email: string;
@@ -144,7 +147,22 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
     seed: materialenSeed,
     skip: materiaalsoorten.items === null,
   });
-  const maten = useFirestoreCollection<Maat>('maten');
+  const maten = useFirestoreCollection<Maat>('maten', { seed: MATEN_SEED });
+  const segmenten = useFirestoreCollection<Segment>('segmenten', { seed: SEGMENTEN_SEED });
+
+  const kunstwerkenReady = segmenten.items !== null && materialen.items !== null && maten.items !== null;
+  const kunstwerkenSeed = kunstwerkenReady
+    ? buildKunstwerkenSeed(segmenten.items!, materialen.items!, maten.items!)
+    : undefined;
+  // Seeding writes all 36 kunstwerken documents one at a time; if a write fails partway
+  // through, the collection is left partially seeded and useFirestoreCollection will not
+  // retry the seed (its guard only fires when the collection comes back empty). Recovery
+  // in that case requires an admin manually deleting the partial documents so the
+  // collection is empty again before a reload can re-trigger the seed.
+  const kunstwerken = useFirestoreCollection<Kunstwerk>('kunstwerken', {
+    seed: kunstwerkenSeed,
+    skip: !kunstwerkenReady,
+  });
 
   const klantenCount = (klanten ?? []).filter((klant) => klant.status === 'Beoordelen').length;
   const facturenCount = MOCK_ADMIN_INVOICES.filter((invoice) => invoice.status === 'Te betalen').length;
@@ -152,6 +170,8 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   const materiaalsoortenCount = (materiaalsoorten.items ?? []).length;
   const materialenCount = (materialen.items ?? []).length;
   const matenCount = (maten.items ?? []).length;
+  const segmentenCount = (segmenten.items ?? []).length;
+  const kunstwerkenCount = (kunstwerken.items ?? []).length;
 
   return (
     <div
@@ -172,6 +192,8 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           materiaalsoortenCount={materiaalsoortenCount}
           materialenCount={materialenCount}
           matenCount={matenCount}
+          segmentenCount={segmentenCount}
+          kunstwerkenCount={kunstwerkenCount}
         />
       </GlassPanel>
       <GlassPanel className="w-full">
@@ -207,13 +229,32 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
             onUpdate={materialen.update}
             onRemove={materialen.remove}
           />
-        ) : (
+        ) : activeSection === 'maten' ? (
           <MatenSection
             maten={maten.items}
             loadError={maten.error === 'load' ? t('matenLoadError') : null}
             onAdd={maten.add}
             onUpdate={maten.update}
             onRemove={maten.remove}
+          />
+        ) : activeSection === 'segmenten' ? (
+          <SegmentenSection
+            segmenten={segmenten.items}
+            loadError={segmenten.error === 'load' ? t('segmentenLoadError') : null}
+            onAdd={segmenten.add}
+            onUpdate={segmenten.update}
+            onRemove={segmenten.remove}
+          />
+        ) : (
+          <KunstwerkenSection
+            kunstwerken={kunstwerken.items}
+            segmenten={segmenten.items}
+            materialen={materialen.items}
+            maten={maten.items}
+            loadError={kunstwerken.error === 'load' ? t('kunstwerkenLoadError') : null}
+            onAdd={kunstwerken.add}
+            onUpdate={kunstwerken.update}
+            onRemove={kunstwerken.remove}
           />
         )}
       </GlassPanel>
