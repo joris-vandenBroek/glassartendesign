@@ -25,6 +25,10 @@ export function FeaturedWorks() {
     [kunstwerken.items]
   );
 
+  if (kunstwerken.items === null) {
+    return null;
+  }
+
   return (
     <GlassPanel className="!max-w-5xl text-center">
       <p className="font-head text-[0.65rem] uppercase tracking-[0.25em] text-white/50">{t('label')}</p>

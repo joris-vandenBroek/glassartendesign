@@ -48,7 +48,7 @@ describe('FeaturedWorks', () => {
   it('renders the section label and exactly 3 featured works when 5 kunstwerken exist', async () => {
     getDocsMock.mockResolvedValue(makeSnapshot(['a', 'b', 'c', 'd', 'e'].map(makeKunstwerk)));
     renderWithIntl(<FeaturedWorks />, 'nl', messages);
-    expect(screen.getByText('Uitgelichte werken')).toBeInTheDocument();
+    expect(await screen.findByText('Uitgelichte werken')).toBeInTheDocument();
     await waitFor(() => expect(screen.getAllByTestId('featured-work')).toHaveLength(3));
   });
 
