@@ -1,15 +1,15 @@
-import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import { WatermarkedImage } from '@/components/WatermarkedImage';
 
 describe('WatermarkedImage', () => {
-  it('renders the image with the given src and alt text', () => {
+  it('renders the image with the given src and alt text (no canvas support: falls back to <img>)', () => {
     render(<WatermarkedImage src="https://example.com/foto.jpg" alt="Een kunstwerk" />);
     const img = screen.getByRole('img', { name: 'Een kunstwerk' });
     expect(img).toHaveAttribute('src', 'https://example.com/foto.jpg');
   });
 
-  it('renders a non-interactive watermark overlay with the copyright text', () => {
+  it('renders a non-interactive watermark overlay with the copyright text as a fallback', () => {
     render(<WatermarkedImage src="https://example.com/foto.jpg" alt="Een kunstwerk" />);
     const overlay = screen.getByTestId('watermark-overlay');
     expect(overlay).toHaveTextContent('© Glassart & Design');
@@ -19,5 +19,57 @@ describe('WatermarkedImage', () => {
   it('applies an extra className to the wrapper when given', () => {
     render(<WatermarkedImage src="https://example.com/foto.jpg" alt="Een kunstwerk" className="h-12 w-12" />);
     expect(screen.getByTestId('watermarked-image')).toHaveClass('h-12', 'w-12');
+  });
+
+  describe('when canvas rendering succeeds', () => {
+    const originalGetContext = HTMLCanvasElement.prototype.getContext;
+    const originalImage = window.Image;
+
+    afterEach(() => {
+      HTMLCanvasElement.prototype.getContext = originalGetContext;
+      window.Image = originalImage;
+    });
+
+    function mockCanvasAndImage() {
+      const fakeCtx = {
+        setTransform: vi.fn(),
+        drawImage: vi.fn(),
+        save: vi.fn(),
+        restore: vi.fn(),
+        translate: vi.fn(),
+        rotate: vi.fn(),
+        fillText: vi.fn(),
+      };
+      // @ts-expect-error partial mock is enough for the drawing calls this component makes
+      HTMLCanvasElement.prototype.getContext = vi.fn(() => fakeCtx);
+
+      class FakeImage {
+        naturalWidth = 800;
+        naturalHeight = 600;
+        complete = true;
+        crossOrigin: string | null = null;
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        set src(_value: string) {
+          setTimeout(() => this.onload?.());
+        }
+      }
+      // @ts-expect-error test double for the browser Image constructor
+      window.Image = FakeImage;
+
+      return fakeCtx;
+    }
+
+    it('bakes the watermark into the canvas instead of showing a bypassable <img> overlay', async () => {
+      mockCanvasAndImage();
+      render(<WatermarkedImage src="https://example.com/foto.jpg" alt="Een kunstwerk" />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('watermark-canvas')).toHaveAttribute('role', 'img');
+      });
+
+      expect(screen.queryByTestId('watermark-overlay')).not.toBeInTheDocument();
+      expect(screen.queryByRole('img', { name: 'Een kunstwerk' })?.tagName).toBe('CANVAS');
+    });
   });
 });
