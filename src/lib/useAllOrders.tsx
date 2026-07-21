@@ -40,30 +40,36 @@ export function useAllOrders(): DisplayOrder[] {
     }
     let cancelled = false;
     async function loadRealOrders() {
-      const headersSnapshot = await getDocs(
-        query(collection(db, 'bestelheaders'), where('klantId', '==', user!.uid))
-      );
-      const orders = await Promise.all(
-        headersSnapshot.docs.map(async (headerDoc) => {
-          const linesSnapshot = await getDocs(
-            collection(db, 'bestelheaders', headerDoc.id, 'bestellines')
-          );
-          const totalQuantity = linesSnapshot.docs.reduce(
-            (sum, lineDoc) => sum + (lineDoc.data().quantity ?? 0),
-            0
-          );
-          const data = headerDoc.data();
-          return {
-            id: headerDoc.id,
-            date: data.besteldatum?.toDate().toISOString().slice(0, 10) ?? '',
-            status: data.status,
-            lineCount: linesSnapshot.docs.length,
-            totalQuantity,
-          };
-        })
-      );
-      if (!cancelled) {
-        setRealOrders(orders);
+      try {
+        const headersSnapshot = await getDocs(
+          query(collection(db, 'bestelheaders'), where('klantId', '==', user!.uid))
+        );
+        const orders = await Promise.all(
+          headersSnapshot.docs.map(async (headerDoc) => {
+            const linesSnapshot = await getDocs(
+              collection(db, 'bestelheaders', headerDoc.id, 'bestellines')
+            );
+            const totalQuantity = linesSnapshot.docs.reduce(
+              (sum, lineDoc) => sum + (lineDoc.data().quantity ?? 0),
+              0
+            );
+            const data = headerDoc.data();
+            return {
+              id: headerDoc.id,
+              date: data.besteldatum?.toDate().toISOString().slice(0, 10) ?? '',
+              status: data.status,
+              lineCount: linesSnapshot.docs.length,
+              totalQuantity,
+            };
+          })
+        );
+        if (!cancelled) {
+          setRealOrders(orders);
+        }
+      } catch {
+        if (!cancelled) {
+          setRealOrders([]);
+        }
       }
     }
     loadRealOrders();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -16,6 +16,12 @@ interface BestellingModalProps {
 export function BestellingModal({ bestelling, onClose, onUpdated }: BestellingModalProps) {
   const t = useTranslations('beheer');
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (bestelling) {
+      setError(null);
+    }
+  }, [bestelling]);
 
   async function handleGoedkeuren() {
     if (!bestelling) return;

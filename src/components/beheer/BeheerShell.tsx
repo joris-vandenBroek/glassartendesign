@@ -97,7 +97,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
               besteldatum: data.besteldatum?.toDate().toLocaleDateString('nl-NL') ?? '',
               status: data.status,
               lineCount: lines.length,
-              totalQuantity: lines.reduce((sum, line) => sum + line.quantity, 0),
+              totalQuantity: lines.reduce((sum, line) => sum + (line.quantity ?? 0), 0),
               lines,
             } as RawBestelling;
           })
