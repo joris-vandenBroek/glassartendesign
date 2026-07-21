@@ -1,25 +1,46 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
+import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
+import { WatermarkedImage } from './WatermarkedImage';
 import { GlassPanel } from './GlassPanel';
+import type { Kunstwerk } from './beheer/materiaalTypes';
 
-const PLACEHOLDER_COUNT = 3;
+const FEATURED_COUNT = 3;
+
+function pickRandom<T>(items: T[], count: number): T[] {
+  const shuffled = [...items].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
 
 export function FeaturedWorks() {
   const t = useTranslations('works');
+  const locale = useLocale();
+  const kunstwerken = useFirestoreCollection<Kunstwerk>('kunstwerken');
+
+  const featured = useMemo(
+    () => pickRandom(kunstwerken.items ?? [], FEATURED_COUNT),
+    [kunstwerken.items]
+  );
 
   return (
     <GlassPanel className="!max-w-5xl text-center">
-      <p className="font-head text-[0.65rem] uppercase tracking-[0.25em] text-white/50">
-        {t('label')}
-      </p>
+      <p className="font-head text-[0.65rem] uppercase tracking-[0.25em] text-white/50">{t('label')}</p>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {Array.from({ length: PLACEHOLDER_COUNT }).map((_, index) => (
+        {featured.map((kunstwerk) => (
           <div
-            key={index}
-            data-testid="work-placeholder"
-            className="aspect-square rounded border border-white/10 bg-gradient-to-br from-graphite to-ink"
-          />
+            key={kunstwerk.id}
+            data-testid="featured-work"
+            className="aspect-square overflow-hidden rounded border border-white/10"
+          >
+            <WatermarkedImage
+              src={kunstwerk.foto}
+              alt={resolveKunstwerkOmschrijving(kunstwerk, locale)}
+              className="h-full w-full"
+            />
+          </div>
         ))}
       </div>
     </GlassPanel>
