@@ -29,6 +29,10 @@ vi.mock('firebase/auth', () => ({
 vi.mock('firebase/firestore', () => ({
   doc: vi.fn((_db, collection, id) => ({ collection, id })),
   getDoc: (...args: unknown[]) => getDocMock(...args),
+  collection: vi.fn((_db, ...segments: string[]) => ({ name: segments.join('/') })),
+  query: vi.fn((collectionRef, ...constraints) => ({ collectionRef, constraints })),
+  where: vi.fn((field, op, value) => ({ field, op, value })),
+  getDocs: vi.fn().mockResolvedValue({ docs: [] }),
 }));
 
 function renderDashboard() {
