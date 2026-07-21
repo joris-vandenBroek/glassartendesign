@@ -2,7 +2,14 @@
 
 import { useTranslations } from 'next-intl';
 
-export type BeheerSection = 'klanten' | 'facturen' | 'materiaalsoorten' | 'materialen' | 'maten';
+export type BeheerSection =
+  | 'klanten'
+  | 'facturen'
+  | 'materiaalsoorten'
+  | 'materialen'
+  | 'maten'
+  | 'segmenten'
+  | 'kunstwerken';
 
 interface BeheerNavProps {
   activeSection: BeheerSection;
@@ -13,6 +20,8 @@ interface BeheerNavProps {
   materiaalsoortenCount: number;
   materialenCount: number;
   matenCount: number;
+  segmentenCount: number;
+  kunstwerkenCount: number;
 }
 
 const ACTIVE_ITEMS: { id: BeheerSection; labelKey: string }[] = [
@@ -21,13 +30,14 @@ const ACTIVE_ITEMS: { id: BeheerSection; labelKey: string }[] = [
   { id: 'materiaalsoorten', labelKey: 'navMateriaalsoorten' },
   { id: 'materialen', labelKey: 'navMaterialen' },
   { id: 'maten', labelKey: 'navMaten' },
+  { id: 'segmenten', labelKey: 'navSegmenten' },
+  { id: 'kunstwerken', labelKey: 'navKunstwerken' },
 ];
 
 const DISABLED_ITEMS: { id: string; labelKey: string }[] = [
   { id: 'bestellingen', labelKey: 'navBestellingen' },
   { id: 'retouren', labelKey: 'navRetouren' },
   { id: 'prijsgroepen', labelKey: 'navPrijsgroepen' },
-  { id: 'kunstwerken', labelKey: 'navKunstwerken' },
   { id: 'glassartDesign', labelKey: 'navGlassartDesign' },
 ];
 
@@ -40,6 +50,8 @@ export function BeheerNav({
   materiaalsoortenCount,
   materialenCount,
   matenCount,
+  segmentenCount,
+  kunstwerkenCount,
 }: BeheerNavProps) {
   const t = useTranslations('beheer');
   const counts: Record<BeheerSection, number> = {
@@ -48,6 +60,8 @@ export function BeheerNav({
     materiaalsoorten: materiaalsoortenCount,
     materialen: materialenCount,
     maten: matenCount,
+    segmenten: segmentenCount,
+    kunstwerken: kunstwerkenCount,
   };
 
   return (
