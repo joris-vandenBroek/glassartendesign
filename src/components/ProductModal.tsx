@@ -12,7 +12,7 @@ import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materi
 const CONFIRM_FEEDBACK_MS = 600;
 
 function materiaalLabel(materiaal: Materiaal, materiaalsoortNaam: string): string {
-  return `${materiaal.materiaaldikte}mm ${materiaalsoortNaam} — ${materiaal.omschrijving}`;
+  return `${materiaal.materiaaldikte}mm ${materiaalsoortNaam}`;
 }
 
 function maatLabel(maat: Maat): string {
@@ -81,6 +81,7 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
   function resolvedMateriaalLabel(materiaal: Materiaal): string {
     return materiaalLabel(materiaal, materiaalsoortNaamById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId);
   }
+  const geselecteerdMateriaal = beschikbareMaterialen.find((materiaal) => materiaal.id === materiaalId);
   const prijsRegel = kunstwerk.prijzen.find(
     (regel) => regel.materiaalId === materiaalId && regel.maatId === maatId
   );
@@ -139,7 +140,9 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
         </button>
         <WatermarkedImage src={kunstwerk.foto} alt={omschrijving} className="h-56 w-full sm:h-full" />
         <div className="flex flex-col gap-4 p-6">
-          <p className="font-head text-xs uppercase tracking-[0.2em] text-gold">{omschrijving}</p>
+          <p data-testid="product-modal-omschrijving" className="text-sm leading-relaxed text-white/80">
+            {omschrijving}
+          </p>
           <label className="flex flex-col gap-1 text-[0.65rem] uppercase tracking-wide text-white/60">
             {t('material')}
             <select
@@ -154,6 +157,14 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
                 </option>
               ))}
             </select>
+            {geselecteerdMateriaal && (
+              <span
+                data-testid="product-modal-materiaal-omschrijving"
+                className="pt-1 text-[0.7rem] normal-case tracking-normal text-white/50"
+              >
+                {geselecteerdMateriaal.omschrijving}
+              </span>
+            )}
           </label>
           <label className="flex flex-col gap-1 text-[0.65rem] uppercase tracking-wide text-white/60">
             {t('size')}

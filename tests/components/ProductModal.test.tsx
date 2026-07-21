@@ -90,14 +90,21 @@ describe('ProductModal', () => {
     expect(options).toHaveLength(2);
   });
 
-  it('includes the materiaalsoort name alongside the dikte and omschrijving in each materiaal option', () => {
+  it('includes the materiaalsoort name alongside the dikte in each materiaal option', () => {
     renderModal();
     const options = screen.getByTestId('product-modal-materiaal').querySelectorAll('option');
-    expect(options[0]).toHaveTextContent(
-      '4mm Veiligheidsglas — Extra diepte en stevigheid voor een indrukwekkend effect.'
+    expect(options[0]).toHaveTextContent('4mm Veiligheidsglas');
+    expect(options[1]).toHaveTextContent('3mm Acryl');
+  });
+
+  it("shows the selected materiaal's own omschrijving below the select, updating when the choice changes", () => {
+    renderModal();
+    expect(screen.getByTestId('product-modal-materiaal-omschrijving')).toHaveTextContent(
+      'Extra diepte en stevigheid voor een indrukwekkend effect.'
     );
-    expect(options[1]).toHaveTextContent(
-      '3mm Acryl — Lichtgewicht en flexibel voor grote oppervlaktes.'
+    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-2' } });
+    expect(screen.getByTestId('product-modal-materiaal-omschrijving')).toHaveTextContent(
+      'Lichtgewicht en flexibel voor grote oppervlaktes.'
     );
   });
 
