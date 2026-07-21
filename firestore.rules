@@ -26,12 +26,12 @@ service cloud.firestore {
       match /bestellines/{lineId} {
         allow create: if request.auth != null &&
           request.auth.uid == get(/databases/$(database)/documents/bestelheaders/$(id)).data.klantId &&
-          request.resource.data.keys().hasOnly(['kunstwerkId', 'maatId', 'materiaalId', 'quantity']) &&
-          request.resource.data.kunstwerkId == null &&
-          request.resource.data.maatId == null &&
-          request.resource.data.materiaalId == null &&
-          request.resource.data.quantity is int &&
-          request.resource.data.quantity > 0;
+          request.resource.data.keys().hasOnly(['kunstwerkId', 'maatId', 'materiaalId', 'prijs', 'quantity']) &&
+          request.resource.data.kunstwerkId is string && request.resource.data.kunstwerkId.size() > 0 &&
+          request.resource.data.maatId is string && request.resource.data.maatId.size() > 0 &&
+          request.resource.data.materiaalId is string && request.resource.data.materiaalId.size() > 0 &&
+          request.resource.data.prijs is number && request.resource.data.prijs > 0 &&
+          request.resource.data.quantity is int && request.resource.data.quantity > 0;
         allow read: if request.auth != null &&
           (request.auth.uid == get(/databases/$(database)/documents/bestelheaders/$(id)).data.klantId ||
            exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
