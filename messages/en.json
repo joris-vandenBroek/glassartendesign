@@ -81,6 +81,8 @@
     "empty": "Your cart is empty.",
     "placeOrder": "Complete order",
     "clearOrder": "Clear order",
+    "loginToOrder": "Log in to order",
+    "placeOrderError": "Something went wrong placing the order. Please try again.",
     "remove": "Remove",
     "requestedStatus": "Requested",
     "added": "Added!",

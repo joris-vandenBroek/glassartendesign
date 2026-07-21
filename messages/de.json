@@ -81,6 +81,8 @@
     "empty": "Ihr Warenkorb ist leer.",
     "placeOrder": "Bestellung abschließen",
     "clearOrder": "Bestellung leeren",
+    "loginToOrder": "Anmelden zum Bestellen",
+    "placeOrderError": "Beim Platzieren der Bestellung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "remove": "Entfernen",
     "requestedStatus": "Angefragt",
     "added": "Hinzugefügt!",

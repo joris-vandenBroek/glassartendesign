@@ -3,16 +3,20 @@
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { useCart } from '@/lib/useCart';
-import { useOrders } from '@/lib/useOrders';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
+import { Link } from '@/i18n/navigation';
 
 export function CartPanel() {
   const t = useTranslations('cart');
   const tSegments = useTranslations('segments');
   const [isOpen, setIsOpen] = useState(false);
+  const [placeOrderError, setPlaceOrderError] = useState<string | null>(null);
   const { items, isHydrated, totalQuantity, removeItem, clear } = useCart();
-  const { placeOrder } = useOrders();
+  const { user, isCustomer } = useCustomerAuth();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -23,15 +27,32 @@ export function CartPanel() {
     initialFocusRef: closeButtonRef,
   });
 
-  function handlePlaceOrder() {
-    const description = items
-      .map(
-        (item) => `${tSegments(`${item.segmentMessageKey}.title`)} ${item.size} ×${item.quantity}`
-      )
-      .join(', ');
-    placeOrder(description, t('requestedStatus'));
-    clear();
-    setIsOpen(false);
+  async function handlePlaceOrder() {
+    if (!user) {
+      return;
+    }
+    setPlaceOrderError(null);
+    try {
+      const headerDoc = await addDoc(collection(db, 'bestelheaders'), {
+        klantId: user.uid,
+        besteldatum: serverTimestamp(),
+        status: 'Te beoordelen',
+      });
+      await Promise.all(
+        items.map((item) =>
+          addDoc(collection(db, 'bestelheaders', headerDoc.id, 'bestellines'), {
+            kunstwerkId: null,
+            maatId: null,
+            materiaalId: null,
+            quantity: item.quantity,
+          })
+        )
+      );
+      clear();
+      setIsOpen(false);
+    } catch {
+      setPlaceOrderError(t('placeOrderError'));
+    }
   }
 
   return (
@@ -121,15 +142,33 @@ export function CartPanel() {
               </div>
 
               <div className="flex flex-col gap-2 border-t border-white/10 px-5 py-4">
-                <button
-                  type="button"
-                  data-testid="cart-place-order"
-                  disabled={items.length === 0}
-                  onClick={handlePlaceOrder}
-                  className="btn-gold w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide disabled:opacity-40"
-                >
-                  {t('placeOrder')}
-                </button>
+                {isCustomer ? (
+                  <button
+                    type="button"
+                    data-testid="cart-place-order"
+                    disabled={items.length === 0}
+                    onClick={handlePlaceOrder}
+                    className="btn-gold w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide disabled:opacity-40"
+                  >
+                    {t('placeOrder')}
+                  </button>
+                ) : (
+                  <Link
+                    href="/inloggen"
+                    data-testid="cart-login-to-order"
+                    className="btn-gold block w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide"
+                  >
+                    {t('loginToOrder')}
+                  </Link>
+                )}
+                {placeOrderError && (
+                  <p
+                    data-testid="cart-place-order-error"
+                    className="text-center text-xs text-red-400"
+                  >
+                    {placeOrderError}
+                  </p>
+                )}
                 <button
                   type="button"
                   data-testid="cart-clear"

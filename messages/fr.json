@@ -81,6 +81,8 @@
     "empty": "Votre panier est vide.",
     "placeOrder": "Finaliser la commande",
     "clearOrder": "Vider la commande",
+    "loginToOrder": "Se connecter pour commander",
+    "placeOrderError": "Une erreur s'est produite lors de la commande. Veuillez réessayer.",
     "remove": "Supprimer",
     "requestedStatus": "Demandée",
     "added": "Ajouté !",

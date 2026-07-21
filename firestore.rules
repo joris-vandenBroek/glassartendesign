@@ -14,5 +14,22 @@ service cloud.firestore {
       allow update: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
+    match /bestelheaders/{id} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.klantId
+        && request.resource.data.status == 'Te beoordelen';
+      allow read: if request.auth != null &&
+        (request.auth.uid == resource.data.klantId ||
+         exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
+      allow update, delete: if false;
+
+      match /bestellines/{lineId} {
+        allow create: if request.auth != null &&
+          request.auth.uid == get(/databases/$(database)/documents/bestelheaders/$(id)).data.klantId;
+        allow read: if request.auth != null &&
+          (request.auth.uid == get(/databases/$(database)/documents/bestelheaders/$(id)).data.klantId ||
+           exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
+        allow update, delete: if false;
+      }
+    }
   }
 }

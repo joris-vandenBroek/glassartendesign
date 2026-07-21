@@ -81,6 +81,8 @@
     "empty": "Je mandje is leeg.",
     "placeOrder": "Bestelling afronden",
     "clearOrder": "Bestelling leegmaken",
+    "loginToOrder": "Inloggen om te bestellen",
+    "placeOrderError": "Er ging iets mis bij het plaatsen van de bestelling. Probeer het opnieuw.",
     "remove": "Verwijderen",
     "requestedStatus": "Aangevraagd",
     "added": "Toegevoegd!",
