@@ -107,6 +107,71 @@ describe('BeheerShell', () => {
     expect(onLogout).toHaveBeenCalled();
   });
 
+  it('shows the count of "Beoordelen" klanten on the Klanten nav item', async () => {
+    mockCollections({
+      klanten: [
+        { id: 'uid-1', data: KLANT_DATA },
+        { id: 'uid-2', data: { ...KLANT_DATA, status: 'Goedgekeurd' } },
+      ],
+    });
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('1'));
+  });
+
+  it('switches to the Facturen section when its nav item is clicked', async () => {
+    mockCollections();
+    renderShell();
+    await waitFor(() => expect(getDocsMock).toHaveBeenCalled());
+    screen.getByTestId('beheer-nav-facturen').click();
+    expect(await screen.findByTestId('facturen-section')).toBeInTheDocument();
+    expect(screen.queryByTestId('klanten-section')).not.toBeInTheDocument();
+  });
+
+  it('shows a load error on the Klanten section when getDocs fails for klanten', async () => {
+    getDocsMock.mockImplementation((collectionRef: { name: string }) => {
+      if (collectionRef.name === 'klanten') {
+        return Promise.reject(new Error('offline'));
+      }
+      return Promise.resolve(makeSnapshot(DEFAULT_COLLECTIONS[collectionRef.name] ?? []));
+    });
+    renderShell();
+    expect(await screen.findByTestId('klanten-error')).toHaveTextContent(
+      'Kon de klanten niet laden. Probeer de pagina te verversen.'
+    );
+  });
+
+  it('shows the materiaalsoorten count and switches to the Materiaalsoorten section', async () => {
+    mockCollections({
+      materiaalsoorten: [
+        { id: 'soort-1', data: { omschrijving: 'Veiligheidsglas' } },
+        { id: 'soort-2', data: { omschrijving: 'Dibond' } },
+      ],
+    });
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-materiaalsoorten')).toHaveTextContent('2'));
+    screen.getByTestId('beheer-nav-materiaalsoorten').click();
+    expect(await screen.findByTestId('materiaalsoorten-section')).toBeInTheDocument();
+    expect(screen.getByTestId('data-table-row-soort-1')).toHaveTextContent('Veiligheidsglas');
+  });
+
+  it('shows the materiaalsoort name in Materialen and the materialen count in the nav', async () => {
+    mockCollections();
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-materialen')).toHaveTextContent('1'));
+    screen.getByTestId('beheer-nav-materialen').click();
+    expect(await screen.findByTestId('materialen-section')).toBeInTheDocument();
+    expect(screen.getByTestId('data-table-row-mat-1')).toHaveTextContent('Veiligheidsglas');
+  });
+
+  it('shows the maten count and switches to the Maten section', async () => {
+    mockCollections();
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-maten')).toHaveTextContent('1'));
+    screen.getByTestId('beheer-nav-maten').click();
+    expect(await screen.findByTestId('maten-section')).toBeInTheDocument();
+    expect(screen.getByTestId('data-table-row-maat-1')).toHaveTextContent('40');
+  });
+
   it('shows the segmenten count and switches to the Segmenten section', async () => {
     mockCollections({
       segmenten: [

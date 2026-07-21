@@ -87,6 +87,11 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   const kunstwerkenSeed = kunstwerkenReady
     ? buildKunstwerkenSeed(segmenten.items!, materialen.items!, maten.items!)
     : undefined;
+  // Seeding writes all 36 kunstwerken documents one at a time; if a write fails partway
+  // through, the collection is left partially seeded and useFirestoreCollection will not
+  // retry the seed (its guard only fires when the collection comes back empty). Recovery
+  // in that case requires an admin manually deleting the partial documents so the
+  // collection is empty again before a reload can re-trigger the seed.
   const kunstwerken = useFirestoreCollection<Kunstwerk>('kunstwerken', {
     seed: kunstwerkenSeed,
     skip: !kunstwerkenReady,
@@ -131,6 +136,10 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           <MateriaalsoortenSection
             materiaalsoorten={materiaalsoorten.items}
             materialen={materialen.items}
+            // Note: a write that succeeds but whose follow-up refetch fails also sets
+            // error to 'load' (not 'action'), so it surfaces here as a full-section
+            // error rather than the modal's actionError banner — treated as acceptable
+            // since the shown data is now stale and worth a hard refresh anyway.
             loadError={materiaalsoorten.error === 'load' ? t('materiaalsoortenLoadError') : null}
             onAdd={materiaalsoorten.add}
             onUpdate={materiaalsoorten.update}
