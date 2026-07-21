@@ -5,15 +5,27 @@ import { useTranslations } from 'next-intl';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Modal } from '@/components/Modal';
+import { formatCurrency } from '@/data/mockAdminInvoices';
 import type { Bestelling } from './BestellingenSection';
+import type { Kunstwerk, Materiaal, Maat } from './materiaalTypes';
 
 interface BestellingModalProps {
   bestelling: Bestelling | null;
+  kunstwerken: Kunstwerk[] | null;
+  materialen: Materiaal[] | null;
+  maten: Maat[] | null;
   onClose: () => void;
   onUpdated: (bestelling: Bestelling) => void;
 }
 
-export function BestellingModal({ bestelling, onClose, onUpdated }: BestellingModalProps) {
+export function BestellingModal({
+  bestelling,
+  kunstwerken,
+  materialen,
+  maten,
+  onClose,
+  onUpdated,
+}: BestellingModalProps) {
   const t = useTranslations('beheer');
   const [error, setError] = useState<string | null>(null);
 
@@ -50,17 +62,38 @@ export function BestellingModal({ bestelling, onClose, onUpdated }: BestellingMo
           <p>{bestelling.companyName}</p>
           <p className="text-white/60">{bestelling.besteldatum}</p>
 
-          <ul className="flex flex-col gap-1 text-xs">
-            {bestelling.lines.map((line) => (
-              <li
-                key={line.id}
-                data-testid={`bestelling-modal-line-${line.id}`}
-                className="flex justify-between"
-              >
-                <span>{line.kunstwerkId ?? t('bestellingenRegelOnbekend')}</span>
-                <span>×{line.quantity}</span>
-              </li>
-            ))}
+          <ul className="flex flex-col gap-2 text-xs">
+            {bestelling.lines.map((line) => {
+              const kunstwerk = (kunstwerken ?? []).find((k) => k.id === line.kunstwerkId);
+              const materiaal = (materialen ?? []).find((m) => m.id === line.materiaalId);
+              const maat = (maten ?? []).find((m) => m.id === line.maatId);
+              return (
+                <li
+                  key={line.id}
+                  data-testid={`bestelling-modal-line-${line.id}`}
+                  className="flex items-center justify-between gap-2"
+                >
+                  {kunstwerk ? (
+                    <div className="flex items-center gap-2">
+                      <img src={kunstwerk.foto} alt="" className="h-10 w-10 rounded object-cover" />
+                      <div>
+                        <p>{kunstwerk.omschrijvingNl}</p>
+                        <p className="text-white/50">
+                          {materiaal ? `${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}` : line.materiaalId}
+                          {' · '}
+                          {maat ? `${maat.breedte}×${maat.hoogte} cm` : line.maatId}
+                          {' · '}
+                          {formatCurrency(line.prijs)}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <span>{t('bestellingenRegelOnbekend')}</span>
+                  )}
+                  <span>×{line.quantity}</span>
+                </li>
+              );
+            })}
           </ul>
 
           {error && (
