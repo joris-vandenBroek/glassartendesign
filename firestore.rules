@@ -20,7 +20,8 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         (request.auth.uid == resource.data.klantId ||
          exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
-      allow update, delete: if false;
+      allow update: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));
+      allow delete: if false;
 
       match /bestellines/{lineId} {
         allow create: if request.auth != null &&

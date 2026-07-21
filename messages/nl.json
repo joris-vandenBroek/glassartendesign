@@ -338,6 +338,16 @@
     "matenLabelHoogte": "Hoogte (cm)",
     "matenToevoegen": "Maat toevoegen",
     "matenOpslaan": "Opslaan",
-    "matenVerwijderen": "Verwijderen"
+    "matenVerwijderen": "Verwijderen",
+    "bestellingenLoadError": "Kon de bestellingen niet laden. Probeer de pagina te verversen.",
+    "bestellingenActionError": "Er is iets misgegaan. Probeer het opnieuw.",
+    "bestellingenEmpty": "Geen bestellingen gevonden.",
+    "bestellingenColKlant": "Klant",
+    "bestellingenColDatum": "Besteldatum",
+    "bestellingenColAantal": "Aantal",
+    "bestellingenColStatus": "Status",
+    "bestellingenRegelOnbekend": "Onbekend",
+    "bestellingenGoedkeuren": "Goedkeuren",
+    "bestellingenAfwijzen": "Afwijzen"
   }
 }

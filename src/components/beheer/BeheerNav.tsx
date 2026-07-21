@@ -2,7 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 
-export type BeheerSection = 'klanten' | 'facturen' | 'materiaalsoorten' | 'materialen' | 'maten';
+export type BeheerSection =
+  | 'klanten'
+  | 'facturen'
+  | 'bestellingen'
+  | 'materiaalsoorten'
+  | 'materialen'
+  | 'maten';
 
 interface BeheerNavProps {
   activeSection: BeheerSection;
@@ -10,6 +16,7 @@ interface BeheerNavProps {
   onLogout: () => void;
   klantenCount: number;
   facturenCount: number;
+  bestellingenCount: number;
   materiaalsoortenCount: number;
   materialenCount: number;
   matenCount: number;
@@ -18,13 +25,13 @@ interface BeheerNavProps {
 const ACTIVE_ITEMS: { id: BeheerSection; labelKey: string }[] = [
   { id: 'klanten', labelKey: 'navKlanten' },
   { id: 'facturen', labelKey: 'navFacturen' },
+  { id: 'bestellingen', labelKey: 'navBestellingen' },
   { id: 'materiaalsoorten', labelKey: 'navMateriaalsoorten' },
   { id: 'materialen', labelKey: 'navMaterialen' },
   { id: 'maten', labelKey: 'navMaten' },
 ];
 
 const DISABLED_ITEMS: { id: string; labelKey: string }[] = [
-  { id: 'bestellingen', labelKey: 'navBestellingen' },
   { id: 'retouren', labelKey: 'navRetouren' },
   { id: 'prijsgroepen', labelKey: 'navPrijsgroepen' },
   { id: 'kunstwerken', labelKey: 'navKunstwerken' },
@@ -37,6 +44,7 @@ export function BeheerNav({
   onLogout,
   klantenCount,
   facturenCount,
+  bestellingenCount,
   materiaalsoortenCount,
   materialenCount,
   matenCount,
@@ -45,6 +53,7 @@ export function BeheerNav({
   const counts: Record<BeheerSection, number> = {
     klanten: klantenCount,
     facturen: facturenCount,
+    bestellingen: bestellingenCount,
     materiaalsoorten: materiaalsoortenCount,
     materialen: materialenCount,
     maten: matenCount,

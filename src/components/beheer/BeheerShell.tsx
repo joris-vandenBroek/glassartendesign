@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -8,6 +8,7 @@ import { GlassPanel } from '@/components/GlassPanel';
 import { BeheerNav, type BeheerSection } from './BeheerNav';
 import { KlantenSection, type Klant } from './KlantenSection';
 import { FacturenSection } from './FacturenSection';
+import { BestellingenSection, type Bestelling, type BestellingLine } from './BestellingenSection';
 import { MateriaalsoortenSection } from './MateriaalsoortenSection';
 import { MaterialenSection } from './MaterialenSection';
 import { MatenSection } from './MatenSection';
@@ -21,11 +22,15 @@ interface BeheerShellProps {
   onLogout: () => void;
 }
 
+type RawBestelling = Omit<Bestelling, 'companyName'>;
+
 export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   const t = useTranslations('beheer');
   const [activeSection, setActiveSection] = useState<BeheerSection>('klanten');
   const [klanten, setKlanten] = useState<Klant[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [rawBestellingen, setRawBestellingen] = useState<RawBestelling[] | null>(null);
+  const [bestellingenLoadError, setBestellingenLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,9 +70,71 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
     };
   }, [t]);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function loadBestellingen() {
+      try {
+        const headersSnapshot = await getDocs(collection(db, 'bestelheaders'));
+        const rows = await Promise.all(
+          headersSnapshot.docs.map(async (headerDoc) => {
+            const linesSnapshot = await getDocs(
+              collection(db, 'bestelheaders', headerDoc.id, 'bestellines')
+            );
+            const lines: BestellingLine[] = linesSnapshot.docs.map((lineDoc) => {
+              const lineData = lineDoc.data();
+              return {
+                id: lineDoc.id,
+                kunstwerkId: lineData.kunstwerkId,
+                maatId: lineData.maatId,
+                materiaalId: lineData.materiaalId,
+                quantity: lineData.quantity,
+              };
+            });
+            const data = headerDoc.data();
+            return {
+              id: headerDoc.id,
+              klantId: data.klantId,
+              besteldatum: data.besteldatum?.toDate().toLocaleDateString('nl-NL') ?? '',
+              status: data.status,
+              lineCount: lines.length,
+              totalQuantity: lines.reduce((sum, line) => sum + line.quantity, 0),
+              lines,
+            } as RawBestelling;
+          })
+        );
+        if (!cancelled) {
+          setRawBestellingen(rows);
+          setBestellingenLoadError(null);
+        }
+      } catch {
+        if (!cancelled) {
+          setBestellingenLoadError(t('bestellingenLoadError'));
+        }
+      }
+    }
+    loadBestellingen();
+    return () => {
+      cancelled = true;
+    };
+  }, [t]);
+
   function handleKlantUpdated(updated: Klant) {
     setKlanten((current) => (current ?? []).map((klant) => (klant.id === updated.id ? updated : klant)));
   }
+
+  function handleBestellingUpdated(updated: Bestelling) {
+    setRawBestellingen((current) =>
+      (current ?? []).map((row) => (row.id === updated.id ? { ...row, status: updated.status } : row))
+    );
+  }
+
+  const bestellingen = useMemo(() => {
+    if (rawBestellingen === null) return null;
+    return rawBestellingen.map((row) => ({
+      ...row,
+      companyName: (klanten ?? []).find((klant) => klant.id === row.klantId)?.companyName ?? row.klantId,
+    }));
+  }, [rawBestellingen, klanten]);
 
   const materiaalsoorten = useFirestoreCollection<Materiaalsoort>('materiaalsoorten', {
     seed: MATERIAALSOORTEN_SEED,
@@ -81,6 +148,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
 
   const klantenCount = (klanten ?? []).filter((klant) => klant.status === 'Beoordelen').length;
   const facturenCount = MOCK_ADMIN_INVOICES.filter((invoice) => invoice.status === 'Te betalen').length;
+  const bestellingenCount = (bestellingen ?? []).filter((b) => b.status === 'Te beoordelen').length;
   const materiaalsoortenCount = (materiaalsoorten.items ?? []).length;
   const materialenCount = (materialen.items ?? []).length;
   const matenCount = (maten.items ?? []).length;
@@ -100,6 +168,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           onLogout={onLogout}
           klantenCount={klantenCount}
           facturenCount={facturenCount}
+          bestellingenCount={bestellingenCount}
           materiaalsoortenCount={materiaalsoortenCount}
           materialenCount={materialenCount}
           matenCount={matenCount}
@@ -110,6 +179,12 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           <KlantenSection klanten={klanten} loadError={loadError} onKlantUpdated={handleKlantUpdated} />
         ) : activeSection === 'facturen' ? (
           <FacturenSection />
+        ) : activeSection === 'bestellingen' ? (
+          <BestellingenSection
+            bestellingen={bestellingen}
+            loadError={bestellingenLoadError}
+            onBestellingUpdated={handleBestellingUpdated}
+          />
         ) : activeSection === 'materiaalsoorten' ? (
           <MateriaalsoortenSection
             materiaalsoorten={materiaalsoorten.items}

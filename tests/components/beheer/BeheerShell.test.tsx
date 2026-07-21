@@ -12,7 +12,7 @@ vi.mock('@/lib/firebase', () => ({
 }));
 
 vi.mock('firebase/firestore', () => ({
-  collection: vi.fn((_db, name) => ({ name })),
+  collection: vi.fn((_db, ...segments: string[]) => ({ name: segments.join('/') })),
   doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
   getDocs: (...args: unknown[]) => getDocsMock(...args),
   addDoc: (...args: unknown[]) => addDocMock(...args),
@@ -45,6 +45,7 @@ const KLANT_DATA = {
 // wiring tests — seeding itself is covered by useFirestoreCollection.test.tsx.
 const DEFAULT_COLLECTIONS: Record<string, Array<{ id: string; data: Record<string, unknown> }>> = {
   klanten: [],
+  bestelheaders: [],
   materiaalsoorten: [{ id: 'soort-1', data: { omschrijving: 'Veiligheidsglas' } }],
   materialen: [{ id: 'mat-1', data: { materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Test' } }],
   maten: [{ id: 'maat-1', data: { breedte: 40, hoogte: 60 } }],
@@ -151,5 +152,29 @@ describe('BeheerShell', () => {
     screen.getByTestId('beheer-nav-maten').click();
     expect(await screen.findByTestId('maten-section')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-maat-1')).toHaveTextContent('40');
+  });
+
+  it('shows the bestellingen count and switches to the Bestellingen section', async () => {
+    mockCollections({
+      klanten: [{ id: 'uid-1', data: KLANT_DATA }],
+      bestelheaders: [
+        {
+          id: 'header-1',
+          data: {
+            klantId: 'uid-1',
+            besteldatum: { toDate: () => new Date('2026-07-01') },
+            status: 'Te beoordelen',
+          },
+        },
+      ],
+      'bestelheaders/header-1/bestellines': [
+        { id: 'line-1', data: { kunstwerkId: null, maatId: null, materiaalId: null, quantity: 3 } },
+      ],
+    });
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-bestellingen')).toHaveTextContent('1'));
+    screen.getByTestId('beheer-nav-bestellingen').click();
+    expect(await screen.findByTestId('bestellingen-section')).toBeInTheDocument();
+    expect(screen.getByTestId('data-table-row-header-1')).toHaveTextContent('Testbedrijf BV');
   });
 });
