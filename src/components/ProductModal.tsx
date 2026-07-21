@@ -1,23 +1,36 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { STANDARD_SIZES } from '@/data/sizes';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCart } from '@/lib/useCart';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
-import type { SegmentImage } from '@/data/segments';
+import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
+import { formatCurrency } from '@/data/mockAdminInvoices';
+import { WatermarkedImage } from './WatermarkedImage';
+import type { Kunstwerk, Materiaal, Maat } from './beheer/materiaalTypes';
 
 const CONFIRM_FEEDBACK_MS = 600;
 
+function materiaalLabel(materiaal: Materiaal): string {
+  return `${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}`;
+}
+
+function maatLabel(maat: Maat): string {
+  return `${maat.breedte}×${maat.hoogte} cm`;
+}
+
 interface ProductModalProps {
-  image: SegmentImage | null;
+  kunstwerk: Kunstwerk | null;
+  materialen: Materiaal[] | null;
+  maten: Maat[] | null;
   onClose: () => void;
 }
 
-export function ProductModal({ image, onClose }: ProductModalProps) {
+export function ProductModal({ kunstwerk, materialen, maten, onClose }: ProductModalProps) {
   const t = useTranslations('cart');
-  const tSegments = useTranslations('segments');
-  const [size, setSize] = useState<string>(STANDARD_SIZES[0]);
+  const locale = useLocale();
+  const [materiaalId, setMateriaalId] = useState('');
+  const [maatId, setMaatId] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { addItem } = useCart();
@@ -26,17 +39,17 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!image) {
+    if (!kunstwerk) {
       return;
     }
-    setSize(STANDARD_SIZES[0]);
+    setMateriaalId(kunstwerk.materiaalIds[0] ?? '');
+    setMaatId(kunstwerk.maatIds[0] ?? '');
     setQuantity(1);
     setIsConfirmed(false);
-  }, [image]);
+  }, [kunstwerk]);
 
   // Ensure a pending "close after confirm" timer never fires for a stale
-  // product: clear it whenever `image` changes to a different value, and
-  // on unmount.
+  // kunstwerk: clear it whenever `kunstwerk` changes, and on unmount.
   useEffect(() => {
     return () => {
       if (closeTimeoutRef.current) {
@@ -44,28 +57,46 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
         closeTimeoutRef.current = null;
       }
     };
-  }, [image]);
+  }, [kunstwerk]);
 
   useOverlayDismiss({
-    isOpen: image !== null,
+    isOpen: kunstwerk !== null,
     onClose,
     containerRef: modalRef,
     initialFocusRef: closeButtonRef,
   });
 
-  if (!image) {
+  if (!kunstwerk) {
     return null;
   }
 
+  const beschikbareMaterialen = (materialen ?? []).filter((materiaal) =>
+    kunstwerk.materiaalIds.includes(materiaal.id)
+  );
+  const beschikbareMaten = (maten ?? []).filter((maat) => kunstwerk.maatIds.includes(maat.id));
+  const prijsRegel = kunstwerk.prijzen.find(
+    (regel) => regel.materiaalId === materiaalId && regel.maatId === maatId
+  );
+  const omschrijving = resolveKunstwerkOmschrijving(kunstwerk, locale);
+
   function handleConfirm() {
-    if (isConfirmed || !image) {
+    if (isConfirmed || !prijsRegel || !kunstwerk) {
+      return;
+    }
+    const gekozenMateriaal = beschikbareMaterialen.find((materiaal) => materiaal.id === materiaalId);
+    const gekozenMaat = beschikbareMaten.find((maat) => maat.id === maatId);
+    if (!gekozenMateriaal || !gekozenMaat) {
       return;
     }
     addItem({
-      segmentSlug: image.segmentSlug,
-      segmentMessageKey: image.segmentMessageKey,
-      imageSrc: image.src,
-      size,
+      kunstwerkId: kunstwerk.id,
+      foto: kunstwerk.foto,
+      omschrijving,
+      materiaalId,
+      materiaalLabel: materiaalLabel(gekozenMateriaal),
+      maatId,
+      maatLabel: maatLabel(gekozenMaat),
+      prijs: prijsRegel.prijs,
       quantity,
     });
     setIsConfirmed(true);
@@ -99,34 +130,46 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
         >
           ×
         </button>
-        <img
-          src={image.src}
-          alt={tSegments(`${image.segmentMessageKey}.title`)}
-          className="h-56 w-full object-cover sm:h-full"
-        />
+        <WatermarkedImage src={kunstwerk.foto} alt={omschrijving} className="h-56 w-full sm:h-full" />
         <div className="flex flex-col gap-4 p-6">
-          <p className="font-head text-xs uppercase tracking-[0.2em] text-gold">
-            {tSegments(`${image.segmentMessageKey}.title`)}
-          </p>
+          <p className="font-head text-xs uppercase tracking-[0.2em] text-gold">{omschrijving}</p>
           <label className="flex flex-col gap-1 text-[0.65rem] uppercase tracking-wide text-white/60">
-            {t('size')}
+            {t('material')}
             <select
-              data-testid="product-modal-size"
-              value={size}
-              onChange={(event) => setSize(event.target.value)}
+              data-testid="product-modal-materiaal"
+              value={materiaalId}
+              onChange={(event) => setMateriaalId(event.target.value)}
               className="rounded-sm bg-black/40 px-2 py-1.5 text-sm text-white"
             >
-              {STANDARD_SIZES.map((option) => (
-                <option key={option} value={option}>
-                  {option}
+              {beschikbareMaterialen.map((materiaal) => (
+                <option key={materiaal.id} value={materiaal.id}>
+                  {materiaalLabel(materiaal)}
                 </option>
               ))}
             </select>
           </label>
+          <label className="flex flex-col gap-1 text-[0.65rem] uppercase tracking-wide text-white/60">
+            {t('size')}
+            <select
+              data-testid="product-modal-maat"
+              value={maatId}
+              onChange={(event) => setMaatId(event.target.value)}
+              className="rounded-sm bg-black/40 px-2 py-1.5 text-sm text-white"
+            >
+              {beschikbareMaten.map((maat) => (
+                <option key={maat.id} value={maat.id}>
+                  {maatLabel(maat)}
+                </option>
+              ))}
+            </select>
+          </label>
+          {prijsRegel && (
+            <p data-testid="product-modal-prijs" className="text-sm text-white/80">
+              {formatCurrency(prijsRegel.prijs)}
+            </p>
+          )}
           <div className="flex items-center justify-between gap-2 text-sm text-white/80">
-            <span className="text-[0.65rem] uppercase tracking-wide text-white/60">
-              {t('quantity')}
-            </span>
+            <span className="text-[0.65rem] uppercase tracking-wide text-white/60">{t('quantity')}</span>
             <div className="flex h-10 items-center overflow-hidden rounded-full border border-white/20">
               <button
                 type="button"
@@ -153,8 +196,8 @@ export function ProductModal({ image, onClose }: ProductModalProps) {
             type="button"
             data-testid="product-modal-confirm"
             onClick={handleConfirm}
-            disabled={isConfirmed}
-            className={`rounded-sm px-4 py-2.5 text-xs tracking-[0.15em] transition ${
+            disabled={isConfirmed || !prijsRegel}
+            className={`rounded-sm px-4 py-2.5 text-xs tracking-[0.15em] transition disabled:opacity-40 ${
               isConfirmed ? 'cursor-default bg-green-500 text-white' : 'btn-gold'
             }`}
           >

@@ -37,22 +37,22 @@ vi.mock('firebase/firestore', () => ({
   serverTimestamp: () => 'SERVER_TIMESTAMP',
 }));
 
+const SEED_ITEM = {
+  kunstwerkId: 'kw-1',
+  foto: 'https://example.com/kw-1.jpg',
+  omschrijving: 'Wellness paneel',
+  materiaalId: 'mat-1',
+  materiaalLabel: '4mm — Veiligheidsglas',
+  maatId: 'maat-1',
+  maatLabel: '60×90 cm',
+  prijs: 150,
+  quantity: 2,
+};
+
 function Seed() {
   const { addItem } = useCart();
   return (
-    <button
-      type="button"
-      data-testid="seed-cart"
-      onClick={() =>
-        addItem({
-          segmentSlug: 'wellness',
-          segmentMessageKey: 'wellness',
-          imageSrc: 'https://images.unsplash.com/example.jpg',
-          size: '60x90cm',
-          quantity: 2,
-        })
-      }
-    >
+    <button type="button" data-testid="seed-cart" onClick={() => addItem(SEED_ITEM)}>
       Seed
     </button>
   );
@@ -108,14 +108,28 @@ describe('CartPanel', () => {
     expect(screen.getByTestId('cart-empty')).toBeInTheDocument();
   });
 
-  it('shows a badge with the total quantity and lists cart items once seeded', () => {
+  it('shows a badge with the total quantity and lists cart items with materiaal/maat/price once seeded', () => {
     renderCartPanel();
     fireEvent.click(screen.getByTestId('seed-cart'));
     expect(screen.getByTestId('cart-badge')).toHaveTextContent('2');
     fireEvent.click(screen.getByTestId('cart-icon'));
     expect(screen.queryByTestId('cart-empty')).not.toBeInTheDocument();
-    expect(screen.getByText('Wellness')).toBeInTheDocument();
-    expect(screen.getByText('60x90cm · ×2')).toBeInTheDocument();
+    expect(screen.getByText('Wellness paneel')).toBeInTheDocument();
+    expect(screen.getByText('4mm — Veiligheidsglas · 60×90 cm · ×2')).toBeInTheDocument();
+  });
+
+  it('shows the total price of all cart items', () => {
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    expect(screen.getByTestId('cart-total')).toHaveTextContent('€ 300,00');
+  });
+
+  it('shows a watermark overlay on each cart item photo', () => {
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    expect(screen.getByTestId('watermark-overlay')).toBeInTheDocument();
   });
 
   it('removes an item when its remove button is clicked', () => {
@@ -138,7 +152,7 @@ describe('CartPanel', () => {
     expect(screen.queryByTestId('cart-place-order')).not.toBeInTheDocument();
   });
 
-  it('writes a bestelheader + one bestelline per cart item, clears the cart and shows a confirmation message', async () => {
+  it('writes a bestelheader + one bestelline with the real kunstwerk/materiaal/maat/prijs per cart item, clears the cart and shows a confirmation message', async () => {
     addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
     renderCartPanel();
     fireEvent.click(screen.getByTestId('seed-cart'));
@@ -162,7 +176,7 @@ describe('CartPanel', () => {
     expect(addDocMock).toHaveBeenNthCalledWith(
       2,
       { path: ['bestelheaders', 'header-1', 'bestellines'] },
-      { kunstwerkId: null, maatId: null, materiaalId: null, quantity: 2 }
+      { kunstwerkId: 'kw-1', maatId: 'maat-1', materiaalId: 'mat-1', prijs: 150, quantity: 2 }
     );
   });
 

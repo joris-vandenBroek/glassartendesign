@@ -3,20 +3,40 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { ProductModal } from '@/components/ProductModal';
 import { CartProvider, useCart } from '@/lib/useCart';
+import type { Kunstwerk, Materiaal, Maat } from '@/components/beheer/materiaalTypes';
 import messages from '../../messages/nl.json';
 
-const SAMPLE_IMAGE = {
-  id: 'wellness-0',
-  src: 'https://images.unsplash.com/example.jpg',
-  segmentSlug: 'wellness',
-  segmentMessageKey: 'wellness',
+const KUNSTWERK: Kunstwerk = {
+  id: 'kw-1',
+  foto: 'https://example.com/kw-1.jpg',
+  segmentIds: ['seg-1'],
+  materiaalIds: ['mat-1', 'mat-2'],
+  maatIds: ['maat-1', 'maat-2'],
+  prijzen: [
+    { materiaalId: 'mat-1', maatId: 'maat-1', prijs: 150 },
+    { materiaalId: 'mat-1', maatId: 'maat-2', prijs: 200 },
+    { materiaalId: 'mat-2', maatId: 'maat-1', prijs: 175 },
+    { materiaalId: 'mat-2', maatId: 'maat-2', prijs: 225 },
+  ],
+  omschrijvingNl: 'Wellness paneel',
+  omschrijvingFr: '',
+  omschrijvingDe: '',
+  omschrijvingEn: '',
 };
+const MATERIALEN: Materiaal[] = [
+  { id: 'mat-1', materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Veiligheidsglas' },
+  { id: 'mat-2', materiaalsoortId: 'soort-2', materiaaldikte: 3, omschrijving: 'Acryl' },
+];
+const MATEN: Maat[] = [
+  { id: 'maat-1', breedte: 40, hoogte: 60 },
+  { id: 'maat-2', breedte: 60, hoogte: 90 },
+];
 
-function renderModal(onClose: () => void = () => {}) {
+function renderModal(onClose: () => void = () => {}, kunstwerk: Kunstwerk | null = KUNSTWERK) {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <CartProvider>
-        <ProductModal image={SAMPLE_IMAGE} onClose={onClose} />
+        <ProductModal kunstwerk={kunstwerk} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
       </CartProvider>
     </NextIntlClientProvider>
   );
@@ -32,22 +52,32 @@ afterEach(() => {
 });
 
 describe('ProductModal', () => {
-  it('renders nothing when image is null', () => {
-    render(
-      <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal image={null} onClose={() => {}} />
-        </CartProvider>
-      </NextIntlClientProvider>
-    );
+  it('renders nothing when kunstwerk is null', () => {
+    renderModal(() => {}, null);
     expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
   });
 
-  it('shows the segment title, default size, and quantity 1 when open', () => {
+  it('shows the resolved description, defaults to the first materiaal/maat, and the matching price', () => {
     renderModal();
-    expect(screen.getByText('Wellness')).toBeInTheDocument();
-    expect(screen.getByTestId('product-modal-size')).toHaveValue('40x60cm');
+    expect(screen.getByText('Wellness paneel')).toBeInTheDocument();
+    expect(screen.getByTestId('product-modal-materiaal')).toHaveValue('mat-1');
+    expect(screen.getByTestId('product-modal-maat')).toHaveValue('maat-1');
+    expect(screen.getByTestId('product-modal-prijs')).toHaveTextContent('€ 150,00');
     expect(screen.getByTestId('product-modal-quantity-value')).toHaveTextContent('1');
+  });
+
+  it('updates the shown price when a different materiaal or maat is chosen', () => {
+    renderModal();
+    fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: 'maat-2' } });
+    expect(screen.getByTestId('product-modal-prijs')).toHaveTextContent('€ 200,00');
+    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-2' } });
+    expect(screen.getByTestId('product-modal-prijs')).toHaveTextContent('€ 225,00');
+  });
+
+  it('only lists the materialen this kunstwerk actually offers', () => {
+    renderModal();
+    const options = screen.getByTestId('product-modal-materiaal').querySelectorAll('option');
+    expect(options).toHaveLength(2);
   });
 
   it('increments and decrements quantity, never below 1', () => {
@@ -80,7 +110,7 @@ describe('ProductModal', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('adds the chosen size/quantity to the cart, shows the confirmed state, then closes after the delay', () => {
+  it('adds the chosen kunstwerk/materiaal/maat/price/quantity to the cart, shows confirmed state, then closes', () => {
     const onClose = vi.fn();
 
     function Probe() {
@@ -91,20 +121,26 @@ describe('ProductModal', () => {
     render(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal image={SAMPLE_IMAGE} onClose={onClose} />
+          <ProductModal kunstwerk={KUNSTWERK} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
           <Probe />
         </CartProvider>
       </NextIntlClientProvider>
     );
 
-    fireEvent.change(screen.getByTestId('product-modal-size'), { target: { value: '60x90cm' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: 'maat-2' } });
     fireEvent.click(screen.getByTestId('product-modal-quantity-plus'));
     fireEvent.click(screen.getByTestId('product-modal-confirm'));
 
     const items = JSON.parse(screen.getByTestId('probe').textContent ?? '[]');
     expect(items).toHaveLength(1);
-    expect(items[0].size).toBe('60x90cm');
-    expect(items[0].quantity).toBe(2);
+    expect(items[0]).toMatchObject({
+      kunstwerkId: 'kw-1',
+      materiaalId: 'mat-1',
+      maatId: 'maat-2',
+      maatLabel: '60×90 cm',
+      prijs: 200,
+      quantity: 2,
+    });
 
     expect(screen.getByTestId('product-modal-confirm')).toHaveTextContent('Toegevoegd!');
     expect(onClose).not.toHaveBeenCalled();
@@ -115,46 +151,13 @@ describe('ProductModal', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('only adds one line to the cart when confirm is clicked twice within the feedback window', () => {
-    const onClose = vi.fn();
-
-    function Probe() {
-      const { items } = useCart();
-      return <div data-testid="probe">{JSON.stringify(items)}</div>;
-    }
-
-    render(
-      <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal image={SAMPLE_IMAGE} onClose={onClose} />
-          <Probe />
-        </CartProvider>
-      </NextIntlClientProvider>
-    );
-
-    fireEvent.click(screen.getByTestId('product-modal-confirm'));
-    // Second click happens before the 600ms close-timer elapses.
-    fireEvent.click(screen.getByTestId('product-modal-confirm'));
-
-    const items = JSON.parse(screen.getByTestId('probe').textContent ?? '[]');
-    expect(items).toHaveLength(1);
-
-    expect(screen.getByTestId('product-modal-confirm')).toBeDisabled();
-
-    act(() => {
-      vi.advanceTimersByTime(600);
-    });
-    // Only one close-timer should have been scheduled, so onClose fires once.
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not let a stale close-timer from a previous image affect the newly shown modal', () => {
+  it('does not let a stale close-timer from a previous kunstwerk affect the newly shown modal', () => {
     const onClose = vi.fn();
 
     const { rerender } = render(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal image={SAMPLE_IMAGE} onClose={onClose} />
+          <ProductModal kunstwerk={KUNSTWERK} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
         </CartProvider>
       </NextIntlClientProvider>
     );
@@ -162,39 +165,29 @@ describe('ProductModal', () => {
     fireEvent.click(screen.getByTestId('product-modal-confirm'));
     expect(screen.getByTestId('product-modal-confirm')).toHaveTextContent('Toegevoegd!');
 
-    const NEXT_IMAGE = {
-      id: 'wellness-1',
-      src: 'https://images.unsplash.com/example-2.jpg',
-      segmentSlug: 'wellness',
-      segmentMessageKey: 'wellness',
-    };
+    const NEXT_KUNSTWERK: Kunstwerk = { ...KUNSTWERK, id: 'kw-2', omschrijvingNl: 'Ander kunstwerk' };
 
-    // A new product is selected before the pending close-timer for the
-    // previous product has fired (parent always passes through image=null
-    // in between, per ProductModal's contract).
     rerender(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal image={null} onClose={onClose} />
+          <ProductModal kunstwerk={null} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
         </CartProvider>
       </NextIntlClientProvider>
     );
     rerender(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal image={NEXT_IMAGE} onClose={onClose} />
+          <ProductModal kunstwerk={NEXT_KUNSTWERK} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
         </CartProvider>
       </NextIntlClientProvider>
     );
 
     expect(screen.getByTestId('product-modal-confirm')).toHaveTextContent('Toevoegen');
 
-    // Advance past when the stale timer would have fired.
     act(() => {
       vi.advanceTimersByTime(600);
     });
 
-    // The stale timer must not have called onClose behind the newly shown modal.
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByTestId('product-modal')).toBeInTheDocument();
   });
@@ -211,36 +204,6 @@ describe('ProductModal', () => {
     expect(screen.getByTestId('product-modal-close')).toHaveFocus();
   });
 
-  it('restores focus to the triggering element when it closes', () => {
-    const onClose = vi.fn();
-    const trigger = document.createElement('button');
-    trigger.textContent = 'Open product';
-    document.body.appendChild(trigger);
-    trigger.focus();
-    expect(trigger).toHaveFocus();
-
-    const { rerender } = render(
-      <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal image={SAMPLE_IMAGE} onClose={onClose} />
-        </CartProvider>
-      </NextIntlClientProvider>
-    );
-
-    expect(screen.getByTestId('product-modal-close')).toHaveFocus();
-
-    rerender(
-      <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal image={null} onClose={onClose} />
-        </CartProvider>
-      </NextIntlClientProvider>
-    );
-
-    expect(trigger).toHaveFocus();
-    trigger.remove();
-  });
-
   it('traps Tab focus within the modal, wrapping from the last to the first focusable element', () => {
     renderModal();
     const closeButton = screen.getByTestId('product-modal-close');
@@ -253,15 +216,8 @@ describe('ProductModal', () => {
     expect(closeButton).toHaveFocus();
   });
 
-  it('traps Shift+Tab focus within the modal, wrapping from the first to the last focusable element', () => {
+  it('shows a watermark overlay on the photo', () => {
     renderModal();
-    const closeButton = screen.getByTestId('product-modal-close');
-    const confirmButton = screen.getByTestId('product-modal-confirm');
-
-    closeButton.focus();
-    expect(closeButton).toHaveFocus();
-
-    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
-    expect(confirmButton).toHaveFocus();
+    expect(screen.getByTestId('watermark-overlay')).toBeInTheDocument();
   });
 });

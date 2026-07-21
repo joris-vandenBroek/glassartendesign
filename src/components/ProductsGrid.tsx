@@ -1,23 +1,35 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { SEGMENTS, getAllImages, type SegmentImage } from '@/data/segments';
+import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
+import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
+import { WatermarkedImage } from './WatermarkedImage';
 import { ProductModal } from './ProductModal';
+import type { Segment, Kunstwerk, Materiaal, Maat } from './beheer/materiaalTypes';
 
 const ALL_FILTER = 'all';
 
 export function ProductsGrid() {
-  const tSegments = useTranslations('segments');
+  const locale = useLocale();
   const tCollections = useTranslations('collectionsPage');
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
-  const [selectedImage, setSelectedImage] = useState<SegmentImage | null>(null);
-  const allImages = useMemo(() => getAllImages(), []);
+  const [selectedKunstwerk, setSelectedKunstwerk] = useState<Kunstwerk | null>(null);
 
-  const visibleImages =
+  const segmenten = useFirestoreCollection<Segment>('segmenten');
+  const kunstwerken = useFirestoreCollection<Kunstwerk>('kunstwerken');
+  const materialen = useFirestoreCollection<Materiaal>('materialen');
+  const maten = useFirestoreCollection<Maat>('maten');
+
+  if (segmenten.items === null || kunstwerken.items === null) {
+    return null;
+  }
+
+  const allKunstwerken = kunstwerken.items;
+  const visibleKunstwerken =
     activeFilter === ALL_FILTER
-      ? allImages
-      : allImages.filter((image) => image.segmentSlug === activeFilter);
+      ? allKunstwerken
+      : allKunstwerken.filter((kunstwerk) => kunstwerk.segmentIds.includes(activeFilter));
 
   function filterButtonClass(isActive: boolean) {
     return isActive
@@ -35,18 +47,19 @@ export function ProductsGrid() {
           onClick={() => setActiveFilter(ALL_FILTER)}
           className={filterButtonClass(activeFilter === ALL_FILTER)}
         >
-          {tCollections('filterAll')} ({allImages.length})
+          {tCollections('filterAll')} ({allKunstwerken.length})
         </button>
-        {SEGMENTS.map((segment) => (
+        {segmenten.items.map((segment) => (
           <button
-            key={segment.slug}
+            key={segment.id}
             type="button"
-            data-testid={`filter-${segment.slug}`}
-            aria-pressed={activeFilter === segment.slug}
-            onClick={() => setActiveFilter(segment.slug)}
-            className={filterButtonClass(activeFilter === segment.slug)}
+            data-testid={`filter-${segment.id}`}
+            aria-pressed={activeFilter === segment.id}
+            onClick={() => setActiveFilter(segment.id)}
+            className={filterButtonClass(activeFilter === segment.id)}
           >
-            {tSegments(`${segment.messageKey}.title`)} ({segment.images.length})
+            {segment.omschrijving} (
+            {allKunstwerken.filter((kunstwerk) => kunstwerk.segmentIds.includes(segment.id)).length})
           </button>
         ))}
       </div>
@@ -55,41 +68,43 @@ export function ProductsGrid() {
         data-testid="products-grid"
         className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
       >
-        {visibleImages.map((image) => (
-          <div
-            key={image.id}
-            data-testid="product-card"
-            role="button"
-            tabIndex={0}
-            aria-label={tSegments(`${image.segmentMessageKey}.title`)}
-            onClick={() => setSelectedImage(image)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                if (event.key === ' ') {
-                  event.preventDefault();
-                }
-                setSelectedImage(image);
-              }
-            }}
-            className="group relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:-translate-y-1"
-          >
-            <img
-              src={image.src}
-              alt={tSegments(`${image.segmentMessageKey}.title`)}
-              className="aspect-square w-full object-cover"
-            />
+        {visibleKunstwerken.map((kunstwerk) => {
+          const omschrijving = resolveKunstwerkOmschrijving(kunstwerk, locale);
+          return (
             <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            />
-            <span className="badge-gold absolute left-2 top-2">
-              {tSegments(`${image.segmentMessageKey}.title`)}
-            </span>
-          </div>
-        ))}
+              key={kunstwerk.id}
+              data-testid="product-card"
+              role="button"
+              tabIndex={0}
+              aria-label={omschrijving}
+              onClick={() => setSelectedKunstwerk(kunstwerk)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  if (event.key === ' ') {
+                    event.preventDefault();
+                  }
+                  setSelectedKunstwerk(kunstwerk);
+                }
+              }}
+              className="group relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:-translate-y-1"
+            >
+              <WatermarkedImage src={kunstwerk.foto} alt={omschrijving} className="aspect-square w-full" />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+              <span className="badge-gold absolute left-2 top-2">{omschrijving}</span>
+            </div>
+          );
+        })}
       </div>
 
-      <ProductModal image={selectedImage} onClose={() => setSelectedImage(null)} />
+      <ProductModal
+        kunstwerk={selectedKunstwerk}
+        materialen={materialen.items}
+        maten={maten.items}
+        onClose={() => setSelectedKunstwerk(null)}
+      />
     </>
   );
 }

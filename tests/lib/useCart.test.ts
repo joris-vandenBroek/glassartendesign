@@ -2,6 +2,18 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { CartProvider, useCart } from '@/lib/useCart';
 
+const SAMPLE_ITEM = {
+  kunstwerkId: 'kw-1',
+  foto: 'https://example.com/foto.jpg',
+  omschrijving: 'Mooi kunstwerk',
+  materiaalId: 'mat-1',
+  materiaalLabel: '4mm — Veiligheidsglas',
+  maatId: 'maat-1',
+  maatLabel: '40×60 cm',
+  prijs: 150,
+  quantity: 2,
+};
+
 beforeEach(() => {
   window.localStorage.clear();
 });
@@ -12,54 +24,55 @@ describe('useCart', () => {
     expect(result.current.isHydrated).toBe(true);
     expect(result.current.items).toEqual([]);
     expect(result.current.totalQuantity).toBe(0);
+    expect(result.current.totalPrice).toBe(0);
   });
 
-  it('adds a new item and persists it to localStorage', () => {
+  it('adds a new item, computes totalPrice, and persists it to localStorage', () => {
     const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
     act(() => {
-      result.current.addItem({
-        segmentSlug: 'wellness',
-        segmentMessageKey: 'wellness',
-        imageSrc: 'https://images.unsplash.com/example.jpg',
-        size: '60x90cm',
-        quantity: 2,
-      });
+      result.current.addItem(SAMPLE_ITEM);
     });
     expect(result.current.items).toHaveLength(1);
     expect(result.current.totalQuantity).toBe(2);
+    expect(result.current.totalPrice).toBe(300);
     const stored = JSON.parse(window.localStorage.getItem('glassart-cart') ?? '[]');
     expect(stored).toHaveLength(1);
   });
 
-  it('increases quantity instead of duplicating when the same segment+image+size is added again', () => {
+  it('increases quantity instead of duplicating when the same kunstwerk+materiaal+maat is added again', () => {
     const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
-    const input = {
-      segmentSlug: 'wellness',
-      segmentMessageKey: 'wellness',
-      imageSrc: 'https://images.unsplash.com/example.jpg',
-      size: '60x90cm',
-      quantity: 1,
-    };
     act(() => {
-      result.current.addItem(input);
+      result.current.addItem({ ...SAMPLE_ITEM, quantity: 1 });
     });
     act(() => {
-      result.current.addItem(input);
+      result.current.addItem({ ...SAMPLE_ITEM, quantity: 1 });
     });
     expect(result.current.items).toHaveLength(1);
     expect(result.current.items[0].quantity).toBe(2);
   });
 
+  it('adds a separate line when the same kunstwerk is added with a different maat', () => {
+    const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
+    act(() => {
+      result.current.addItem(SAMPLE_ITEM);
+    });
+    act(() => {
+      result.current.addItem({
+        ...SAMPLE_ITEM,
+        maatId: 'maat-2',
+        maatLabel: '60×90 cm',
+        prijs: 200,
+        quantity: 1,
+      });
+    });
+    expect(result.current.items).toHaveLength(2);
+    expect(result.current.totalPrice).toBe(500);
+  });
+
   it('removes an item by id', () => {
     const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
     act(() => {
-      result.current.addItem({
-        segmentSlug: 'hotel',
-        segmentMessageKey: 'hotel',
-        imageSrc: 'https://images.unsplash.com/example2.jpg',
-        size: '40x60cm',
-        quantity: 1,
-      });
+      result.current.addItem(SAMPLE_ITEM);
     });
     const id = result.current.items[0].id;
     act(() => {
@@ -71,13 +84,7 @@ describe('useCart', () => {
   it('clears the cart and localStorage', () => {
     const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
     act(() => {
-      result.current.addItem({
-        segmentSlug: 'hotel',
-        segmentMessageKey: 'hotel',
-        imageSrc: 'https://images.unsplash.com/example2.jpg',
-        size: '40x60cm',
-        quantity: 1,
-      });
+      result.current.addItem(SAMPLE_ITEM);
     });
     act(() => {
       result.current.clear();

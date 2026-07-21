@@ -14,10 +14,14 @@ const STORAGE_KEY = 'glassart-cart';
 
 export interface CartItem {
   id: string;
-  segmentSlug: string;
-  segmentMessageKey: string;
-  imageSrc: string;
-  size: string;
+  kunstwerkId: string;
+  foto: string;
+  omschrijving: string;
+  materiaalId: string;
+  materiaalLabel: string;
+  maatId: string;
+  maatLabel: string;
+  prijs: number;
   quantity: number;
 }
 
@@ -27,6 +31,7 @@ interface CartValue {
   items: CartItem[];
   isHydrated: boolean;
   totalQuantity: number;
+  totalPrice: number;
   addItem: (input: AddItemInput) => void;
   removeItem: (id: string) => void;
   clear: () => void;
@@ -34,8 +39,8 @@ interface CartValue {
 
 const CartContext = createContext<CartValue | null>(null);
 
-function makeItemId(segmentSlug: string, imageSrc: string, size: string): string {
-  return `${segmentSlug}__${imageSrc}__${size}`;
+function makeItemId(kunstwerkId: string, materiaalId: string, maatId: string): string {
+  return `${kunstwerkId}__${materiaalId}__${maatId}`;
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -56,7 +61,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((input: AddItemInput) => {
     setItems((current) => {
-      const id = makeItemId(input.segmentSlug, input.imageSrc, input.size);
+      const id = makeItemId(input.kunstwerkId, input.materiaalId, input.maatId);
       const existing = current.find((item) => item.id === id);
       const next = existing
         ? current.map((item) =>
@@ -86,9 +91,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [items]
   );
 
+  const totalPrice = useMemo(
+    () => items.reduce((sum, item) => sum + item.prijs * item.quantity, 0),
+    [items]
+  );
+
   const value = useMemo(
-    () => ({ items, isHydrated, totalQuantity, addItem, removeItem, clear }),
-    [items, isHydrated, totalQuantity, addItem, removeItem, clear]
+    () => ({ items, isHydrated, totalQuantity, totalPrice, addItem, removeItem, clear }),
+    [items, isHydrated, totalQuantity, totalPrice, addItem, removeItem, clear]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -8,15 +8,16 @@ import { db } from '@/lib/firebase';
 import { useCart } from '@/lib/useCart';
 import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
+import { formatCurrency } from '@/data/mockAdminInvoices';
+import { WatermarkedImage } from './WatermarkedImage';
 import { Link } from '@/i18n/navigation';
 
 export function CartPanel() {
   const t = useTranslations('cart');
-  const tSegments = useTranslations('segments');
   const [isOpen, setIsOpen] = useState(false);
   const [placeOrderError, setPlaceOrderError] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const { items, isHydrated, totalQuantity, removeItem, clear } = useCart();
+  const { items, isHydrated, totalQuantity, totalPrice, removeItem, clear } = useCart();
   const { user, isCustomer } = useCustomerAuth();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -47,9 +48,10 @@ export function CartPanel() {
       await Promise.all(
         items.map((item) =>
           addDoc(collection(db, 'bestelheaders', headerDoc.id, 'bestellines'), {
-            kunstwerkId: null,
-            maatId: null,
-            materiaalId: null,
+            kunstwerkId: item.kunstwerkId,
+            maatId: item.maatId,
+            materiaalId: item.materiaalId,
+            prijs: item.prijs,
             quantity: item.quantity,
           })
         )
@@ -139,10 +141,7 @@ export function CartPanel() {
 
               <div className="flex-1 overflow-y-auto px-5 py-4">
                 {orderPlaced ? (
-                  <p
-                    data-testid="cart-order-confirmation"
-                    className="text-center text-xs text-white/80"
-                  >
+                  <p data-testid="cart-order-confirmation" className="text-center text-xs text-white/80">
                     {t('orderConfirmation')}
                   </p>
                 ) : items.length === 0 ? (
@@ -157,12 +156,13 @@ export function CartPanel() {
                         data-testid={`cart-item-${item.id}`}
                         className="flex gap-3 rounded-md border border-white/10 bg-graphite/60 p-3 text-xs text-white/80"
                       >
-                        <img src={item.imageSrc} alt="" className="h-12 w-12 rounded object-cover" />
+                        <WatermarkedImage src={item.foto} alt="" className="h-12 w-12 rounded" />
                         <div className="flex-1">
-                          <p>{tSegments(`${item.segmentMessageKey}.title`)}</p>
+                          <p>{item.omschrijving}</p>
                           <p className="text-white/50">
-                            {item.size} · ×{item.quantity}
+                            {item.materiaalLabel} · {item.maatLabel} · ×{item.quantity}
                           </p>
+                          <p className="text-white/50">{formatCurrency(item.prijs * item.quantity)}</p>
                         </div>
                         <button
                           type="button"
@@ -181,6 +181,12 @@ export function CartPanel() {
 
               {!orderPlaced && (
                 <div className="flex flex-col gap-2 border-t border-white/10 px-5 py-4">
+                  {items.length > 0 && (
+                    <p data-testid="cart-total" className="flex justify-between text-sm text-white/80">
+                      <span>{t('total')}</span>
+                      <span>{formatCurrency(totalPrice)}</span>
+                    </p>
+                  )}
                   {isCustomer ? (
                     <button
                       type="button"
@@ -201,10 +207,7 @@ export function CartPanel() {
                     </Link>
                   )}
                   {placeOrderError && (
-                    <p
-                      data-testid="cart-place-order-error"
-                      className="text-center text-xs text-red-400"
-                    >
+                    <p data-testid="cart-place-order-error" className="text-center text-xs text-red-400">
                       {placeOrderError}
                     </p>
                   )}

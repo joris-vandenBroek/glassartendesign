@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { BestellingModal } from './BestellingModal';
+import type { Kunstwerk, Materiaal, Maat } from './materiaalTypes';
 
 export interface BestellingLine {
   id: string;
   kunstwerkId: string | null;
   maatId: string | null;
   materiaalId: string | null;
+  prijs: number;
   quantity: number;
 }
 
@@ -26,12 +28,18 @@ export interface Bestelling {
 
 interface BestellingenSectionProps {
   bestellingen: Bestelling[] | null;
+  kunstwerken: Kunstwerk[] | null;
+  materialen: Materiaal[] | null;
+  maten: Maat[] | null;
   loadError: string | null;
   onBestellingUpdated: (bestelling: Bestelling) => void;
 }
 
 export function BestellingenSection({
   bestellingen,
+  kunstwerken,
+  materialen,
+  maten,
   loadError,
   onBestellingUpdated,
 }: BestellingenSectionProps) {
@@ -79,6 +87,9 @@ export function BestellingenSection({
       />
       <BestellingModal
         bestelling={selectedBestelling}
+        kunstwerken={kunstwerken}
+        materialen={materialen}
+        maten={maten}
         onClose={() => setSelectedBestelling(null)}
         onUpdated={(updated) => {
           onBestellingUpdated(updated);

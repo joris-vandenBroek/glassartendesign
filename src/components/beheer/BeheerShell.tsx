@@ -90,6 +90,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
                 kunstwerkId: lineData.kunstwerkId,
                 maatId: lineData.maatId,
                 materiaalId: lineData.materiaalId,
+                prijs: lineData.prijs,
                 quantity: lineData.quantity,
               };
             });
@@ -204,6 +205,9 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
         ) : activeSection === 'bestellingen' ? (
           <BestellingenSection
             bestellingen={bestellingen}
+            kunstwerken={kunstwerken.items}
+            materialen={materialen.items}
+            maten={maten.items}
             loadError={bestellingenLoadError}
             onBestellingUpdated={handleBestellingUpdated}
           />

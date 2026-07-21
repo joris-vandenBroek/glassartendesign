@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { BestellingenSection, type Bestelling } from '@/components/beheer/BestellingenSection';
+import type { Kunstwerk, Materiaal, Maat } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
 
 const updateDocMock = vi.fn();
@@ -15,6 +16,25 @@ vi.mock('firebase/firestore', () => ({
   updateDoc: (...args: unknown[]) => updateDocMock(...args),
 }));
 
+const KUNSTWERKEN: Kunstwerk[] = [
+  {
+    id: 'kw-1',
+    foto: 'https://example.com/kw-1.jpg',
+    segmentIds: [],
+    materiaalIds: ['mat-1'],
+    maatIds: ['maat-1'],
+    prijzen: [],
+    omschrijvingNl: 'Hotel paneel',
+    omschrijvingFr: '',
+    omschrijvingDe: '',
+    omschrijvingEn: '',
+  },
+];
+const MATERIALEN: Materiaal[] = [
+  { id: 'mat-1', materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Veiligheidsglas' },
+];
+const MATEN: Maat[] = [{ id: 'maat-1', breedte: 40, hoogte: 60 }];
+
 const BESTELLINGEN: Bestelling[] = [
   {
     id: 'header-1',
@@ -24,7 +44,7 @@ const BESTELLINGEN: Bestelling[] = [
     status: 'Te beoordelen',
     lineCount: 1,
     totalQuantity: 3,
-    lines: [{ id: 'line-1', kunstwerkId: null, maatId: null, materiaalId: null, quantity: 3 }],
+    lines: [{ id: 'line-1', kunstwerkId: 'kw-1', maatId: 'maat-1', materiaalId: 'mat-1', prijs: 150, quantity: 3 }],
   },
   {
     id: 'header-2',
@@ -34,7 +54,7 @@ const BESTELLINGEN: Bestelling[] = [
     status: 'Goedgekeurd',
     lineCount: 1,
     totalQuantity: 1,
-    lines: [{ id: 'line-2', kunstwerkId: null, maatId: null, materiaalId: null, quantity: 1 }],
+    lines: [{ id: 'line-2', kunstwerkId: 'kw-1', maatId: 'maat-1', materiaalId: 'mat-1', prijs: 150, quantity: 1 }],
   },
 ];
 
@@ -44,6 +64,9 @@ function renderSection(overrides: Partial<React.ComponentProps<typeof Bestelling
     <NextIntlClientProvider locale="nl" messages={messages}>
       <BestellingenSection
         bestellingen={BESTELLINGEN}
+        kunstwerken={KUNSTWERKEN}
+        materialen={MATERIALEN}
+        maten={MATEN}
         loadError={null}
         onBestellingUpdated={onBestellingUpdated}
         {...overrides}
@@ -82,10 +105,11 @@ describe('BestellingenSection', () => {
     expect(screen.getByTestId('data-table-row-header-2')).toBeInTheDocument();
   });
 
-  it("opens the BestellingModal with the clicked bestelling's data when a row is clicked", () => {
+  it("opens the BestellingModal with the clicked bestelling's resolved kunstwerk data when a row is clicked", () => {
     renderSection();
     fireEvent.click(screen.getByTestId('data-table-row-header-1'));
     expect(screen.getByTestId('bestelling-modal')).toHaveTextContent('Testbedrijf BV');
+    expect(screen.getByTestId('bestelling-modal')).toHaveTextContent('Hotel paneel');
   });
 
   it('closes the modal and reports the updated bestelling via onBestellingUpdated after approving', async () => {

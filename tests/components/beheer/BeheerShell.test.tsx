@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { BeheerShell } from '@/components/beheer/BeheerShell';
 import messages from '../../../messages/nl.json';
@@ -187,7 +187,7 @@ describe('BeheerShell', () => {
         },
       ],
       'bestelheaders/header-1/bestellines': [
-        { id: 'line-1', data: { kunstwerkId: null, maatId: null, materiaalId: null, quantity: 3 } },
+        { id: 'line-1', data: { kunstwerkId: 'kw-1', maatId: 'maat-1', materiaalId: 'mat-1', prijs: 150, quantity: 3 } },
       ],
     });
     renderShell();
@@ -195,6 +195,8 @@ describe('BeheerShell', () => {
     screen.getByTestId('beheer-nav-bestellingen').click();
     expect(await screen.findByTestId('bestellingen-section')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-header-1')).toHaveTextContent('Testbedrijf BV');
+    fireEvent.click(screen.getByTestId('data-table-row-header-1'));
+    expect(screen.getByTestId('bestelling-modal')).toHaveTextContent('Hotel paneel');
   });
 
   it('shows the segmenten count and switches to the Segmenten section', async () => {
