@@ -29,9 +29,9 @@ describe('FacturenSection', () => {
     });
   });
 
-  it('shows all facturen when the status filter is cleared', () => {
+  it('shows all facturen after clicking the "alle facturen" quick filter link', () => {
     renderSection();
-    fireEvent.change(screen.getByTestId('data-table-filter-status'), { target: { value: '' } });
+    fireEvent.click(screen.getByTestId('data-table-quick-all'));
     MOCK_ADMIN_INVOICES.forEach((invoice) => {
       expect(screen.getByTestId(`data-table-row-${invoice.invoiceNumber}`)).toBeInTheDocument();
     });

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DataTable, type Column } from '@/components/DataTable';
+import { DataTable, type Column, type StatusQuickFilter } from '@/components/DataTable';
 
 interface Row {
   id: string;
@@ -16,9 +16,9 @@ const ROWS: Row[] = [
 ];
 
 const COLUMNS: Column<Row>[] = [
-  { key: 'name', label: 'Naam', filterType: 'text' },
-  { key: 'amount', label: 'Bedrag', filterType: 'text' },
-  { key: 'status', label: 'Status', filterType: 'select', filterOptions: ['Open', 'Gesloten'] },
+  { key: 'name', label: 'Naam' },
+  { key: 'amount', label: 'Bedrag' },
+  { key: 'status', label: 'Status' },
 ];
 
 function renderTable(overrides: Partial<React.ComponentProps<typeof DataTable<Row>>> = {}) {
@@ -30,6 +30,7 @@ function renderTable(overrides: Partial<React.ComponentProps<typeof DataTable<Ro
       getRowId={(row) => row.id}
       onRowClick={onRowClick}
       emptyLabel="Geen rijen gevonden."
+      searchPlaceholder="Zoeken..."
       {...overrides}
     />
   );
@@ -73,32 +74,62 @@ describe('DataTable', () => {
     expect(rowOrder()).toEqual(['data-table-row-b', 'data-table-row-c', 'data-table-row-a']);
   });
 
-  it('filters rows via a text filter (case-insensitive substring match)', () => {
+  it('filters rows via the global search across every column (case-insensitive substring match)', () => {
     renderTable();
-    fireEvent.change(screen.getByTestId('data-table-filter-name'), { target: { value: 'lph' } });
+    fireEvent.change(screen.getByTestId('data-table-search'), { target: { value: 'lph' } });
     expect(screen.getByTestId('data-table-row-b')).toBeInTheDocument();
     expect(screen.queryByTestId('data-table-row-a')).not.toBeInTheDocument();
     expect(screen.queryByTestId('data-table-row-c')).not.toBeInTheDocument();
   });
 
-  it('filters rows via a select filter (exact match)', () => {
+  it('matches the global search against a column not visible in the current sort, e.g. status', () => {
     renderTable();
-    fireEvent.change(screen.getByTestId('data-table-filter-status'), { target: { value: 'Gesloten' } });
+    fireEvent.change(screen.getByTestId('data-table-search'), { target: { value: 'Gesloten' } });
     expect(screen.getByTestId('data-table-row-b')).toBeInTheDocument();
     expect(screen.queryByTestId('data-table-row-a')).not.toBeInTheDocument();
     expect(screen.queryByTestId('data-table-row-c')).not.toBeInTheDocument();
   });
 
-  it('applies defaultFilters on first render', () => {
-    renderTable({ defaultFilters: { status: 'Open' } });
-    expect(screen.getByTestId('data-table-row-a')).toBeInTheDocument();
-    expect(screen.getByTestId('data-table-row-c')).toBeInTheDocument();
-    expect(screen.queryByTestId('data-table-row-b')).not.toBeInTheDocument();
-  });
-
-  it('shows the emptyLabel when no rows match the current filters', () => {
+  it('shows the emptyLabel when no rows match the current search', () => {
     renderTable();
-    fireEvent.change(screen.getByTestId('data-table-filter-name'), { target: { value: 'zzz' } });
+    fireEvent.change(screen.getByTestId('data-table-search'), { target: { value: 'zzz' } });
     expect(screen.getByTestId('data-table-empty')).toHaveTextContent('Geen rijen gevonden.');
+  });
+
+  describe('quickFilter', () => {
+    const quickFilter: StatusQuickFilter<Row> = {
+      key: 'status',
+      activeValue: 'Open',
+      activeLabel: 'Open rijen',
+      allLabel: 'Alle rijen',
+    };
+
+    it('applies the quick filter to only the activeValue by default', () => {
+      renderTable({ quickFilter });
+      expect(screen.getByTestId('data-table-row-a')).toBeInTheDocument();
+      expect(screen.getByTestId('data-table-row-c')).toBeInTheDocument();
+      expect(screen.queryByTestId('data-table-row-b')).not.toBeInTheDocument();
+    });
+
+    it('shows all rows after clicking the "all" quick filter link', () => {
+      renderTable({ quickFilter });
+      fireEvent.click(screen.getByTestId('data-table-quick-all'));
+      expect(screen.getByTestId('data-table-row-a')).toBeInTheDocument();
+      expect(screen.getByTestId('data-table-row-b')).toBeInTheDocument();
+      expect(screen.getByTestId('data-table-row-c')).toBeInTheDocument();
+    });
+
+    it('combines the quick filter with the global search', () => {
+      renderTable({ quickFilter });
+      fireEvent.change(screen.getByTestId('data-table-search'), { target: { value: 'Bravo' } });
+      expect(screen.getByTestId('data-table-row-a')).toBeInTheDocument();
+      expect(screen.queryByTestId('data-table-row-c')).not.toBeInTheDocument();
+    });
+
+    it('does not render quick filter links when no quickFilter is passed', () => {
+      renderTable();
+      expect(screen.queryByTestId('data-table-quick-active')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('data-table-quick-all')).not.toBeInTheDocument();
+    });
   });
 });

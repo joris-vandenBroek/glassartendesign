@@ -193,12 +193,11 @@ export function KunstwerkenSection({
     {
       key: 'foto',
       label: t('kunstwerkenColFoto'),
-      filterType: 'text',
       sortable: false,
       render: (row) => <img src={row.foto} alt="" className="h-10 w-10 rounded object-cover" />,
     },
-    { key: 'segmentNamen', label: t('kunstwerkenColSegmenten'), filterType: 'text' },
-    { key: 'omschrijvingNl', label: t('kunstwerkenColOmschrijving'), filterType: 'text' },
+    { key: 'segmentNamen', label: t('kunstwerkenColSegmenten') },
+    { key: 'omschrijvingNl', label: t('kunstwerkenColOmschrijving') },
   ];
 
   return (
@@ -219,6 +218,7 @@ export function KunstwerkenSection({
         getRowId={(row) => row.id}
         onRowClick={openEdit}
         emptyLabel={t('kunstwerkenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')}>
         <div data-testid="kunstwerk-modal" className="flex flex-col gap-3 text-sm text-white/80">

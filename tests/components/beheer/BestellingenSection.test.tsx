@@ -98,9 +98,9 @@ describe('BestellingenSection', () => {
     expect(screen.queryByTestId('data-table-row-header-2')).not.toBeInTheDocument();
   });
 
-  it('shows all bestellingen when the status filter is cleared', () => {
+  it('shows all bestellingen after clicking the "alle bestellingen" quick filter link', () => {
     renderSection();
-    fireEvent.change(screen.getByTestId('data-table-filter-status'), { target: { value: '' } });
+    fireEvent.click(screen.getByTestId('data-table-quick-all'));
     expect(screen.getByTestId('data-table-row-header-1')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-header-2')).toBeInTheDocument();
   });

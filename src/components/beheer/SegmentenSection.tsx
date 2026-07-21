@@ -73,9 +73,7 @@ export function SegmentenSection({ segmenten, loadError, onAdd, onUpdate, onRemo
     }
   }
 
-  const columns: Column<Segment>[] = [
-    { key: 'omschrijving', label: t('segmentenColOmschrijving'), filterType: 'text' },
-  ];
+  const columns: Column<Segment>[] = [{ key: 'omschrijving', label: t('segmentenColOmschrijving') }];
 
   return (
     <div data-testid="segmenten-section">
@@ -95,6 +93,7 @@ export function SegmentenSection({ segmenten, loadError, onAdd, onUpdate, onRemo
         getRowId={(row) => row.id}
         onRowClick={openEdit}
         emptyLabel={t('segmentenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')}>
         <div data-testid="segment-modal" className="flex flex-col gap-2 text-sm text-white/80">

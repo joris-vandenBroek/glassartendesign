@@ -88,9 +88,7 @@ export function MateriaalsoortenSection({
     }
   }
 
-  const columns: Column<Materiaalsoort>[] = [
-    { key: 'omschrijving', label: t('materiaalsoortenColOmschrijving'), filterType: 'text' },
-  ];
+  const columns: Column<Materiaalsoort>[] = [{ key: 'omschrijving', label: t('materiaalsoortenColOmschrijving') }];
 
   return (
     <div data-testid="materiaalsoorten-section">
@@ -110,6 +108,7 @@ export function MateriaalsoortenSection({
         getRowId={(row) => row.id}
         onRowClick={openEdit}
         emptyLabel={t('materiaalsoortenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')}>
         <div data-testid="materiaalsoort-modal" className="flex flex-col gap-2 text-sm text-white/80">

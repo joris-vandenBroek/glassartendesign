@@ -59,20 +59,14 @@ export function BestellingenSection({
   }
 
   const columns: Column<Bestelling>[] = [
-    { key: 'companyName', label: t('bestellingenColKlant'), filterType: 'text' },
-    { key: 'besteldatum', label: t('bestellingenColDatum'), filterType: 'text' },
+    { key: 'companyName', label: t('bestellingenColKlant') },
+    { key: 'besteldatum', label: t('bestellingenColDatum') },
     {
       key: 'lineCount',
       label: t('bestellingenColAantal'),
-      filterType: 'text',
       render: (row) => `${row.lineCount} / ${row.totalQuantity}`,
     },
-    {
-      key: 'status',
-      label: t('bestellingenColStatus'),
-      filterType: 'select',
-      filterOptions: ['Te beoordelen', 'Goedgekeurd', 'Afgewezen'],
-    },
+    { key: 'status', label: t('bestellingenColStatus') },
   ];
 
   return (
@@ -82,8 +76,14 @@ export function BestellingenSection({
         rows={bestellingen}
         getRowId={(row) => row.id}
         onRowClick={setSelectedBestelling}
-        defaultFilters={{ status: 'Te beoordelen' }}
+        quickFilter={{
+          key: 'status',
+          activeValue: 'Te beoordelen',
+          activeLabel: t('bestellingenQuickTeBeoordelen'),
+          allLabel: t('bestellingenQuickAlle'),
+        }}
         emptyLabel={t('bestellingenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <BestellingModal
         bestelling={selectedBestelling}

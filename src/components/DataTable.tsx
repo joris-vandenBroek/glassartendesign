@@ -5,10 +5,15 @@ import { useMemo, useState, type ReactNode } from 'react';
 export interface Column<T> {
   key: keyof T & string;
   label: string;
-  filterType: 'text' | 'select';
-  filterOptions?: string[];
   sortable?: boolean;
   render?: (row: T) => ReactNode;
+}
+
+export interface StatusQuickFilter<T> {
+  key: keyof T & string;
+  activeValue: string;
+  activeLabel: string;
+  allLabel: string;
 }
 
 interface DataTableProps<T> {
@@ -16,8 +21,9 @@ interface DataTableProps<T> {
   rows: T[];
   getRowId: (row: T) => string;
   onRowClick: (row: T) => void;
-  defaultFilters?: Record<string, string>;
+  quickFilter?: StatusQuickFilter<T>;
   emptyLabel: string;
+  searchPlaceholder: string;
 }
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -27,28 +33,27 @@ export function DataTable<T extends object>({
   rows,
   getRowId,
   onRowClick,
-  defaultFilters,
+  quickFilter,
   emptyLabel,
+  searchPlaceholder,
 }: DataTableProps<T>) {
-  const [filters, setFilters] = useState<Record<string, string>>(defaultFilters ?? {});
+  const [search, setSearch] = useState('');
+  const [quickFilterActive, setQuickFilterActive] = useState(quickFilter !== undefined);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   const filteredRows = useMemo(() => {
-    return rows.filter((row) =>
-      columns.every((column) => {
-        const filterValue = filters[column.key];
-        if (!filterValue) {
-          return true;
-        }
-        const cellValue = String(row[column.key] ?? '');
-        if (column.filterType === 'select') {
-          return cellValue === filterValue;
-        }
-        return cellValue.toLowerCase().includes(filterValue.toLowerCase());
-      })
-    );
-  }, [rows, columns, filters]);
+    return rows.filter((row) => {
+      if (quickFilter && quickFilterActive && String(row[quickFilter.key] ?? '') !== quickFilter.activeValue) {
+        return false;
+      }
+      if (!search) {
+        return true;
+      }
+      const query = search.toLowerCase();
+      return columns.some((column) => String(row[column.key] ?? '').toLowerCase().includes(query));
+    });
+  }, [rows, columns, search, quickFilter, quickFilterActive]);
 
   const sortedRows = useMemo(() => {
     if (!sortKey || !sortDirection) {
@@ -81,80 +86,87 @@ export function DataTable<T extends object>({
   }
 
   return (
-    <div data-testid="data-table" className="overflow-x-auto">
-      <table className="w-full text-left text-sm text-white/80">
-        <thead>
-          <tr className="border-b border-white/10 text-xs uppercase tracking-wide text-white/60">
-            {columns.map((column) => (
-              <th key={column.key} className="px-3 py-2">
-                <button
-                  type="button"
-                  data-testid={`data-table-sort-${column.key}`}
-                  onClick={() => handleHeaderClick(column)}
-                  className="flex items-center gap-1 hover:text-white"
-                >
-                  {column.label}
-                  {sortKey === column.key && (sortDirection === 'asc' ? ' ▲' : sortDirection === 'desc' ? ' ▼' : '')}
-                </button>
-              </th>
-            ))}
-          </tr>
-          <tr>
-            {columns.map((column) => (
-              <th key={column.key} className="px-3 py-2">
-                {column.filterType === 'select' ? (
-                  <select
-                    value={filters[column.key] ?? ''}
-                    onChange={(event) =>
-                      setFilters((current) => ({ ...current, [column.key]: event.target.value }))
-                    }
-                    data-testid={`data-table-filter-${column.key}`}
-                    className="w-full rounded-sm bg-black/40 px-2 py-1 text-xs text-white"
-                  >
-                    <option value="">—</option>
-                    {(column.filterOptions ?? []).map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type="text"
-                    value={filters[column.key] ?? ''}
-                    onChange={(event) =>
-                      setFilters((current) => ({ ...current, [column.key]: event.target.value }))
-                    }
-                    data-testid={`data-table-filter-${column.key}`}
-                    className="w-full rounded-sm bg-black/40 px-2 py-1 text-xs text-white"
-                  />
-                )}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedRows.map((row) => (
-            <tr
-              key={getRowId(row)}
-              data-testid={`data-table-row-${getRowId(row)}`}
-              onClick={() => onRowClick(row)}
-              className="cursor-pointer border-b border-white/5 hover:bg-white/5"
+    <div data-testid="data-table">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <input
+          type="text"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder={searchPlaceholder}
+          data-testid="data-table-search"
+          className="w-full max-w-xs rounded-sm bg-black/40 px-3 py-2 text-xs text-white placeholder:text-white/40"
+        />
+        {quickFilter && (
+          <div className="flex items-center gap-4 text-xs">
+            <button
+              type="button"
+              onClick={() => setQuickFilterActive(true)}
+              data-testid="data-table-quick-active"
+              className={
+                quickFilterActive
+                  ? 'text-white underline underline-offset-4'
+                  : 'text-white/50 hover:text-white'
+              }
             >
+              {quickFilter.activeLabel}
+            </button>
+            <button
+              type="button"
+              onClick={() => setQuickFilterActive(false)}
+              data-testid="data-table-quick-all"
+              className={
+                !quickFilterActive
+                  ? 'text-white underline underline-offset-4'
+                  : 'text-white/50 hover:text-white'
+              }
+            >
+              {quickFilter.allLabel}
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm text-white/80">
+          <thead>
+            <tr className="border-b border-white/10 text-xs uppercase tracking-wide text-white/60">
               {columns.map((column) => (
-                <td key={column.key} className="px-3 py-2">
-                  {column.render ? column.render(row) : String(row[column.key] ?? '')}
-                </td>
+                <th key={column.key} className="px-3 py-2">
+                  <button
+                    type="button"
+                    data-testid={`data-table-sort-${column.key}`}
+                    onClick={() => handleHeaderClick(column)}
+                    className="flex items-center gap-1 hover:text-white"
+                  >
+                    {column.label}
+                    {sortKey === column.key && (sortDirection === 'asc' ? ' ▲' : sortDirection === 'desc' ? ' ▼' : '')}
+                  </button>
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {sortedRows.length === 0 && (
-        <p data-testid="data-table-empty" className="px-3 py-4 text-xs text-white/60">
-          {emptyLabel}
-        </p>
-      )}
+          </thead>
+          <tbody>
+            {sortedRows.map((row) => (
+              <tr
+                key={getRowId(row)}
+                data-testid={`data-table-row-${getRowId(row)}`}
+                onClick={() => onRowClick(row)}
+                className="cursor-pointer border-b border-white/5 hover:bg-white/5"
+              >
+                {columns.map((column) => (
+                  <td key={column.key} className="px-3 py-2">
+                    {column.render ? column.render(row) : String(row[column.key] ?? '')}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {sortedRows.length === 0 && (
+          <p data-testid="data-table-empty" className="px-3 py-4 text-xs text-white/60">
+            {emptyLabel}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

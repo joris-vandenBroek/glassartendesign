@@ -75,8 +75,8 @@ export function MatenSection({ maten, loadError, onAdd, onUpdate, onRemove }: Ma
   }
 
   const columns: Column<Maat>[] = [
-    { key: 'breedte', label: t('matenColBreedte'), filterType: 'text' },
-    { key: 'hoogte', label: t('matenColHoogte'), filterType: 'text' },
+    { key: 'breedte', label: t('matenColBreedte') },
+    { key: 'hoogte', label: t('matenColHoogte') },
   ];
 
   return (
@@ -97,6 +97,7 @@ export function MatenSection({ maten, loadError, onAdd, onUpdate, onRemove }: Ma
         getRowId={(row) => row.id}
         onRowClick={openEdit}
         emptyLabel={t('matenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')}>
         <div data-testid="maat-modal" className="flex flex-col gap-2 text-sm text-white/80">

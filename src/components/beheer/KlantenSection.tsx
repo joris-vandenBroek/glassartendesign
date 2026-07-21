@@ -43,17 +43,12 @@ export function KlantenSection({ klanten, loadError, onKlantUpdated }: KlantenSe
   }
 
   const columns: Column<Klant>[] = [
-    { key: 'companyName', label: t('klantenColCompanyName'), filterType: 'text' },
-    { key: 'kvk', label: t('klantenColKvk'), filterType: 'text' },
-    { key: 'contactPerson', label: t('klantenColContactPerson'), filterType: 'text' },
-    { key: 'email', label: t('klantenColEmail'), filterType: 'text' },
-    { key: 'phone', label: t('klantenColPhone'), filterType: 'text' },
-    {
-      key: 'status',
-      label: t('klantenColStatus'),
-      filterType: 'select',
-      filterOptions: ['Beoordelen', 'Goedgekeurd', 'Afgewezen'],
-    },
+    { key: 'companyName', label: t('klantenColCompanyName') },
+    { key: 'kvk', label: t('klantenColKvk') },
+    { key: 'contactPerson', label: t('klantenColContactPerson') },
+    { key: 'email', label: t('klantenColEmail') },
+    { key: 'phone', label: t('klantenColPhone') },
+    { key: 'status', label: t('klantenColStatus') },
   ];
 
   return (
@@ -63,8 +58,14 @@ export function KlantenSection({ klanten, loadError, onKlantUpdated }: KlantenSe
         rows={klanten}
         getRowId={(row) => row.id}
         onRowClick={setSelectedKlant}
-        defaultFilters={{ status: 'Beoordelen' }}
+        quickFilter={{
+          key: 'status',
+          activeValue: 'Beoordelen',
+          activeLabel: t('klantenQuickTeBeoordelen'),
+          allLabel: t('klantenQuickAlle'),
+        }}
         emptyLabel={t('klantenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <KlantModal
         klant={selectedKlant}

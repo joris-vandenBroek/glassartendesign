@@ -99,14 +99,9 @@ export function MaterialenSection({
   }
 
   const columns: Column<MateriaalRow>[] = [
-    {
-      key: 'materiaalsoortNaam',
-      label: t('materialenColMateriaalsoort'),
-      filterType: 'select',
-      filterOptions: Array.from(soortNameById.values()),
-    },
-    { key: 'materiaaldikte', label: t('materialenColDikte'), filterType: 'text' },
-    { key: 'omschrijving', label: t('materialenColOmschrijving'), filterType: 'text' },
+    { key: 'materiaalsoortNaam', label: t('materialenColMateriaalsoort') },
+    { key: 'materiaaldikte', label: t('materialenColDikte') },
+    { key: 'omschrijving', label: t('materialenColOmschrijving') },
   ];
 
   return (
@@ -127,6 +122,7 @@ export function MaterialenSection({
         getRowId={(row) => row.id}
         onRowClick={openEdit}
         emptyLabel={t('materialenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')}>
         <div data-testid="materiaal-modal" className="flex flex-col gap-2 text-sm text-white/80">

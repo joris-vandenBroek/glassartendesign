@@ -78,9 +78,9 @@ describe('KlantenSection', () => {
     expect(screen.queryByTestId('data-table-row-uid-2')).not.toBeInTheDocument();
   });
 
-  it('shows all klanten when the status filter is cleared', () => {
+  it('shows all klanten after clicking the "alle klanten" quick filter link', () => {
     renderSection();
-    fireEvent.change(screen.getByTestId('data-table-filter-status'), { target: { value: '' } });
+    fireEvent.click(screen.getByTestId('data-table-quick-all'));
     expect(screen.getByTestId('data-table-row-uid-1')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-uid-2')).toBeInTheDocument();
   });

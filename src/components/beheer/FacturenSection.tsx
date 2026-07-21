@@ -11,21 +11,15 @@ export function FacturenSection() {
   const [selectedFactuur, setSelectedFactuur] = useState<AdminInvoice | null>(null);
 
   const columns: Column<AdminInvoice>[] = [
-    { key: 'invoiceNumber', label: t('facturenColInvoiceNumber'), filterType: 'text' },
-    { key: 'date', label: t('facturenColDate'), filterType: 'text' },
-    { key: 'companyName', label: t('facturenColCompanyName'), filterType: 'text' },
+    { key: 'invoiceNumber', label: t('facturenColInvoiceNumber') },
+    { key: 'date', label: t('facturenColDate') },
+    { key: 'companyName', label: t('facturenColCompanyName') },
     {
       key: 'amount',
       label: t('facturenColAmount'),
-      filterType: 'text',
       render: (row) => formatCurrency(row.amount),
     },
-    {
-      key: 'status',
-      label: t('facturenColStatus'),
-      filterType: 'select',
-      filterOptions: ['Te betalen', 'Betaald'],
-    },
+    { key: 'status', label: t('facturenColStatus') },
   ];
 
   return (
@@ -35,8 +29,14 @@ export function FacturenSection() {
         rows={MOCK_ADMIN_INVOICES}
         getRowId={(row) => row.invoiceNumber}
         onRowClick={setSelectedFactuur}
-        defaultFilters={{ status: 'Te betalen' }}
+        quickFilter={{
+          key: 'status',
+          activeValue: 'Te betalen',
+          activeLabel: t('facturenQuickTeBetalen'),
+          allLabel: t('facturenQuickAlle'),
+        }}
         emptyLabel={t('facturenEmpty')}
+        searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
       <FactuurModal factuur={selectedFactuur} onClose={() => setSelectedFactuur(null)} />
     </div>

@@ -53,11 +53,9 @@ describe('MaterialenSection', () => {
     expect(screen.getByTestId('data-table-row-mat-2')).toHaveTextContent('Acryl');
   });
 
-  it('filters by materiaalsoort name via the select filter', () => {
+  it('filters by materiaalsoort name via the global search', () => {
     renderSection();
-    fireEvent.change(screen.getByTestId('data-table-filter-materiaalsoortNaam'), {
-      target: { value: 'Acryl' },
-    });
+    fireEvent.change(screen.getByTestId('data-table-search'), { target: { value: 'Acryl' } });
     expect(screen.queryByTestId('data-table-row-mat-1')).not.toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-mat-2')).toBeInTheDocument();
   });
