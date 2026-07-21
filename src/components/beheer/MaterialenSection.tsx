@@ -1,0 +1,200 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { DataTable, type Column } from '@/components/DataTable';
+import { Modal } from '@/components/Modal';
+import type { Materiaal, Materiaalsoort } from './materiaalTypes';
+
+interface MaterialenSectionProps {
+  materialen: Materiaal[] | null;
+  materiaalsoorten: Materiaalsoort[] | null;
+  loadError: string | null;
+  onAdd: (data: Omit<Materiaal, 'id'>) => Promise<boolean>;
+  onUpdate: (id: string, data: Omit<Materiaal, 'id'>) => Promise<boolean>;
+  onRemove: (id: string) => Promise<boolean>;
+}
+
+type ModalState = { mode: 'add' } | { mode: 'edit'; materiaal: Materiaal } | null;
+type MateriaalRow = Materiaal & { materiaalsoortNaam: string };
+
+export function MaterialenSection({
+  materialen,
+  materiaalsoorten,
+  loadError,
+  onAdd,
+  onUpdate,
+  onRemove,
+}: MaterialenSectionProps) {
+  const t = useTranslations('beheer');
+  const [modalState, setModalState] = useState<ModalState>(null);
+  const [materiaalsoortId, setMateriaalsoortId] = useState('');
+  const [materiaaldikte, setMateriaaldikte] = useState('');
+  const [omschrijving, setOmschrijving] = useState('');
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const soortNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    (materiaalsoorten ?? []).forEach((soort) => map.set(soort.id, soort.omschrijving));
+    return map;
+  }, [materiaalsoorten]);
+
+  if (loadError) {
+    return (
+      <p data-testid="materialen-error" className="text-xs text-red-400">
+        {loadError}
+      </p>
+    );
+  }
+
+  if (materialen === null) {
+    return null;
+  }
+
+  const rows: MateriaalRow[] = materialen.map((materiaal) => ({
+    ...materiaal,
+    materiaalsoortNaam: soortNameById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId,
+  }));
+
+  function openAdd() {
+    setMateriaalsoortId((materiaalsoorten ?? [])[0]?.id ?? '');
+    setMateriaaldikte('');
+    setOmschrijving('');
+    setActionError(null);
+    setModalState({ mode: 'add' });
+  }
+
+  function openEdit(materiaal: Materiaal) {
+    setMateriaalsoortId(materiaal.materiaalsoortId);
+    setMateriaaldikte(String(materiaal.materiaaldikte));
+    setOmschrijving(materiaal.omschrijving);
+    setActionError(null);
+    setModalState({ mode: 'edit', materiaal });
+  }
+
+  function closeModal() {
+    setModalState(null);
+  }
+
+  async function handleSave() {
+    if (!modalState) return;
+    const data = { materiaalsoortId, materiaaldikte: Number(materiaaldikte), omschrijving };
+    const success =
+      modalState.mode === 'add' ? await onAdd(data) : await onUpdate(modalState.materiaal.id, data);
+    if (success) {
+      closeModal();
+    } else {
+      setActionError(t('materialenActionError'));
+    }
+  }
+
+  async function handleRemove() {
+    if (modalState?.mode !== 'edit') return;
+    const success = await onRemove(modalState.materiaal.id);
+    if (success) {
+      closeModal();
+    } else {
+      setActionError(t('materialenActionError'));
+    }
+  }
+
+  const columns: Column<MateriaalRow>[] = [
+    {
+      key: 'materiaalsoortNaam',
+      label: t('materialenColMateriaalsoort'),
+      filterType: 'select',
+      filterOptions: Array.from(soortNameById.values()),
+    },
+    { key: 'materiaaldikte', label: t('materialenColDikte'), filterType: 'text' },
+    { key: 'omschrijving', label: t('materialenColOmschrijving'), filterType: 'text' },
+  ];
+
+  return (
+    <div data-testid="materialen-section">
+      <div className="mb-3 flex justify-end">
+        <button
+          type="button"
+          onClick={openAdd}
+          data-testid="materialen-add"
+          className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink"
+        >
+          {t('materialenToevoegen')}
+        </button>
+      </div>
+      <DataTable<MateriaalRow>
+        columns={columns}
+        rows={rows}
+        getRowId={(row) => row.id}
+        onRowClick={openEdit}
+        emptyLabel={t('materialenEmpty')}
+      />
+      <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')}>
+        <div data-testid="materiaal-modal" className="flex flex-col gap-2 text-sm text-white/80">
+          <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
+            {t('materialenLabelMateriaalsoort')}
+            <select
+              value={materiaalsoortId}
+              onChange={(event) => setMateriaalsoortId(event.target.value)}
+              data-testid="materiaal-modal-materiaalsoort"
+              className="rounded-sm bg-black/40 px-3 py-2 text-sm text-white"
+            >
+              {(materiaalsoorten ?? []).map((soort) => (
+                <option key={soort.id} value={soort.id}>
+                  {soort.omschrijving}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
+            {t('materialenLabelDikte')}
+            <input
+              type="number"
+              value={materiaaldikte}
+              onChange={(event) => setMateriaaldikte(event.target.value)}
+              data-testid="materiaal-modal-dikte"
+              className="rounded-sm bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
+            {t('materialenLabelOmschrijving')}
+            <input
+              type="text"
+              value={omschrijving}
+              onChange={(event) => setOmschrijving(event.target.value)}
+              data-testid="materiaal-modal-omschrijving"
+              className="rounded-sm bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </label>
+
+          {actionError && (
+            <p data-testid="materiaal-modal-error" className="text-xs text-red-400">
+              {actionError}
+            </p>
+          )}
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={!materiaalsoortId || materiaaldikte === '' || !omschrijving}
+              data-testid="materiaal-modal-opslaan"
+              className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink disabled:opacity-40"
+            >
+              {t('materialenOpslaan')}
+            </button>
+            {modalState?.mode === 'edit' && (
+              <button
+                type="button"
+                onClick={handleRemove}
+                data-testid="materiaal-modal-verwijderen"
+                className="rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white"
+              >
+                {t('materialenVerwijderen')}
+              </button>
+            )}
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
