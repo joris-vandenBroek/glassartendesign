@@ -2,14 +2,14 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { useMockAuth } from '@/lib/useMockAuth';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { Logo } from './Logo';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CartPanel } from './CartPanel';
 
 export function NavBar() {
   const t = useTranslations('nav');
-  const { isLoggedIn, isHydrated } = useMockAuth();
+  const { isCustomer, isHydrated } = useCustomerAuth();
 
   return (
     <nav
@@ -32,7 +32,7 @@ export function NavBar() {
       </div>
 
       <div className="flex items-center gap-3">
-        {isHydrated && isLoggedIn ? (
+        {isHydrated && isCustomer ? (
           <Link
             href="/account"
             data-testid="account-icon"

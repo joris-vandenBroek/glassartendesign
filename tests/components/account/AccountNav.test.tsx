@@ -1,21 +1,48 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { MockAuthProvider } from '@/lib/useMockAuth';
+import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import { AccountNav } from '@/components/account/AccountNav';
 import messages from '../../../messages/nl.json';
+
+const onAuthStateChangedMock = vi.fn();
+const signOutMock = vi.fn();
+
+vi.mock('@/lib/firebase', () => ({
+  auth: {},
+  db: {},
+}));
+
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: (...args: unknown[]) => onAuthStateChangedMock(...args),
+  signOut: (...args: unknown[]) => signOutMock(...args),
+}));
+
+vi.mock('firebase/firestore', () => ({
+  doc: vi.fn((_db, collection, id) => ({ collection, id })),
+  getDoc: vi.fn().mockResolvedValue({ exists: () => true, data: () => ({ status: 'Goedgekeurd' }) }),
+}));
 
 function renderNav(activeSection: 'orders' | 'settings' = 'orders') {
   const onSelect = vi.fn();
   render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <MockAuthProvider>
+      <CustomerAuthProvider>
         <AccountNav activeSection={activeSection} onSelect={onSelect} />
-      </MockAuthProvider>
+      </CustomerAuthProvider>
     </NextIntlClientProvider>
   );
   return { onSelect };
 }
+
+beforeEach(() => {
+  onAuthStateChangedMock.mockReset();
+  signOutMock.mockReset();
+  onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+    callback({ uid: 'uid-1', email: 'klant@example.com' });
+    return () => {};
+  });
+});
 
 describe('AccountNav', () => {
   it('renders all 6 section buttons plus a logout button', () => {
@@ -41,10 +68,9 @@ describe('AccountNav', () => {
     expect(onSelect).toHaveBeenCalledWith('returns');
   });
 
-  it('calls logout (clearing localStorage) when the logout button is clicked', () => {
-    window.localStorage.setItem('glassart-mock-logged-in', 'true');
+  it('calls signOut when the logout button is clicked', () => {
     renderNav();
     fireEvent.click(screen.getByTestId('account-nav-logout'));
-    expect(window.localStorage.getItem('glassart-mock-logged-in')).toBeNull();
+    expect(signOutMock).toHaveBeenCalledWith({});
   });
 });

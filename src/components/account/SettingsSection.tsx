@@ -13,12 +13,12 @@ import {
 import { signInWithEmailAndPassword, deleteUser } from 'firebase/auth';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { useMockAuth } from '@/lib/useMockAuth';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
 
 export function SettingsSection() {
   const t = useTranslations('accountPage.settings');
   const { profile, updateProfile } = useMockProfile();
-  const { email: authEmail, uid, logout } = useMockAuth();
+  const { user, logout } = useCustomerAuth();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -76,14 +76,14 @@ export function SettingsSection() {
     setDeleteError(null);
     let response;
     try {
-      response = await signInWithEmailAndPassword(auth, authEmail ?? '', deletePassword);
+      response = await signInWithEmailAndPassword(auth, user?.email ?? '', deletePassword);
     } catch {
       setDeleteError(t('deleteAccountError'));
       return;
     }
 
     try {
-      await deleteDoc(doc(db, 'klanten', uid ?? ''));
+      await deleteDoc(doc(db, 'klanten', user?.uid ?? ''));
     } catch {
       setDeleteError(t('deleteAccountError'));
       return;
@@ -98,7 +98,7 @@ export function SettingsSection() {
       return;
     }
 
-    logout();
+    await logout();
     router.replace('/');
   }
 

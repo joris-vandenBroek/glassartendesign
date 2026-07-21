@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { MockAuthProvider } from '@/lib/useMockAuth';
+import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import { OrdersProvider } from '@/lib/useOrders';
 import { ReturnsProvider } from '@/lib/useReturns';
 import { MockProfileProvider } from '@/lib/useMockProfile';
@@ -9,6 +9,8 @@ import { AccountDashboard } from '@/components/account/AccountDashboard';
 import messages from '../../../messages/nl.json';
 
 const replaceMock = vi.fn();
+const onAuthStateChangedMock = vi.fn();
+const getDocMock = vi.fn();
 
 vi.mock('@/i18n/navigation', () => ({
   usePathname: () => '/account',
@@ -20,10 +22,19 @@ vi.mock('@/lib/firebase', () => ({
   db: {},
 }));
 
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: (...args: unknown[]) => onAuthStateChangedMock(...args),
+}));
+
+vi.mock('firebase/firestore', () => ({
+  doc: vi.fn((_db, collection, id) => ({ collection, id })),
+  getDoc: (...args: unknown[]) => getDocMock(...args),
+}));
+
 function renderDashboard() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <MockAuthProvider>
+      <CustomerAuthProvider>
         <OrdersProvider>
           <ReturnsProvider>
             <MockProfileProvider>
@@ -31,33 +42,47 @@ function renderDashboard() {
             </MockProfileProvider>
           </ReturnsProvider>
         </OrdersProvider>
-      </MockAuthProvider>
+      </CustomerAuthProvider>
     </NextIntlClientProvider>
   );
 }
 
 beforeEach(() => {
-  window.localStorage.clear();
   replaceMock.mockClear();
+  onAuthStateChangedMock.mockReset();
+  getDocMock.mockReset();
 });
 
 describe('AccountDashboard', () => {
-  it('redirects to "/" and renders nothing when not logged in', () => {
+  it('redirects to "/" and renders nothing when not logged in', async () => {
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback(null);
+      return () => {};
+    });
     renderDashboard();
-    expect(replaceMock).toHaveBeenCalledWith('/');
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/'));
     expect(screen.queryByTestId('account-dashboard')).not.toBeInTheDocument();
   });
 
-  it('renders the Bestellingen section by default when logged in', () => {
-    window.localStorage.setItem('glassart-mock-logged-in', 'true');
+  it('renders the Bestellingen section by default when logged in', async () => {
+    getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Goedgekeurd' }) });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-1', email: 'klant@example.com' });
+      return () => {};
+    });
     renderDashboard();
+    await waitFor(() => expect(screen.getByTestId('orders-section')).toBeInTheDocument());
     expect(replaceMock).not.toHaveBeenCalled();
-    expect(screen.getByTestId('orders-section')).toBeInTheDocument();
   });
 
-  it('switches to the Instellingen section when its nav button is clicked', () => {
-    window.localStorage.setItem('glassart-mock-logged-in', 'true');
+  it('switches to the Instellingen section when its nav button is clicked', async () => {
+    getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Goedgekeurd' }) });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-1', email: 'klant@example.com' });
+      return () => {};
+    });
     renderDashboard();
+    await waitFor(() => expect(screen.getByTestId('orders-section')).toBeInTheDocument());
     fireEvent.click(screen.getByTestId('account-nav-settings'));
     expect(screen.getByTestId('settings-section')).toBeInTheDocument();
     expect(screen.queryByTestId('orders-section')).not.toBeInTheDocument();

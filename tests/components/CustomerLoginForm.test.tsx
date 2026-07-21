@@ -7,7 +7,6 @@ import messages from '../../messages/nl.json';
 const signInMock = vi.fn();
 const signOutMock = vi.fn();
 const getDocMock = vi.fn();
-const loginMock = vi.fn();
 const replaceMock = vi.fn();
 
 vi.mock('@/lib/firebase', () => ({
@@ -23,10 +22,6 @@ vi.mock('firebase/auth', () => ({
 vi.mock('firebase/firestore', () => ({
   doc: vi.fn((_db, collection, id) => ({ collection, id })),
   getDoc: (...args: unknown[]) => getDocMock(...args),
-}));
-
-vi.mock('@/lib/useMockAuth', () => ({
-  useMockAuth: () => ({ login: loginMock }),
 }));
 
 vi.mock('@/i18n/navigation', () => ({
@@ -51,7 +46,6 @@ beforeEach(() => {
   signInMock.mockReset();
   signOutMock.mockReset();
   getDocMock.mockReset();
-  loginMock.mockReset();
   replaceMock.mockReset();
 });
 
@@ -63,22 +57,20 @@ describe('CustomerLoginForm', () => {
     expect(await screen.findByTestId('login-error')).toHaveTextContent(
       'E-mailadres of wachtwoord onjuist.'
     );
-    expect(loginMock).not.toHaveBeenCalled();
+    expect(replaceMock).not.toHaveBeenCalled();
   });
 
-  it('grants access and redirects to /account when the klant is "Goedgekeurd"', async () => {
+  it('grants access, keeps the session alive, and redirects to /account when the klant is "Goedgekeurd"', async () => {
     signInMock.mockResolvedValue({ user: { uid: 'uid-1' } });
     getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Goedgekeurd' }) });
-    signOutMock.mockResolvedValue(undefined);
     renderForm();
     submitWith('klant@example.com', 'geheim123');
 
-    await waitFor(() => expect(loginMock).toHaveBeenCalledWith('klant@example.com', 'uid-1'));
-    expect(signOutMock).toHaveBeenCalledWith({});
-    expect(replaceMock).toHaveBeenCalledWith('/account');
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/account'));
+    expect(signOutMock).not.toHaveBeenCalled();
   });
 
-  it('shows a pending message and does not grant access when status is "Beoordelen"', async () => {
+  it('shows a pending message, signs out, and does not grant access when status is "Beoordelen"', async () => {
     signInMock.mockResolvedValue({ user: { uid: 'uid-2' } });
     getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Beoordelen' }) });
     signOutMock.mockResolvedValue(undefined);
@@ -88,11 +80,11 @@ describe('CustomerLoginForm', () => {
     expect(await screen.findByTestId('login-error')).toHaveTextContent(
       'Uw aanvraag wordt nog beoordeeld.'
     );
-    expect(loginMock).not.toHaveBeenCalled();
+    expect(signOutMock).toHaveBeenCalledWith({});
     expect(replaceMock).not.toHaveBeenCalled();
   });
 
-  it('shows a rejected message and does not grant access when status is "Afgewezen"', async () => {
+  it('shows a rejected message and signs out when status is "Afgewezen"', async () => {
     signInMock.mockResolvedValue({ user: { uid: 'uid-3' } });
     getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Afgewezen' }) });
     signOutMock.mockResolvedValue(undefined);
@@ -102,10 +94,10 @@ describe('CustomerLoginForm', () => {
     expect(await screen.findByTestId('login-error')).toHaveTextContent(
       'Uw aanvraag is helaas afgewezen.'
     );
-    expect(loginMock).not.toHaveBeenCalled();
+    expect(signOutMock).toHaveBeenCalledWith({});
   });
 
-  it('shows the accountIncompleteMessage when the klant document does not exist', async () => {
+  it('shows the accountIncompleteMessage and signs out when the klant document does not exist', async () => {
     signInMock.mockResolvedValue({ user: { uid: 'uid-5' } });
     getDocMock.mockResolvedValue({ exists: () => false });
     signOutMock.mockResolvedValue(undefined);
@@ -115,7 +107,7 @@ describe('CustomerLoginForm', () => {
     expect(await screen.findByTestId('login-error')).toHaveTextContent(
       'Er ging iets mis bij uw eerdere aanvraag. Neem contact met ons op.'
     );
-    expect(loginMock).not.toHaveBeenCalled();
+    expect(signOutMock).toHaveBeenCalledWith({});
   });
 
   it('signs out and shows generic error when getDoc fails after successful sign-in', async () => {
@@ -129,6 +121,5 @@ describe('CustomerLoginForm', () => {
       'E-mailadres of wachtwoord onjuist.'
     );
     expect(signOutMock).toHaveBeenCalledWith({});
-    expect(loginMock).not.toHaveBeenCalled();
   });
 });

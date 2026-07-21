@@ -5,12 +5,10 @@ import { useTranslations } from 'next-intl';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { useMockAuth } from '@/lib/useMockAuth';
 import { useRouter } from '@/i18n/navigation';
 
 export function CustomerLoginForm() {
   const t = useTranslations('loginPage');
-  const { login } = useMockAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,9 +25,11 @@ export function CustomerLoginForm() {
         const status = klantDoc.exists() ? (klantDoc.data() as { status?: string }).status : null;
 
         if (status === 'Goedgekeurd') {
-          login(email, uid);
           router.replace('/account');
-        } else if (status === 'Beoordelen') {
+          return;
+        }
+
+        if (status === 'Beoordelen') {
           setError(t('pendingMessage'));
         } else if (status === 'Afgewezen') {
           setError(t('rejectedMessage'));
@@ -38,8 +38,10 @@ export function CustomerLoginForm() {
         } else {
           setError(t('loginError'));
         }
-      } finally {
         await signOut(auth);
+      } catch {
+        await signOut(auth);
+        throw new Error('klant status check failed');
       }
     } catch {
       setError(t('loginError'));

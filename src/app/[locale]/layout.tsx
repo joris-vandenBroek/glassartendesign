@@ -3,7 +3,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { NavBar } from '@/components/NavBar';
-import { MockAuthProvider } from '@/lib/useMockAuth';
+import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import { AdminAuthProvider } from '@/lib/useAdminAuth';
 import { CartProvider } from '@/lib/useCart';
 import { OrdersProvider } from '@/lib/useOrders';
@@ -31,7 +31,7 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       <AdminAuthProvider>
-        <MockAuthProvider>
+        <CustomerAuthProvider>
           <CartProvider>
             <OrdersProvider>
               <ReturnsProvider>
@@ -42,7 +42,7 @@ export default async function LocaleLayout({
               </ReturnsProvider>
             </OrdersProvider>
           </CartProvider>
-        </MockAuthProvider>
+        </CustomerAuthProvider>
       </AdminAuthProvider>
     </NextIntlClientProvider>
   );

@@ -1,9 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { NavBar } from '@/components/NavBar';
-import { MockAuthProvider } from '@/lib/useMockAuth';
+import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import messages from '../../messages/nl.json';
+
+const onAuthStateChangedMock = vi.fn();
+const getDocMock = vi.fn();
 
 vi.mock('@/i18n/navigation', () => ({
   Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
@@ -19,60 +22,102 @@ vi.mock('@/components/CartPanel', () => ({
   CartPanel: () => <div data-testid="cart-panel-stub" />,
 }));
 
+vi.mock('@/lib/firebase', () => ({
+  auth: {},
+  db: {},
+}));
+
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: (...args: unknown[]) => onAuthStateChangedMock(...args),
+}));
+
+vi.mock('firebase/firestore', () => ({
+  doc: vi.fn((_db, collection, id) => ({ collection, id })),
+  getDoc: (...args: unknown[]) => getDocMock(...args),
+}));
+
 function renderNavBar() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <MockAuthProvider>
+      <CustomerAuthProvider>
         <NavBar />
-      </MockAuthProvider>
+      </CustomerAuthProvider>
     </NextIntlClientProvider>
   );
 }
 
+function signedOut() {
+  onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+    callback(null);
+    return () => {};
+  });
+}
+
+function signedInAsApprovedCustomer() {
+  getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Goedgekeurd' }) });
+  onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+    callback({ uid: 'uid-1', email: 'klant@example.com' });
+    return () => {};
+  });
+}
+
 beforeEach(() => {
-  window.localStorage.clear();
+  onAuthStateChangedMock.mockReset();
+  getDocMock.mockReset();
 });
 
 describe('NavBar', () => {
-  it('shows "Word klant" and "Inloggen" when logged out, no account link', () => {
+  it('shows "Word klant" and "Inloggen" when logged out, no account link', async () => {
+    signedOut();
     renderNavBar();
-    expect(screen.getByTestId('nav-become-client')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('nav-become-client')).toBeInTheDocument());
     expect(screen.getByTestId('nav-login')).toBeInTheDocument();
     expect(screen.queryByTestId('account-icon')).not.toBeInTheDocument();
   });
 
-  it('renders Collecties as a single direct link, no dropdown', () => {
+  it('renders Collecties as a single direct link, no dropdown', async () => {
+    signedOut();
     renderNavBar();
+    await waitFor(() => expect(screen.getByTestId('nav-become-client')).toBeInTheDocument());
     expect(screen.getByTestId('nav-collections')).toHaveAttribute('href', '/collecties');
     expect(screen.queryByTestId('collections-dropdown')).not.toBeInTheDocument();
   });
 
-  it('shows the "Inloggen" link pointing to /inloggen when logged out', () => {
+  it('shows the "Inloggen" link pointing to /inloggen when logged out', async () => {
+    signedOut();
     renderNavBar();
+    await waitFor(() => expect(screen.getByTestId('nav-login')).toBeInTheDocument());
     expect(screen.getByTestId('nav-login')).toHaveAttribute('href', '/inloggen');
   });
 
-  it('shows a link to /account instead of "Word klant"/"Inloggen" when already logged in', () => {
-    window.localStorage.setItem('glassart-mock-logged-in', 'true');
+  it('shows a link to /account instead of "Word klant"/"Inloggen" when already logged in', async () => {
+    signedInAsApprovedCustomer();
     renderNavBar();
+    await waitFor(() => expect(screen.getByTestId('account-icon')).toBeInTheDocument());
     expect(screen.getByTestId('account-icon')).toHaveAttribute('href', '/account');
     expect(screen.queryByTestId('nav-become-client')).not.toBeInTheDocument();
     expect(screen.queryByTestId('nav-login')).not.toBeInTheDocument();
   });
 
-  it('points Contact at /contact and Word klant at /word-klant', () => {
+  it('points Contact at /contact and Word klant at /word-klant', async () => {
+    signedOut();
     renderNavBar();
+    await waitFor(() => expect(screen.getByTestId('nav-become-client')).toBeInTheDocument());
     expect(screen.getByTestId('nav-contact')).toHaveAttribute('href', '/contact');
     expect(screen.getByTestId('nav-become-client')).toHaveAttribute('href', '/word-klant');
   });
 
-  it('renders the logo linking to the homepage', () => {
+  it('renders the logo linking to the homepage', async () => {
+    signedOut();
     renderNavBar();
+    await waitFor(() => expect(screen.getByTestId('logo')).toBeInTheDocument());
     expect(screen.getByTestId('logo')).toHaveAttribute('href', '/');
   });
 
-  it('shows a Beheer link pointing to /beheer', () => {
+  it('shows a Beheer link pointing to /beheer', async () => {
+    signedOut();
     renderNavBar();
+    await waitFor(() => expect(screen.getByTestId('nav-beheer')).toBeInTheDocument());
     expect(screen.getByTestId('nav-beheer')).toHaveAttribute('href', '/beheer');
   });
 });

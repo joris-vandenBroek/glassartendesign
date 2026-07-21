@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useMockAuth } from '@/lib/useMockAuth';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { useRouter } from '@/i18n/navigation';
 import { GlassPanel } from '@/components/GlassPanel';
 import { AccountNav, type AccountSection } from './AccountNav';
@@ -22,17 +22,17 @@ const SECTION_COMPONENTS: Record<AccountSection, () => JSX.Element> = {
 };
 
 export function AccountDashboard() {
-  const { isLoggedIn, isHydrated } = useMockAuth();
+  const { isCustomer, isHydrated } = useCustomerAuth();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<AccountSection>('orders');
 
   useEffect(() => {
-    if (isHydrated && !isLoggedIn) {
+    if (isHydrated && !isCustomer) {
       router.replace('/');
     }
-  }, [isHydrated, isLoggedIn, router]);
+  }, [isHydrated, isCustomer, router]);
 
-  if (!isHydrated || !isLoggedIn) {
+  if (!isHydrated || !isCustomer) {
     return null;
   }
 

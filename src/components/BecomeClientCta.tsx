@@ -2,13 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { useMockAuth } from '@/lib/useMockAuth';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
 
 export function BecomeClientCta() {
   const t = useTranslations('nav');
-  const { isHydrated, isLoggedIn } = useMockAuth();
+  const { isHydrated, isCustomer } = useCustomerAuth();
 
-  if (isHydrated && isLoggedIn) {
+  if (isHydrated && isCustomer) {
     return null;
   }
 

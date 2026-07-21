@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useMockAuth } from '@/lib/useMockAuth';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
 
 export type AccountSection =
   | 'orders'
@@ -27,7 +27,7 @@ const SECTIONS: { id: AccountSection; labelKey: string }[] = [
 
 export function AccountNav({ activeSection, onSelect }: AccountNavProps) {
   const t = useTranslations('accountPage');
-  const { logout } = useMockAuth();
+  const { logout } = useCustomerAuth();
 
   return (
     <nav data-testid="account-nav" className="flex flex-col gap-1 text-xs tracking-wide">
