@@ -9,3 +9,4 @@ tsconfig.tsbuildinfo
 .env*.local
 Beheer_users.txt
 mijnhost-herstelcodes.txt
+mail-server/config.php
