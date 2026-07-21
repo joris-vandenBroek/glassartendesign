@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
@@ -47,6 +48,21 @@ function TestConsumer({ seed, skip }: { seed?: Omit<Item, 'id'>[]; skip?: boolea
         onClick={() => update(items?.[0]?.id ?? '', { naam: 'Aangepast' })}
       />
       <button type="button" data-testid="remove" onClick={() => remove(items?.[0]?.id ?? '')} />
+    </div>
+  );
+}
+
+function TestConsumerWithResult({ seed, skip }: { seed?: Omit<Item, 'id'>[]; skip?: boolean }) {
+  const { items, error, add } = useFirestoreCollection<Item>('dingen', { seed, skip });
+  const [result, setResult] = React.useState<boolean | null>(null);
+  return (
+    <div>
+      <div data-testid="items">
+        {items === null ? 'loading' : items.length === 0 ? 'empty' : items.map((item) => item.naam).join(',')}
+      </div>
+      <div data-testid="error">{error ?? 'none'}</div>
+      <div data-testid="result">{result === null ? 'null' : result ? 'true' : 'false'}</div>
+      <button type="button" data-testid="add" onClick={async () => setResult(await add({ naam: 'Nieuw' }))} />
     </div>
   );
 }
@@ -136,6 +152,19 @@ describe('useFirestoreCollection', () => {
     await waitFor(() => expect(screen.getByTestId('items')).toHaveTextContent('Een'));
     fireEvent.click(screen.getByTestId('add'));
     await waitFor(() => expect(screen.getByTestId('error')).toHaveTextContent('action'));
+    expect(screen.getByTestId('items')).toHaveTextContent('Een');
+  });
+
+  it('returns false and sets load error when mutation succeeds but refetch fails', async () => {
+    getDocsMock
+      .mockResolvedValueOnce(makeSnapshot([{ id: 'a', data: { naam: 'Een' } }]))
+      .mockRejectedValueOnce(new Error('offline'));
+    addDocMock.mockResolvedValue({ id: 'new-1' });
+    render(<TestConsumerWithResult />);
+    await waitFor(() => expect(screen.getByTestId('items')).toHaveTextContent('Een'));
+    fireEvent.click(screen.getByTestId('add'));
+    await waitFor(() => expect(screen.getByTestId('result')).toHaveTextContent('false'));
+    expect(screen.getByTestId('error')).toHaveTextContent('load');
     expect(screen.getByTestId('items')).toHaveTextContent('Een');
   });
 });

@@ -59,8 +59,7 @@ export function useFirestoreCollection<T extends { id: string }>(
     async (data: Omit<T, 'id'>) => {
       try {
         await addDoc(collection(db, collectionName), data);
-        await fetchItems();
-        return true;
+        return await fetchItems();
       } catch {
         setError('action');
         return false;
@@ -73,8 +72,7 @@ export function useFirestoreCollection<T extends { id: string }>(
     async (id: string, data: Partial<Omit<T, 'id'>>) => {
       try {
         await updateDoc(doc(db, collectionName, id), data);
-        await fetchItems();
-        return true;
+        return await fetchItems();
       } catch {
         setError('action');
         return false;
@@ -87,8 +85,7 @@ export function useFirestoreCollection<T extends { id: string }>(
     async (id: string) => {
       try {
         await deleteDoc(doc(db, collectionName, id));
-        await fetchItems();
-        return true;
+        return await fetchItems();
       } catch {
         setError('action');
         return false;
