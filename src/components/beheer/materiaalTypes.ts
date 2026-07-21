@@ -15,3 +15,27 @@ export interface Maat {
   breedte: number;
   hoogte: number;
 }
+
+export interface Segment {
+  id: string;
+  omschrijving: string;
+}
+
+export interface PrijsRegel {
+  materiaalId: string;
+  maatId: string;
+  prijs: number;
+}
+
+export interface Kunstwerk {
+  id: string;
+  foto: string;
+  segmentIds: string[];
+  materiaalIds: string[];
+  maatIds: string[];
+  prijzen: PrijsRegel[];
+  omschrijvingNl: string;
+  omschrijvingFr: string;
+  omschrijvingDe: string;
+  omschrijvingEn: string;
+}
