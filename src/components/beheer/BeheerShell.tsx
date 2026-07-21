@@ -177,9 +177,9 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   return (
     <div
       data-testid="beheer-dashboard"
-      className="mx-auto grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-[220px_1fr]"
+      className="mx-auto grid max-w-6xl grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]"
     >
-      <GlassPanel className="w-full">
+      <GlassPanel className="w-full !max-w-none !px-5">
         <p data-testid="beheer-logged-in-as" className="mb-4 text-xs text-white/60">
           {t('loggedInAs', { email })}
         </p>
@@ -197,7 +197,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           kunstwerkenCount={kunstwerkenCount}
         />
       </GlassPanel>
-      <GlassPanel className="w-full">
+      <GlassPanel className="w-full !max-w-none">
         {activeSection === 'klanten' ? (
           <KlantenSection klanten={klanten} loadError={loadError} onKlantUpdated={handleKlantUpdated} />
         ) : activeSection === 'facturen' ? (

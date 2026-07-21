@@ -71,18 +71,23 @@ export function BestellingModal({
                 <li
                   key={line.id}
                   data-testid={`bestelling-modal-line-${line.id}`}
-                  className="flex items-center justify-between gap-2"
+                  className="flex items-start justify-between gap-3 border-b border-white/10 pb-2 last:border-0"
                 >
                   {kunstwerk ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-start gap-2">
                       <img src={kunstwerk.foto} alt="" className="h-10 w-10 rounded object-cover" />
                       <div>
-                        <p>{kunstwerk.omschrijvingNl}</p>
+                        <p className="text-white/90">{kunstwerk.omschrijvingNl}</p>
                         <p className="text-white/50">
+                          <span className="text-white/35">{t('bestellingenModalLabelMateriaal')}: </span>
                           {materiaal ? `${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}` : line.materiaalId}
-                          {' · '}
+                        </p>
+                        <p className="text-white/50">
+                          <span className="text-white/35">{t('bestellingenModalLabelMaat')}: </span>
                           {maat ? `${maat.breedte}×${maat.hoogte} cm` : line.maatId}
-                          {' · '}
+                        </p>
+                        <p className="text-white/50">
+                          <span className="text-white/35">{t('bestellingenModalLabelPrijs')}: </span>
                           {formatCurrency(line.prijs)}
                         </p>
                       </div>
@@ -90,7 +95,9 @@ export function BestellingModal({
                   ) : (
                     <span>{t('bestellingenRegelOnbekend')}</span>
                   )}
-                  <span>×{line.quantity}</span>
+                  <p className="shrink-0 text-right">
+                    <span className="block text-white/35">{t('bestellingenModalLabelAantal')}</span>×{line.quantity}
+                  </p>
                 </li>
               );
             })}
