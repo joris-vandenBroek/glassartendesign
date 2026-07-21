@@ -53,9 +53,6 @@ const DEFAULT_COLLECTIONS: Record<string, Array<{ id: string; data: Record<strin
 function mockCollections(overrides: Partial<typeof DEFAULT_COLLECTIONS> = {}) {
   const data = { ...DEFAULT_COLLECTIONS, ...overrides };
   getDocsMock.mockImplementation((collectionRef: { name: string }) => {
-    if (collectionRef.name === 'klanten-error') {
-      return Promise.reject(new Error('offline'));
-    }
     return Promise.resolve(makeSnapshot(data[collectionRef.name] ?? []));
   });
 }

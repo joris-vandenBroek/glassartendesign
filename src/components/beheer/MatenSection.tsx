@@ -131,7 +131,7 @@ export function MatenSection({ maten, loadError, onAdd, onUpdate, onRemove }: Ma
             <button
               type="button"
               onClick={handleSave}
-              disabled={!breedte || !hoogte}
+              disabled={!breedte || !hoogte || Number(breedte) <= 0 || Number(hoogte) <= 0}
               data-testid="maat-modal-opslaan"
               className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink disabled:opacity-40"
             >

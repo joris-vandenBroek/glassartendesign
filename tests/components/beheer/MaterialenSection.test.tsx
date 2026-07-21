@@ -112,4 +112,15 @@ describe('MaterialenSection', () => {
     fireEvent.click(screen.getByTestId('materiaal-modal-verwijderen'));
     await waitFor(() => expect(onRemove).toHaveBeenCalledWith('mat-2'));
   });
+
+  it('shows an action error and keeps the modal open when deleting fails', async () => {
+    const onRemove = vi.fn().mockResolvedValue(false);
+    renderSection({ onRemove });
+    fireEvent.click(screen.getByTestId('data-table-row-mat-2'));
+    fireEvent.click(screen.getByTestId('materiaal-modal-verwijderen'));
+    expect(await screen.findByTestId('materiaal-modal-error')).toHaveTextContent(
+      'Er is iets misgegaan. Probeer het opnieuw.'
+    );
+    expect(screen.getByTestId('materiaal-modal')).toBeInTheDocument();
+  });
 });

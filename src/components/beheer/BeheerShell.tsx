@@ -114,6 +114,10 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           <MateriaalsoortenSection
             materiaalsoorten={materiaalsoorten.items}
             materialen={materialen.items}
+            // Note: a write that succeeds but whose follow-up refetch fails also sets
+            // error to 'load' (not 'action'), so it surfaces here as a full-section
+            // error rather than the modal's actionError banner — treated as acceptable
+            // since the shown data is now stale and worth a hard refresh anyway.
             loadError={materiaalsoorten.error === 'load' ? t('materiaalsoortenLoadError') : null}
             onAdd={materiaalsoorten.add}
             onUpdate={materiaalsoorten.update}

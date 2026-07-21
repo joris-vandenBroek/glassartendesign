@@ -97,4 +97,18 @@ describe('MateriaalsoortenSection', () => {
     await waitFor(() => expect(onRemove).toHaveBeenCalledWith('soort-2'));
     await waitFor(() => expect(screen.queryByTestId('materiaalsoort-modal')).not.toBeInTheDocument());
   });
+
+  it('shows an action error and keeps the modal open when adding fails', async () => {
+    const onAdd = vi.fn().mockResolvedValue(false);
+    renderSection({ onAdd });
+    fireEvent.click(screen.getByTestId('materiaalsoorten-add'));
+    fireEvent.change(screen.getByTestId('materiaalsoort-modal-omschrijving'), {
+      target: { value: 'Acryl' },
+    });
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
+    expect(await screen.findByTestId('materiaalsoort-modal-error')).toHaveTextContent(
+      'Er is iets misgegaan. Probeer het opnieuw.'
+    );
+    expect(screen.getByTestId('materiaalsoort-modal')).toBeInTheDocument();
+  });
 });

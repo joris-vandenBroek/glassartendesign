@@ -58,6 +58,14 @@ describe('MatenSection', () => {
     expect(screen.getByTestId('maat-modal-opslaan')).not.toBeDisabled();
   });
 
+  it('disables Opslaan when breedte or hoogte is 0', () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('maten-add'));
+    fireEvent.change(screen.getByTestId('maat-modal-breedte'), { target: { value: '0' } });
+    fireEvent.change(screen.getByTestId('maat-modal-hoogte'), { target: { value: '120' } });
+    expect(screen.getByTestId('maat-modal-opslaan')).toBeDisabled();
+  });
+
   it('opens a row for editing pre-filled, and updates it', async () => {
     const { onUpdate } = renderSection();
     fireEvent.click(screen.getByTestId('data-table-row-maat-2'));
@@ -73,5 +81,18 @@ describe('MatenSection', () => {
     fireEvent.click(screen.getByTestId('data-table-row-maat-1'));
     fireEvent.click(screen.getByTestId('maat-modal-verwijderen'));
     await waitFor(() => expect(onRemove).toHaveBeenCalledWith('maat-1'));
+  });
+
+  it('shows an action error and keeps the modal open when adding fails', async () => {
+    const onAdd = vi.fn().mockResolvedValue(false);
+    renderSection({ onAdd });
+    fireEvent.click(screen.getByTestId('maten-add'));
+    fireEvent.change(screen.getByTestId('maat-modal-breedte'), { target: { value: '80' } });
+    fireEvent.change(screen.getByTestId('maat-modal-hoogte'), { target: { value: '120' } });
+    fireEvent.click(screen.getByTestId('maat-modal-opslaan'));
+    expect(await screen.findByTestId('maat-modal-error')).toHaveTextContent(
+      'Er is iets misgegaan. Probeer het opnieuw.'
+    );
+    expect(screen.getByTestId('maat-modal')).toBeInTheDocument();
   });
 });
