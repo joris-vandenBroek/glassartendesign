@@ -27,8 +27,6 @@ vi.mock('@/lib/firebase', () => ({
 
 vi.mock('firebase/firestore', () => ({
   collection: vi.fn((_db, name) => ({ name })),
-  query: vi.fn((ref, whereClause) => ({ ref, whereClause })),
-  where: vi.fn((field, op, value) => ({ field, op, value })),
   doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
   getDocs: (...args: unknown[]) => getDocsMock(...args),
   updateDoc: vi.fn(),
@@ -62,7 +60,7 @@ describe('AdminDashboard', () => {
     expect(screen.getByTestId('beheer-login-email')).toBeInTheDocument();
   });
 
-  it('shows the dashboard shell with the logged-in email when authorized', async () => {
+  it('shows the BeheerShell with the logged-in email when authorized', async () => {
     mockAuthState = {
       user: { uid: 'uid-1', email: 'paul@glassartanddesign.com' },
       isAdmin: true,

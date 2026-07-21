@@ -303,14 +303,6 @@
     "facturenColCompanyName": "Bedrijfsnaam",
     "facturenColAmount": "Factuurbedrag",
     "facturenColStatus": "Status",
-    "facturenEmpty": "Geen facturen gevonden.",
-    "klantaanvragenTitle": "Klantaanvragen",
-    "klantaanvragenEmpty": "Geen openstaande klantaanvragen.",
-    "klantaanvragenContactPreference": "Contactvoorkeur",
-    "klantaanvragenLabelPrijsgroep": "Prijsgroep",
-    "klantaanvragenGoedkeuren": "Goedkeuren",
-    "klantaanvragenAfwijzen": "Afwijzen",
-    "klantaanvragenLoadError": "Kon de klantaanvragen niet laden. Probeer de pagina te verversen.",
-    "klantaanvragenActionError": "Er is iets misgegaan. Probeer het opnieuw."
+    "facturenEmpty": "Geen facturen gevonden."
   }
 }
