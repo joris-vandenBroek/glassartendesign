@@ -130,7 +130,7 @@ describe('CartPanel', () => {
     expect(screen.queryByTestId('cart-place-order')).not.toBeInTheDocument();
   });
 
-  it('writes a bestelheader + one bestelline per cart item, then clears the cart and closes the panel', async () => {
+  it('writes a bestelheader + one bestelline per cart item, clears the cart and shows a confirmation message', async () => {
     addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
     renderCartPanel();
     fireEvent.click(screen.getByTestId('seed-cart'));
@@ -138,8 +138,13 @@ describe('CartPanel', () => {
     await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
     fireEvent.click(screen.getByTestId('cart-place-order'));
 
-    await waitFor(() => expect(screen.queryByTestId('cart-panel')).not.toBeInTheDocument());
+    expect(await screen.findByTestId('cart-order-confirmation')).toHaveTextContent(
+      'Uw bestelling is door ons ontvangen en zal zo spoedig mogelijk worden verwerkt.'
+    );
+    expect(screen.getByTestId('cart-panel')).toBeInTheDocument();
     expect(screen.queryByTestId('cart-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cart-place-order')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cart-clear')).not.toBeInTheDocument();
 
     expect(addDocMock).toHaveBeenNthCalledWith(
       1,
@@ -151,6 +156,22 @@ describe('CartPanel', () => {
       { path: ['bestelheaders', 'header-1', 'bestellines'] },
       { kunstwerkId: null, maatId: null, materiaalId: null, quantity: 2 }
     );
+  });
+
+  it('clears the confirmation message once the panel is closed and reopened', async () => {
+    addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+    expect(await screen.findByTestId('cart-order-confirmation')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('cart-close'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+
+    expect(screen.queryByTestId('cart-order-confirmation')).not.toBeInTheDocument();
+    expect(screen.getByTestId('cart-empty')).toBeInTheDocument();
   });
 
   it('shows an error and keeps the cart intact when the Firestore write fails', async () => {

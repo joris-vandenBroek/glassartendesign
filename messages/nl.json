@@ -83,6 +83,7 @@
     "clearOrder": "Bestelling leegmaken",
     "loginToOrder": "Inloggen om te bestellen",
     "placeOrderError": "Er ging iets mis bij het plaatsen van de bestelling. Probeer het opnieuw.",
+    "orderConfirmation": "Uw bestelling is door ons ontvangen en zal zo spoedig mogelijk worden verwerkt.",
     "remove": "Verwijderen",
     "requestedStatus": "Aangevraagd",
     "added": "Toegevoegd!",

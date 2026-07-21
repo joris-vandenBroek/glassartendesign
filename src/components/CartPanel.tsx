@@ -15,14 +15,20 @@ export function CartPanel() {
   const tSegments = useTranslations('segments');
   const [isOpen, setIsOpen] = useState(false);
   const [placeOrderError, setPlaceOrderError] = useState<string | null>(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const { items, isHydrated, totalQuantity, removeItem, clear } = useCart();
   const { user, isCustomer } = useCustomerAuth();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  function handleClose() {
+    setIsOpen(false);
+    setOrderPlaced(false);
+  }
+
   useOverlayDismiss({
     isOpen,
-    onClose: () => setIsOpen(false),
+    onClose: handleClose,
     containerRef: panelRef,
     initialFocusRef: closeButtonRef,
   });
@@ -49,7 +55,7 @@ export function CartPanel() {
         )
       );
       clear();
-      setIsOpen(false);
+      setOrderPlaced(true);
     } catch {
       setPlaceOrderError(t('placeOrderError'));
     }
@@ -80,7 +86,7 @@ export function CartPanel() {
           <>
             <div
               data-testid="cart-backdrop"
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
               className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
             />
             <div
@@ -99,7 +105,7 @@ export function CartPanel() {
                   type="button"
                   data-testid="cart-close"
                   aria-label={t('close')}
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleClose}
                   className="flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:text-white"
                 >
                   ×
@@ -107,7 +113,14 @@ export function CartPanel() {
               </div>
 
               <div className="flex-1 overflow-y-auto px-5 py-4">
-                {items.length === 0 ? (
+                {orderPlaced ? (
+                  <p
+                    data-testid="cart-order-confirmation"
+                    className="text-center text-xs text-white/80"
+                  >
+                    {t('orderConfirmation')}
+                  </p>
+                ) : items.length === 0 ? (
                   <p data-testid="cart-empty" className="text-center text-xs text-white/60">
                     {t('empty')}
                   </p>
@@ -141,44 +154,46 @@ export function CartPanel() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-2 border-t border-white/10 px-5 py-4">
-                {isCustomer ? (
+              {!orderPlaced && (
+                <div className="flex flex-col gap-2 border-t border-white/10 px-5 py-4">
+                  {isCustomer ? (
+                    <button
+                      type="button"
+                      data-testid="cart-place-order"
+                      disabled={items.length === 0}
+                      onClick={handlePlaceOrder}
+                      className="btn-gold w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide disabled:opacity-40"
+                    >
+                      {t('placeOrder')}
+                    </button>
+                  ) : (
+                    <Link
+                      href="/inloggen"
+                      data-testid="cart-login-to-order"
+                      className="btn-gold block w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide"
+                    >
+                      {t('loginToOrder')}
+                    </Link>
+                  )}
+                  {placeOrderError && (
+                    <p
+                      data-testid="cart-place-order-error"
+                      className="text-center text-xs text-red-400"
+                    >
+                      {placeOrderError}
+                    </p>
+                  )}
                   <button
                     type="button"
-                    data-testid="cart-place-order"
+                    data-testid="cart-clear"
                     disabled={items.length === 0}
-                    onClick={handlePlaceOrder}
-                    className="btn-gold w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide disabled:opacity-40"
+                    onClick={clear}
+                    className="text-xs text-white/50 transition hover:text-red-400 disabled:opacity-40"
                   >
-                    {t('placeOrder')}
+                    {t('clearOrder')}
                   </button>
-                ) : (
-                  <Link
-                    href="/inloggen"
-                    data-testid="cart-login-to-order"
-                    className="btn-gold block w-full rounded-sm px-3 py-2.5 text-center text-xs font-head tracking-wide"
-                  >
-                    {t('loginToOrder')}
-                  </Link>
-                )}
-                {placeOrderError && (
-                  <p
-                    data-testid="cart-place-order-error"
-                    className="text-center text-xs text-red-400"
-                  >
-                    {placeOrderError}
-                  </p>
-                )}
-                <button
-                  type="button"
-                  data-testid="cart-clear"
-                  disabled={items.length === 0}
-                  onClick={clear}
-                  className="text-xs text-white/50 transition hover:text-red-400 disabled:opacity-40"
-                >
-                  {t('clearOrder')}
-                </button>
-              </div>
+                </div>
+              )}
             </div>
           </>,
           document.body

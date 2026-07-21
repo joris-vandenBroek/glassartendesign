@@ -83,6 +83,7 @@
     "clearOrder": "Clear order",
     "loginToOrder": "Log in to order",
     "placeOrderError": "Something went wrong placing the order. Please try again.",
+    "orderConfirmation": "We've received your order and will process it as soon as possible.",
     "remove": "Remove",
     "requestedStatus": "Requested",
     "added": "Added!",
