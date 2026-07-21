@@ -205,6 +205,12 @@
     "navConversations": "Gesprekgeschiedenis",
     "navSettings": "Instellingen",
     "logout": "Uitloggen",
+    "orders": {
+      "lineSummary": "{lines, plural, one {# regel} other {# regels}}, {quantity, plural, one {# stuk} other {# stuks}}",
+      "statusTeBeoordelen": "Te beoordelen",
+      "statusGoedgekeurd": "Goedgekeurd",
+      "statusAfgewezen": "Afgewezen"
+    },
     "invoices": {
       "empty": "Geen facturen gevonden.",
       "downloadPdf": "Download PDF",

@@ -205,6 +205,12 @@
     "navConversations": "Conversation history",
     "navSettings": "Settings",
     "logout": "Log out",
+    "orders": {
+      "lineSummary": "{lines, plural, one {# line} other {# lines}}, {quantity, plural, one {# piece} other {# pieces}}",
+      "statusTeBeoordelen": "Under review",
+      "statusGoedgekeurd": "Approved",
+      "statusAfgewezen": "Rejected"
+    },
     "invoices": {
       "empty": "No invoices found.",
       "downloadPdf": "Download PDF",

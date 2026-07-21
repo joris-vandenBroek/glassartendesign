@@ -205,6 +205,12 @@
     "navConversations": "Historique des conversations",
     "navSettings": "Paramètres",
     "logout": "Déconnexion",
+    "orders": {
+      "lineSummary": "{lines, plural, one {# ligne} other {# lignes}}, {quantity, plural, one {# pièce} other {# pièces}}",
+      "statusTeBeoordelen": "En cours d'examen",
+      "statusGoedgekeurd": "Approuvée",
+      "statusAfgewezen": "Refusée"
+    },
     "invoices": {
       "empty": "Aucune facture trouvée.",
       "downloadPdf": "Télécharger le PDF",

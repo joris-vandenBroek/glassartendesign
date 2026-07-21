@@ -205,6 +205,12 @@
     "navConversations": "Gesprächsverlauf",
     "navSettings": "Einstellungen",
     "logout": "Abmelden",
+    "orders": {
+      "lineSummary": "{lines, plural, one {# Position} other {# Positionen}}, {quantity} Stück",
+      "statusTeBeoordelen": "In Prüfung",
+      "statusGoedgekeurd": "Genehmigt",
+      "statusAfgewezen": "Abgelehnt"
+    },
     "invoices": {
       "empty": "Keine Rechnungen gefunden.",
       "downloadPdf": "PDF herunterladen",
