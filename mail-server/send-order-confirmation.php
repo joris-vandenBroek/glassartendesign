@@ -49,6 +49,7 @@ if (!filter_var($to, FILTER_VALIDATE_EMAIL) || $subject === '' || $body === '') 
 $mail = new PHPMailer(true);
 
 try {
+    $mail->CharSet = PHPMailer::CHARSET_UTF8;
     $mail->isSMTP();
     $mail->Host = $config['smtp_host'];
     $mail->Port = $config['smtp_port'];
