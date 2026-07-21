@@ -1,0 +1,56 @@
+'use client';
+
+import { useRef, type ReactNode } from 'react';
+import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  closeLabel: string;
+  children: ReactNode;
+}
+
+export function Modal({ isOpen, onClose, closeLabel, children }: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useOverlayDismiss({
+    isOpen,
+    onClose,
+    containerRef: modalRef,
+    initialFocusRef: closeButtonRef,
+  });
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div
+      ref={modalRef}
+      data-testid="modal"
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        data-testid="modal-backdrop"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
+      />
+      <div className="relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-lg border border-white/10 bg-charcoal p-6">
+        <button
+          ref={closeButtonRef}
+          type="button"
+          data-testid="modal-close"
+          aria-label={closeLabel}
+          onClick={onClose}
+          className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white/80 hover:text-white"
+        >
+          ×
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+}
