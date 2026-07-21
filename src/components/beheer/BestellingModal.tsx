@@ -7,13 +7,14 @@ import { db } from '@/lib/firebase';
 import { Modal } from '@/components/Modal';
 import { formatCurrency } from '@/data/mockAdminInvoices';
 import type { Bestelling } from './BestellingenSection';
-import type { Kunstwerk, Materiaal, Maat } from './materiaalTypes';
+import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './materiaalTypes';
 
 interface BestellingModalProps {
   bestelling: Bestelling | null;
   kunstwerken: Kunstwerk[] | null;
   materialen: Materiaal[] | null;
   maten: Maat[] | null;
+  materiaalsoorten: Materiaalsoort[] | null;
   onClose: () => void;
   onUpdated: (bestelling: Bestelling) => void;
 }
@@ -23,6 +24,7 @@ export function BestellingModal({
   kunstwerken,
   materialen,
   maten,
+  materiaalsoorten,
   onClose,
   onUpdated,
 }: BestellingModalProps) {
@@ -34,6 +36,10 @@ export function BestellingModal({
       setError(null);
     }
   }, [bestelling]);
+
+  const materiaalsoortNaamById = new Map(
+    (materiaalsoorten ?? []).map((soort) => [soort.id, soort.omschrijving])
+  );
 
   async function handleGoedkeuren() {
     if (!bestelling) return;
@@ -80,7 +86,11 @@ export function BestellingModal({
                         <p className="text-white/90">{kunstwerk.omschrijvingNl}</p>
                         <p className="text-white/50">
                           <span className="text-white/35">{t('bestellingenModalLabelMateriaal')}: </span>
-                          {materiaal ? `${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}` : line.materiaalId}
+                          {materiaal
+                            ? `${materiaal.materiaaldikte}mm ${
+                                materiaalsoortNaamById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId
+                              } — ${materiaal.omschrijving}`
+                            : line.materiaalId}
                         </p>
                         <p className="text-white/50">
                           <span className="text-white/35">{t('bestellingenModalLabelMaat')}: </span>

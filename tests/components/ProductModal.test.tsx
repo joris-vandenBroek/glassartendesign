@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { ProductModal } from '@/components/ProductModal';
 import { CartProvider, useCart } from '@/lib/useCart';
-import type { Kunstwerk, Materiaal, Maat } from '@/components/beheer/materiaalTypes';
+import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from '@/components/beheer/materiaalTypes';
 import messages from '../../messages/nl.json';
 
 const KUNSTWERK: Kunstwerk = {
@@ -24,19 +24,29 @@ const KUNSTWERK: Kunstwerk = {
   omschrijvingEn: '',
 };
 const MATERIALEN: Materiaal[] = [
-  { id: 'mat-1', materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Veiligheidsglas' },
-  { id: 'mat-2', materiaalsoortId: 'soort-2', materiaaldikte: 3, omschrijving: 'Acryl' },
+  { id: 'mat-1', materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Extra diepte en stevigheid voor een indrukwekkend effect.' },
+  { id: 'mat-2', materiaalsoortId: 'soort-2', materiaaldikte: 3, omschrijving: 'Lichtgewicht en flexibel voor grote oppervlaktes.' },
 ];
 const MATEN: Maat[] = [
   { id: 'maat-1', breedte: 40, hoogte: 60 },
   { id: 'maat-2', breedte: 60, hoogte: 90 },
+];
+const MATERIAALSOORTEN: Materiaalsoort[] = [
+  { id: 'soort-1', omschrijving: 'Veiligheidsglas' },
+  { id: 'soort-2', omschrijving: 'Acryl' },
 ];
 
 function renderModal(onClose: () => void = () => {}, kunstwerk: Kunstwerk | null = KUNSTWERK) {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <CartProvider>
-        <ProductModal kunstwerk={kunstwerk} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
+        <ProductModal
+          kunstwerk={kunstwerk}
+          materialen={MATERIALEN}
+          maten={MATEN}
+          materiaalsoorten={MATERIAALSOORTEN}
+          onClose={onClose}
+        />
       </CartProvider>
     </NextIntlClientProvider>
   );
@@ -80,6 +90,17 @@ describe('ProductModal', () => {
     expect(options).toHaveLength(2);
   });
 
+  it('includes the materiaalsoort name alongside the dikte and omschrijving in each materiaal option', () => {
+    renderModal();
+    const options = screen.getByTestId('product-modal-materiaal').querySelectorAll('option');
+    expect(options[0]).toHaveTextContent(
+      '4mm Veiligheidsglas — Extra diepte en stevigheid voor een indrukwekkend effect.'
+    );
+    expect(options[1]).toHaveTextContent(
+      '3mm Acryl — Lichtgewicht en flexibel voor grote oppervlaktes.'
+    );
+  });
+
   it('increments and decrements quantity, never below 1', () => {
     renderModal();
     fireEvent.click(screen.getByTestId('product-modal-quantity-minus'));
@@ -121,7 +142,13 @@ describe('ProductModal', () => {
     render(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal kunstwerk={KUNSTWERK} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
+          <ProductModal
+            kunstwerk={KUNSTWERK}
+            materialen={MATERIALEN}
+            maten={MATEN}
+            materiaalsoorten={MATERIAALSOORTEN}
+            onClose={onClose}
+          />
           <Probe />
         </CartProvider>
       </NextIntlClientProvider>
@@ -157,7 +184,13 @@ describe('ProductModal', () => {
     const { rerender } = render(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal kunstwerk={KUNSTWERK} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
+          <ProductModal
+            kunstwerk={KUNSTWERK}
+            materialen={MATERIALEN}
+            maten={MATEN}
+            materiaalsoorten={MATERIAALSOORTEN}
+            onClose={onClose}
+          />
         </CartProvider>
       </NextIntlClientProvider>
     );
@@ -170,14 +203,26 @@ describe('ProductModal', () => {
     rerender(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal kunstwerk={null} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
+          <ProductModal
+            kunstwerk={null}
+            materialen={MATERIALEN}
+            maten={MATEN}
+            materiaalsoorten={MATERIAALSOORTEN}
+            onClose={onClose}
+          />
         </CartProvider>
       </NextIntlClientProvider>
     );
     rerender(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CartProvider>
-          <ProductModal kunstwerk={NEXT_KUNSTWERK} materialen={MATERIALEN} maten={MATEN} onClose={onClose} />
+          <ProductModal
+            kunstwerk={NEXT_KUNSTWERK}
+            materialen={MATERIALEN}
+            maten={MATEN}
+            materiaalsoorten={MATERIAALSOORTEN}
+            onClose={onClose}
+          />
         </CartProvider>
       </NextIntlClientProvider>
     );

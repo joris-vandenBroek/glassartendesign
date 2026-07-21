@@ -6,7 +6,7 @@ import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
 import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
 import { WatermarkedImage } from './WatermarkedImage';
 import { ProductModal } from './ProductModal';
-import type { Segment, Kunstwerk, Materiaal, Maat } from './beheer/materiaalTypes';
+import type { Segment, Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materiaalTypes';
 
 const ALL_FILTER = 'all';
 
@@ -20,6 +20,7 @@ export function ProductsGrid() {
   const kunstwerken = useFirestoreCollection<Kunstwerk>('kunstwerken');
   const materialen = useFirestoreCollection<Materiaal>('materialen');
   const maten = useFirestoreCollection<Maat>('maten');
+  const materiaalsoorten = useFirestoreCollection<Materiaalsoort>('materiaalsoorten');
 
   if (segmenten.items === null || kunstwerken.items === null) {
     return null;
@@ -103,6 +104,7 @@ export function ProductsGrid() {
         kunstwerk={selectedKunstwerk}
         materialen={materialen.items}
         maten={maten.items}
+        materiaalsoorten={materiaalsoorten.items}
         onClose={() => setSelectedKunstwerk(null)}
       />
     </>

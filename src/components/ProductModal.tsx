@@ -7,12 +7,12 @@ import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
 import { formatCurrency } from '@/data/mockAdminInvoices';
 import { WatermarkedImage } from './WatermarkedImage';
-import type { Kunstwerk, Materiaal, Maat } from './beheer/materiaalTypes';
+import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materiaalTypes';
 
 const CONFIRM_FEEDBACK_MS = 600;
 
-function materiaalLabel(materiaal: Materiaal): string {
-  return `${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}`;
+function materiaalLabel(materiaal: Materiaal, materiaalsoortNaam: string): string {
+  return `${materiaal.materiaaldikte}mm ${materiaalsoortNaam} — ${materiaal.omschrijving}`;
 }
 
 function maatLabel(maat: Maat): string {
@@ -23,10 +23,11 @@ interface ProductModalProps {
   kunstwerk: Kunstwerk | null;
   materialen: Materiaal[] | null;
   maten: Maat[] | null;
+  materiaalsoorten: Materiaalsoort[] | null;
   onClose: () => void;
 }
 
-export function ProductModal({ kunstwerk, materialen, maten, onClose }: ProductModalProps) {
+export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, onClose }: ProductModalProps) {
   const t = useTranslations('cart');
   const locale = useLocale();
   const [materiaalId, setMateriaalId] = useState('');
@@ -74,6 +75,12 @@ export function ProductModal({ kunstwerk, materialen, maten, onClose }: ProductM
     kunstwerk.materiaalIds.includes(materiaal.id)
   );
   const beschikbareMaten = (maten ?? []).filter((maat) => kunstwerk.maatIds.includes(maat.id));
+  const materiaalsoortNaamById = new Map(
+    (materiaalsoorten ?? []).map((soort) => [soort.id, soort.omschrijving])
+  );
+  function resolvedMateriaalLabel(materiaal: Materiaal): string {
+    return materiaalLabel(materiaal, materiaalsoortNaamById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId);
+  }
   const prijsRegel = kunstwerk.prijzen.find(
     (regel) => regel.materiaalId === materiaalId && regel.maatId === maatId
   );
@@ -93,7 +100,7 @@ export function ProductModal({ kunstwerk, materialen, maten, onClose }: ProductM
       foto: kunstwerk.foto,
       omschrijving,
       materiaalId,
-      materiaalLabel: materiaalLabel(gekozenMateriaal),
+      materiaalLabel: resolvedMateriaalLabel(gekozenMateriaal),
       maatId,
       maatLabel: maatLabel(gekozenMaat),
       prijs: prijsRegel.prijs,
@@ -143,7 +150,7 @@ export function ProductModal({ kunstwerk, materialen, maten, onClose }: ProductM
             >
               {beschikbareMaterialen.map((materiaal) => (
                 <option key={materiaal.id} value={materiaal.id}>
-                  {materiaalLabel(materiaal)}
+                  {resolvedMateriaalLabel(materiaal)}
                 </option>
               ))}
             </select>

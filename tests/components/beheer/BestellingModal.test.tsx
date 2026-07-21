@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { BestellingModal } from '@/components/beheer/BestellingModal';
 import type { Bestelling } from '@/components/beheer/BestellingenSection';
-import type { Kunstwerk, Materiaal, Maat } from '@/components/beheer/materiaalTypes';
+import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
 
 const updateDocMock = vi.fn();
@@ -32,9 +32,10 @@ const KUNSTWERKEN: Kunstwerk[] = [
   },
 ];
 const MATERIALEN: Materiaal[] = [
-  { id: 'mat-1', materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Veiligheidsglas' },
+  { id: 'mat-1', materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Extra diepte en stevigheid.' },
 ];
 const MATEN: Maat[] = [{ id: 'maat-1', breedte: 40, hoogte: 60 }];
+const MATERIAALSOORTEN: Materiaalsoort[] = [{ id: 'soort-1', omschrijving: 'Veiligheidsglas' }];
 
 const BESTELLING: Bestelling = {
   id: 'header-1',
@@ -60,6 +61,7 @@ function renderModal(bestelling: Bestelling | null) {
         kunstwerken={KUNSTWERKEN}
         materialen={MATERIALEN}
         maten={MATEN}
+        materiaalsoorten={MATERIAALSOORTEN}
         onClose={onClose}
         onUpdated={onUpdated}
       />
@@ -82,7 +84,7 @@ describe('BestellingModal', () => {
     renderModal(BESTELLING);
     const line1 = screen.getByTestId('bestelling-modal-line-line-1');
     expect(line1).toHaveTextContent('Hotel paneel');
-    expect(line1).toHaveTextContent('4mm — Veiligheidsglas');
+    expect(line1).toHaveTextContent('4mm Veiligheidsglas — Extra diepte en stevigheid.');
     expect(line1).toHaveTextContent('40×60 cm');
     expect(line1).toHaveTextContent('€ 150,00');
     expect(line1).toHaveTextContent('×3');

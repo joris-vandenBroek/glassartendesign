@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { BestellingenSection, type Bestelling } from '@/components/beheer/BestellingenSection';
-import type { Kunstwerk, Materiaal, Maat } from '@/components/beheer/materiaalTypes';
+import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
 
 const updateDocMock = vi.fn();
@@ -34,6 +34,7 @@ const MATERIALEN: Materiaal[] = [
   { id: 'mat-1', materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Veiligheidsglas' },
 ];
 const MATEN: Maat[] = [{ id: 'maat-1', breedte: 40, hoogte: 60 }];
+const MATERIAALSOORTEN: Materiaalsoort[] = [{ id: 'soort-1', omschrijving: 'Veiligheidsglas' }];
 
 const BESTELLINGEN: Bestelling[] = [
   {
@@ -67,6 +68,7 @@ function renderSection(overrides: Partial<React.ComponentProps<typeof Bestelling
         kunstwerken={KUNSTWERKEN}
         materialen={MATERIALEN}
         maten={MATEN}
+        materiaalsoorten={MATERIAALSOORTEN}
         loadError={null}
         onBestellingUpdated={onBestellingUpdated}
         {...overrides}

@@ -6,7 +6,7 @@ service cloud.firestore {
       allow write: if false;
     }
     match /materiaalsoorten/{id} {
-      allow read: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));
+      allow read: if true;
       allow write: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));
     }
     match /materialen/{id} {
