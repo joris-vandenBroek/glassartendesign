@@ -56,8 +56,33 @@ export function CartPanel() {
       );
       clear();
       setOrderPlaced(true);
+      if (user.email) {
+        void sendConfirmationEmail(user.email);
+      }
     } catch {
       setPlaceOrderError(t('placeOrderError'));
+    }
+  }
+
+  async function sendConfirmationEmail(email: string) {
+    const endpoint = process.env.NEXT_PUBLIC_MAIL_ENDPOINT_URL;
+    const secret = process.env.NEXT_PUBLIC_MAIL_SECRET;
+    if (!endpoint || !secret) {
+      return;
+    }
+    try {
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret,
+          to: email,
+          subject: t('orderEmailSubject'),
+          body: t('orderConfirmation'),
+        }),
+      });
+    } catch {
+      // Best-effort only -- the order itself already succeeded via Firestore.
     }
   }
 

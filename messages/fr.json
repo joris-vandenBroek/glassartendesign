@@ -84,6 +84,7 @@
     "loginToOrder": "Se connecter pour commander",
     "placeOrderError": "Une erreur s'est produite lors de la commande. Veuillez réessayer.",
     "orderConfirmation": "Nous avons bien reçu votre commande et la traiterons dans les plus brefs délais.",
+    "orderEmailSubject": "Confirmation de votre commande — Glassart & Design",
     "remove": "Supprimer",
     "requestedStatus": "Demandée",
     "added": "Ajouté !",

@@ -84,6 +84,7 @@
     "loginToOrder": "Anmelden zum Bestellen",
     "placeOrderError": "Beim Platzieren der Bestellung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "orderConfirmation": "Wir haben Ihre Bestellung erhalten und werden sie so schnell wie möglich bearbeiten.",
+    "orderEmailSubject": "Bestellbestätigung — Glassart & Design",
     "remove": "Entfernen",
     "requestedStatus": "Angefragt",
     "added": "Hinzugefügt!",

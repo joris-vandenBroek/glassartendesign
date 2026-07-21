@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { CartPanel } from '@/components/CartPanel';
@@ -9,6 +9,8 @@ import messages from '../../messages/nl.json';
 const onAuthStateChangedMock = vi.fn();
 const getDocMock = vi.fn();
 const addDocMock = vi.fn();
+const fetchMock = vi.fn();
+vi.stubGlobal('fetch', fetchMock);
 
 vi.mock('@/i18n/navigation', () => ({
   Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
@@ -89,7 +91,13 @@ beforeEach(() => {
   onAuthStateChangedMock.mockReset();
   getDocMock.mockReset();
   addDocMock.mockReset();
+  fetchMock.mockReset();
+  fetchMock.mockResolvedValue({ ok: true });
   signedInAsApprovedCustomer();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe('CartPanel', () => {
@@ -156,6 +164,57 @@ describe('CartPanel', () => {
       { path: ['bestelheaders', 'header-1', 'bestellines'] },
       { kunstwerkId: null, maatId: null, materiaalId: null, quantity: 2 }
     );
+  });
+
+  it('sends a confirmation email via fetch when the order succeeds and mail env vars are set', async () => {
+    vi.stubEnv('NEXT_PUBLIC_MAIL_ENDPOINT_URL', 'https://example.com/mail.php');
+    vi.stubEnv('NEXT_PUBLIC_MAIL_SECRET', 'test-secret');
+    addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+
+    await screen.findByTestId('cart-order-confirmation');
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith('https://example.com/mail.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret: 'test-secret',
+          to: 'klant@example.com',
+          subject: 'Bevestiging van uw bestelling — Glassart & Design',
+          body: 'Uw bestelling is door ons ontvangen en zal zo spoedig mogelijk worden verwerkt.',
+        }),
+      })
+    );
+  });
+
+  it('does not call fetch when the mail endpoint/secret env vars are not set', async () => {
+    addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+
+    await screen.findByTestId('cart-order-confirmation');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('still shows the order confirmation even if sending the email fails', async () => {
+    vi.stubEnv('NEXT_PUBLIC_MAIL_ENDPOINT_URL', 'https://example.com/mail.php');
+    vi.stubEnv('NEXT_PUBLIC_MAIL_SECRET', 'test-secret');
+    fetchMock.mockRejectedValue(new Error('network error'));
+    addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+
+    expect(await screen.findByTestId('cart-order-confirmation')).toBeInTheDocument();
   });
 
   it('clears the confirmation message once the panel is closed and reopened', async () => {
