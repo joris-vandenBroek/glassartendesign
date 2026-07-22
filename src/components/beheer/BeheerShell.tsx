@@ -13,8 +13,9 @@ import { MaterialenSection } from './MaterialenSection';
 import { MatenSection } from './MatenSection';
 import { SegmentenSection } from './SegmentenSection';
 import { KunstwerkenSection } from './KunstwerkenSection';
+import { PrijsgroepenSection } from './PrijsgroepenSection';
 import { ActiviteitSection, type Activiteit } from './ActiviteitSection';
-import type { Materiaalsoort, Materiaal, Maat, Segment, Kunstwerk } from './materiaalTypes';
+import type { Materiaalsoort, Materiaal, Maat, Segment, Kunstwerk, Prijsgroep } from './materiaalTypes';
 import type { ActiviteitType } from '@/lib/logActiviteit';
 import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
 import { MATERIAALSOORTEN_SEED, buildMaterialenSeed } from '@/data/materiaalsoortenSeed';
@@ -199,6 +200,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
     seed: kunstwerkenSeed,
     skip: !kunstwerkenReady,
   });
+  const prijsgroepen = useFirestoreCollection<Prijsgroep>('prijsgroepen');
 
   const klantenCount = (klanten ?? []).filter((klant) => klant.status === 'Beoordelen').length;
   const bestellingenCount = (bestellingen ?? []).filter((b) => b.status === 'Te beoordelen').length;
@@ -207,6 +209,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   const matenCount = (maten.items ?? []).length;
   const segmentenCount = (segmenten.items ?? []).length;
   const kunstwerkenCount = (kunstwerken.items ?? []).length;
+  const prijsgroepenCount = (prijsgroepen.items ?? []).length;
   const activiteitCount = (activiteiten ?? []).length;
 
   return (
@@ -229,6 +232,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           matenCount={matenCount}
           segmentenCount={segmentenCount}
           kunstwerkenCount={kunstwerkenCount}
+          prijsgroepenCount={prijsgroepenCount}
           activiteitCount={activiteitCount}
         />
       </GlassPanel>
@@ -295,6 +299,14 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
             onAdd={kunstwerken.add}
             onUpdate={kunstwerken.update}
             onRemove={kunstwerken.remove}
+          />
+        ) : activeSection === 'prijsgroepen' ? (
+          <PrijsgroepenSection
+            prijsgroepen={prijsgroepen.items}
+            loadError={prijsgroepen.error === 'load' ? t('prijsgroepenLoadError') : null}
+            onAdd={prijsgroepen.add}
+            onUpdate={prijsgroepen.update}
+            onRemove={prijsgroepen.remove}
           />
         ) : (
           <ActiviteitSection activiteiten={activiteiten} loadError={activiteitenLoadError} />

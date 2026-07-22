@@ -377,6 +377,16 @@
     "kunstwerkenLabelOmschrijvingEn": "Omschrijving (EN)",
     "kunstwerkenToevoegen": "Kunstwerk toevoegen",
     "kunstwerkenOpslaan": "Opslaan",
-    "kunstwerkenVerwijderen": "Verwijderen"
+    "kunstwerkenVerwijderen": "Verwijderen",
+    "prijsgroepenLoadError": "Kon de prijsgroepen niet laden. Probeer de pagina te verversen.",
+    "prijsgroepenActionError": "Er is iets misgegaan. Probeer het opnieuw.",
+    "prijsgroepenEmpty": "Geen prijsgroepen gevonden.",
+    "prijsgroepenColNaam": "Naam",
+    "prijsgroepenColKortingspercentage": "Kortingspercentage",
+    "prijsgroepenLabelNaam": "Naam",
+    "prijsgroepenLabelKortingspercentage": "Kortingspercentage",
+    "prijsgroepenToevoegen": "Prijsgroep toevoegen",
+    "prijsgroepenOpslaan": "Opslaan",
+    "prijsgroepenVerwijderen": "Verwijderen"
   }
 }

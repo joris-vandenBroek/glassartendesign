@@ -20,6 +20,7 @@ function renderNav(activeSection: BeheerSection = 'klanten') {
         matenCount={2}
         segmentenCount={6}
         kunstwerkenCount={36}
+        prijsgroepenCount={9}
         activiteitCount={12}
       />
     </NextIntlClientProvider>
@@ -41,10 +42,12 @@ describe('BeheerNav', () => {
     expect(screen.getByTestId('beheer-nav-segmenten')).toHaveTextContent('6');
     expect(screen.getByTestId('beheer-nav-kunstwerken')).toHaveTextContent('Kunstwerken');
     expect(screen.getByTestId('beheer-nav-kunstwerken')).toHaveTextContent('36');
+    expect(screen.getByTestId('beheer-nav-prijsgroepen')).toHaveTextContent('Prijsgroepen');
+    expect(screen.getByTestId('beheer-nav-prijsgroepen')).toHaveTextContent('9');
     expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('Activiteitenlog');
     expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('12');
 
-    ['prijsgroepen', 'glassartDesign'].forEach((id) => {
+    ['glassartDesign'].forEach((id) => {
       expect(screen.getByTestId(`beheer-nav-${id}`)).toBeDisabled();
     });
   });

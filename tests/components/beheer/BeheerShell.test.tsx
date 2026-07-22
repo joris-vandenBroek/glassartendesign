@@ -68,6 +68,7 @@ const DEFAULT_COLLECTIONS: Record<string, Array<{ id: string; data: Record<strin
   materialen: [{ id: 'mat-1', data: { materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Test' } }],
   maten: [{ id: 'maat-1', data: { breedte: 40, hoogte: 60 } }],
   segmenten: [{ id: 'seg-1', data: { omschrijving: 'Hotel' } }],
+  prijsgroepen: [],
   kunstwerken: [
     {
       id: 'kw-1',
@@ -262,5 +263,19 @@ describe('BeheerShell', () => {
     fireEvent.click(screen.getByTestId('beheer-nav-activiteit'));
     expect(await screen.findByTestId('activiteit-section')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-log-1')).toHaveTextContent('Kunstwerk bekeken');
+  });
+
+  it('shows the prijsgroepen count and switches to the Prijsgroepen section', async () => {
+    mockCollections({
+      prijsgroepen: [
+        { id: 'pg-1', data: { naam: 'Standaard', kortingspercentage: 0 } },
+        { id: 'pg-2', data: { naam: 'Wholesale', kortingspercentage: 15 } },
+      ],
+    });
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-prijsgroepen')).toHaveTextContent('2'));
+    screen.getByTestId('beheer-nav-prijsgroepen').click();
+    expect(await screen.findByTestId('prijsgroepen-section')).toBeInTheDocument();
+    expect(screen.getByTestId('data-table-row-pg-1')).toHaveTextContent('Standaard');
   });
 });
