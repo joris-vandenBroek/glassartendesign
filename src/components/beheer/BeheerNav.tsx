@@ -11,7 +11,8 @@ export type BeheerSection =
   | 'segmenten'
   | 'kunstwerken'
   | 'prijsgroepen'
-  | 'activiteit';
+  | 'activiteit'
+  | 'glassartDesign';
 
 interface BeheerNavProps {
   activeSection: BeheerSection;
@@ -38,11 +39,10 @@ const ACTIVE_ITEMS: { id: BeheerSection; labelKey: string }[] = [
   { id: 'kunstwerken', labelKey: 'navKunstwerken' },
   { id: 'prijsgroepen', labelKey: 'navPrijsgroepen' },
   { id: 'activiteit', labelKey: 'navActiviteit' },
-];
-
-const DISABLED_ITEMS: { id: string; labelKey: string }[] = [
   { id: 'glassartDesign', labelKey: 'navGlassartDesign' },
 ];
+
+const DISABLED_ITEMS: { id: string; labelKey: string }[] = [];
 
 export function BeheerNav({
   activeSection,
@@ -59,7 +59,7 @@ export function BeheerNav({
   activiteitCount,
 }: BeheerNavProps) {
   const t = useTranslations('beheer');
-  const counts: Record<BeheerSection, number> = {
+  const counts: Partial<Record<BeheerSection, number>> = {
     klanten: klantenCount,
     bestellingen: bestellingenCount,
     materiaalsoorten: materiaalsoortenCount,
@@ -87,7 +87,9 @@ export function BeheerNav({
           }`}
         >
           <span>{t(item.labelKey)}</span>
-          <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.65rem]">{counts[item.id]}</span>
+          {counts[item.id] !== undefined && (
+            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.65rem]">{counts[item.id]}</span>
+          )}
         </button>
       ))}
       {DISABLED_ITEMS.map((item) => (

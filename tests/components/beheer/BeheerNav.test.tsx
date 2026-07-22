@@ -29,7 +29,7 @@ function renderNav(activeSection: BeheerSection = 'klanten') {
 }
 
 describe('BeheerNav', () => {
-  it('renders the 8 active items with their counters, and the 2 disabled placeholder items', () => {
+  it('renders the 10 active items with their counters, and no disabled placeholder items', () => {
     renderNav();
     expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('Klanten');
     expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('3');
@@ -46,10 +46,14 @@ describe('BeheerNav', () => {
     expect(screen.getByTestId('beheer-nav-prijsgroepen')).toHaveTextContent('9');
     expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('Activiteitenlog');
     expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('12');
+    expect(screen.getByTestId('beheer-nav-glassartDesign')).toHaveTextContent('Glassart and Design');
+    expect(screen.getByTestId('beheer-nav-glassartDesign')).not.toBeDisabled();
+  });
 
-    ['glassartDesign'].forEach((id) => {
-      expect(screen.getByTestId(`beheer-nav-${id}`)).toBeDisabled();
-    });
+  it('does not show a count badge on the Glassart & Design item', () => {
+    renderNav();
+    const item = screen.getByTestId('beheer-nav-glassartDesign');
+    expect(item.querySelectorAll('span')).toHaveLength(1);
   });
 
   it('marks the active section with aria-current', () => {
