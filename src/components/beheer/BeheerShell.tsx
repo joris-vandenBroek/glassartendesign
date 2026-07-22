@@ -15,11 +15,15 @@ import { SegmentenSection } from './SegmentenSection';
 import { KunstwerkenSection } from './KunstwerkenSection';
 import { PrijsgroepenSection } from './PrijsgroepenSection';
 import { ActiviteitSection, type Activiteit } from './ActiviteitSection';
+import { GlassartDesignSection } from './GlassartDesignSection';
 import type { Materiaalsoort, Materiaal, Maat, Segment, Kunstwerk, Prijsgroep } from './materiaalTypes';
+import type { Bedrijfsgegevens } from './bedrijfsgegevensTypes';
 import type { ActiviteitType } from '@/lib/logActiviteit';
 import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
+import { useFirestoreDocument } from '@/lib/useFirestoreDocument';
 import { MATERIAALSOORTEN_SEED, buildMaterialenSeed } from '@/data/materiaalsoortenSeed';
 import { SEGMENTEN_SEED, MATEN_SEED, buildKunstwerkenSeed } from '@/data/kunstwerkenSeed';
+import { BEDRIJFSGEGEVENS_SEED } from '@/data/bedrijfsgegevensSeed';
 
 interface BeheerShellProps {
   email: string;
@@ -201,6 +205,9 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
     skip: !kunstwerkenReady,
   });
   const prijsgroepen = useFirestoreCollection<Prijsgroep>('prijsgroepen');
+  const bedrijfsgegevens = useFirestoreDocument<Bedrijfsgegevens>('instellingen', 'bedrijfsgegevens', {
+    seed: BEDRIJFSGEGEVENS_SEED,
+  });
 
   const klantenCount = (klanten ?? []).filter((klant) => klant.status === 'Beoordelen').length;
   const bestellingenCount = (bestellingen ?? []).filter((b) => b.status === 'Te beoordelen').length;
@@ -313,6 +320,12 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
             onAdd={prijsgroepen.add}
             onUpdate={prijsgroepen.update}
             onRemove={prijsgroepen.remove}
+          />
+        ) : activeSection === 'glassartDesign' ? (
+          <GlassartDesignSection
+            bedrijfsgegevens={bedrijfsgegevens.data}
+            loadError={bedrijfsgegevens.error === 'load' ? t('glassartDesignLoadError') : null}
+            onSave={bedrijfsgegevens.save}
           />
         ) : (
           <ActiviteitSection activiteiten={activiteiten} loadError={activiteitenLoadError} />

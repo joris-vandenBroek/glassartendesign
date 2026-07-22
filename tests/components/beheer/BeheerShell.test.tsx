@@ -6,6 +6,8 @@ import messages from '../../../messages/nl.json';
 
 const getDocsMock = vi.fn();
 const addDocMock = vi.fn();
+const getDocMock = vi.fn();
+const setDocMock = vi.fn();
 
 vi.mock('@/lib/firebase', () => ({
   db: {},
@@ -19,6 +21,8 @@ vi.mock('firebase/firestore', () => ({
   addDoc: (...args: unknown[]) => addDocMock(...args),
   updateDoc: vi.fn(),
   deleteDoc: vi.fn(),
+  getDoc: (...args: unknown[]) => getDocMock(...args),
+  setDoc: (...args: unknown[]) => setDocMock(...args),
   query: vi.fn((collectionRef) => collectionRef),
   orderBy: vi.fn(),
   limit: vi.fn(),
@@ -87,11 +91,25 @@ const DEFAULT_COLLECTIONS: Record<string, Array<{ id: string; data: Record<strin
   ],
 };
 
+const BEDRIJFSGEGEVENS_FIXTURE = {
+  bezoekadres: 'Den Heuvel 21, 5688 EM Oirschot',
+  email: 'info@glassartdesign.nl',
+  whatsappNummer: '31600000000',
+  iban: 'NL00 BANK 0123 4567 89',
+  kvkNummer: '12345678',
+  btwNummer: 'NL123456789B01',
+  openingstijden: { nl: 'Ma–vr: 09:00 – 17:00', en: '', fr: '', de: '' },
+  contactpersonen: [
+    { id: 'p1', naam: 'Paul van den Hout', telefoon: '+31651404089', rol: { nl: 'Voor projecten, hotels etc.', en: '', fr: '', de: '' } },
+  ],
+};
+
 function mockCollections(overrides: Partial<typeof DEFAULT_COLLECTIONS> = {}) {
   const data = { ...DEFAULT_COLLECTIONS, ...overrides };
   getDocsMock.mockImplementation((collectionRef: { name: string }) =>
     Promise.resolve(makeSnapshot(data[collectionRef.name] ?? []))
   );
+  getDocMock.mockResolvedValue({ exists: () => true, data: () => BEDRIJFSGEGEVENS_FIXTURE });
 }
 
 function renderShell() {
@@ -107,6 +125,8 @@ function renderShell() {
 beforeEach(() => {
   getDocsMock.mockReset();
   addDocMock.mockReset();
+  getDocMock.mockReset();
+  setDocMock.mockReset();
 });
 
 describe('BeheerShell', () => {
@@ -277,5 +297,31 @@ describe('BeheerShell', () => {
     screen.getByTestId('beheer-nav-prijsgroepen').click();
     expect(await screen.findByTestId('prijsgroepen-section')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-pg-1')).toHaveTextContent('Standaard');
+  });
+
+  it('shows the Glassart & Design section with the loaded bedrijfsgegevens when the nav item is clicked', async () => {
+    mockCollections();
+    renderShell();
+    screen.getByTestId('beheer-nav-glassartDesign').click();
+    expect(await screen.findByTestId('glassart-design-section')).toBeInTheDocument();
+    expect(screen.getByTestId('glassart-design-bezoekadres')).toHaveValue('Den Heuvel 21, 5688 EM Oirschot');
+  });
+
+  it('saves bedrijfsgegevens through setDoc and logs bedrijfsgegevens_gewijzigd', async () => {
+    mockCollections();
+    setDocMock.mockResolvedValue(undefined);
+    renderShell();
+    screen.getByTestId('beheer-nav-glassartDesign').click();
+    await screen.findByTestId('glassart-design-section');
+    fireEvent.change(screen.getByTestId('glassart-design-email'), {
+      target: { value: 'nieuw@glassartdesign.nl' },
+    });
+    fireEvent.click(screen.getByTestId('glassart-design-opslaan'));
+    await waitFor(() =>
+      expect(setDocMock).toHaveBeenCalledWith(
+        { collectionName: 'instellingen', id: 'bedrijfsgegevens' },
+        expect.objectContaining({ email: 'nieuw@glassartdesign.nl' })
+      )
+    );
   });
 });
