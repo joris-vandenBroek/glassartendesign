@@ -4,24 +4,39 @@ import { NextIntlClientProvider } from 'next-intl';
 import { BeheerNav, type BeheerSection } from '@/components/beheer/BeheerNav';
 import messages from '../../../messages/nl.json';
 
-function renderNav(activeSection: BeheerSection = 'klanten') {
+function renderNav(
+  activeSection: BeheerSection = 'klanten',
+  overrideCounts?: Partial<Record<BeheerSection, number>>
+) {
   const onSelect = vi.fn();
   const onLogout = vi.fn();
+  const defaultCounts = {
+    klantenCount: 3,
+    bestellingenCount: 5,
+    materiaalsoortenCount: 4,
+    materialenCount: 6,
+    matenCount: 2,
+    segmentenCount: 6,
+    kunstwerkenCount: 36,
+    prijsgroepenCount: 9,
+    activiteitCount: 12,
+  };
+  const counts = { ...defaultCounts, ...overrideCounts };
   render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <BeheerNav
         activeSection={activeSection}
         onSelect={onSelect}
         onLogout={onLogout}
-        klantenCount={3}
-        bestellingenCount={5}
-        materiaalsoortenCount={4}
-        materialenCount={6}
-        matenCount={2}
-        segmentenCount={6}
-        kunstwerkenCount={36}
-        prijsgroepenCount={9}
-        activiteitCount={12}
+        klantenCount={counts.klantenCount}
+        bestellingenCount={counts.bestellingenCount}
+        materiaalsoortenCount={counts.materiaalsoortenCount}
+        materialenCount={counts.materialenCount}
+        matenCount={counts.matenCount}
+        segmentenCount={counts.segmentenCount}
+        kunstwerkenCount={counts.kunstwerkenCount}
+        prijsgroepenCount={counts.prijsgroepenCount}
+        activiteitCount={counts.activiteitCount}
       />
     </NextIntlClientProvider>
   );
@@ -74,5 +89,11 @@ describe('BeheerNav', () => {
     const { onLogout } = renderNav();
     fireEvent.click(screen.getByTestId('beheer-nav-logout'));
     expect(onLogout).toHaveBeenCalled();
+  });
+
+  it('renders a badge with count of 0', () => {
+    renderNav('materiaalsoorten', { materiaalsoortenCount: 0 });
+    const item = screen.getByTestId('beheer-nav-materiaalsoorten');
+    expect(item).toHaveTextContent('0');
   });
 });
