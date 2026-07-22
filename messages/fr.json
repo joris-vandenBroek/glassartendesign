@@ -182,9 +182,6 @@
   },
   "accountPage": {
     "navOrders": "Commandes",
-    "navInvoicesDue": "Factures à payer",
-    "navInvoicesPaid": "Factures payées",
-    "navReturns": "Retours",
     "navConversations": "Historique des conversations",
     "navSettings": "Paramètres",
     "logout": "Déconnexion",
@@ -196,33 +193,6 @@
       "modalClose": "Fermer",
       "modalLineUnknown": "Article inconnu",
       "loadError": "Impossible de charger vos commandes. Veuillez réessayer plus tard."
-    },
-    "invoices": {
-      "empty": "Aucune facture trouvée.",
-      "downloadPdf": "Télécharger le PDF",
-      "items": {
-        "invoice1": { "description": "Ensemble hall d'hôtel – 3 panneaux" },
-        "invoice2": { "description": "Panneau abstrait 60x90cm" },
-        "invoice3": { "description": "Projet de bureau – 5 panneaux" },
-        "invoice4": { "description": "Panneau bien-être 40x60cm" },
-        "invoice5": { "description": "Panneau mural restaurant 80x120cm" },
-        "invoice6": { "description": "Jeu de crochets supplémentaires" }
-      }
-    },
-    "returns": {
-      "selectOrderLabel": "Sélectionnez une commande",
-      "reasonLabel": "Motif",
-      "reasonDamaged": "Endommagé",
-      "reasonNotAsExpected": "Ne correspond pas aux attentes",
-      "reasonWrongOrder": "Commandé par erreur",
-      "reasonOther": "Autre",
-      "noteLabel": "Remarque",
-      "submit": "Signaler pour retour",
-      "confirmationTitle": "Retour enregistré",
-      "confirmationMessage": "Nous vous contacterons pour la suite.",
-      "noEligibleOrders": "Aucune commande n'est disponible pour un retour.",
-      "existingReturnsTitle": "Retours signalés précédemment",
-      "statusRegistered": "Retour enregistré"
     },
     "conversations": {
       "empty": "Aucune conversation trouvée.",

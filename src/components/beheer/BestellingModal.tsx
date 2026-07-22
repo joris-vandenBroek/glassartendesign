@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Modal } from '@/components/Modal';
-import { formatCurrency } from '@/data/mockAdminInvoices';
+import { formatCurrency } from '@/lib/formatCurrency';
 import type { Bestelling } from './BestellingenSection';
 import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './materiaalTypes';
 

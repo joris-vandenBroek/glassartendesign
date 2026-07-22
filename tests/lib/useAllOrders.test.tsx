@@ -1,7 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { ReturnsProvider, useReturns } from '@/lib/useReturns';
 import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import { useAllOrders } from '@/lib/useAllOrders';
 import messages from '../../messages/nl.json';
@@ -72,9 +71,7 @@ function signedInWithOrder(overrides: Record<string, unknown> = {}) {
 function wrapper({ children }: { children: React.ReactNode }) {
   return (
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <CustomerAuthProvider>
-        <ReturnsProvider>{children}</ReturnsProvider>
-      </CustomerAuthProvider>
+      <CustomerAuthProvider>{children}</CustomerAuthProvider>
     </NextIntlClientProvider>
   );
 }
@@ -101,7 +98,6 @@ describe('useAllOrders', () => {
     await waitFor(() => expect(result.current.orders).toHaveLength(1));
     expect(result.current.orders[0].id).toBe('GD-00001');
     expect(result.current.orders[0].description).toBe('1 bestelregel, totaal 3 stuks');
-    expect(result.current.orders[0].hasReturnRequest).toBe(false);
     expect(result.current.loadError).toBe(false);
   });
 
@@ -124,21 +120,5 @@ describe('useAllOrders', () => {
     const { result } = renderHook(() => useAllOrders(), { wrapper });
     await waitFor(() => expect(result.current.loadError).toBe(true));
     expect(result.current.orders).toHaveLength(0);
-  });
-
-  it('marks an order as having a return request once one is registered', async () => {
-    signedInWithOrder();
-
-    const { result } = renderHook(
-      () => ({ orders: useAllOrders().orders, registerReturn: useReturns().registerReturn }),
-      { wrapper }
-    );
-    await waitFor(() => expect(result.current.orders).toHaveLength(1));
-
-    act(() => {
-      result.current.registerReturn('GD-00001', 'Beschadigd', 'Kapot aangekomen');
-    });
-    const order = result.current.orders.find((o) => o.id === 'GD-00001');
-    expect(order?.hasReturnRequest).toBe(true);
   });
 });

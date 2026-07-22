@@ -6,7 +6,6 @@ import { NavBar } from '@/components/NavBar';
 import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import { AdminAuthProvider } from '@/lib/useAdminAuth';
 import { CartProvider } from '@/lib/useCart';
-import { ReturnsProvider } from '@/lib/useReturns';
 import { MockProfileProvider } from '@/lib/useMockProfile';
 
 export function generateStaticParams() {
@@ -32,12 +31,10 @@ export default async function LocaleLayout({
       <AdminAuthProvider>
         <CustomerAuthProvider>
           <CartProvider>
-            <ReturnsProvider>
-              <MockProfileProvider>
-                <NavBar />
-                {children}
-              </MockProfileProvider>
-            </ReturnsProvider>
+            <MockProfileProvider>
+              <NavBar />
+              {children}
+            </MockProfileProvider>
           </CartProvider>
         </CustomerAuthProvider>
       </AdminAuthProvider>

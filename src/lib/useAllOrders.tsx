@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { formatOrderDateTime } from '@/lib/formatOrderDateTime';
-import { useReturns } from './useReturns';
 import { useCustomerAuth } from './useCustomerAuth';
 
 export interface DisplayOrderLine {
@@ -22,7 +21,6 @@ export interface DisplayOrder {
   date: string;
   time: string;
   description: string;
-  hasReturnRequest: boolean;
   lines: DisplayOrderLine[] | null;
 }
 
@@ -41,7 +39,6 @@ export interface UseAllOrdersResult {
 
 export function useAllOrders(): UseAllOrdersResult {
   const tAccount = useTranslations('accountPage');
-  const { returnsByOrderId } = useReturns();
   const { user } = useCustomerAuth();
   const [realOrders, setRealOrders] = useState<RealOrder[]>([]);
   const [loadError, setLoadError] = useState(false);
@@ -115,11 +112,10 @@ export function useAllOrders(): UseAllOrdersResult {
           lines: order.lineCount,
           quantity: order.totalQuantity,
         }),
-        hasReturnRequest: Boolean(returnsByOrderId[order.id]),
         lines: order.lines,
       };
     });
-  }, [realOrders, returnsByOrderId, tAccount]);
+  }, [realOrders, tAccount]);
 
   return useMemo(() => ({ orders, loadError }), [orders, loadError]);
 }

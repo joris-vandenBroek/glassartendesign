@@ -14,7 +14,6 @@ function renderNav(activeSection: BeheerSection = 'klanten') {
         onSelect={onSelect}
         onLogout={onLogout}
         klantenCount={3}
-        facturenCount={7}
         bestellingenCount={5}
         materiaalsoortenCount={4}
         materialenCount={6}
@@ -29,12 +28,10 @@ function renderNav(activeSection: BeheerSection = 'klanten') {
 }
 
 describe('BeheerNav', () => {
-  it('renders the 9 active items with their counters, and the 3 disabled placeholder items', () => {
+  it('renders the 8 active items with their counters, and the 2 disabled placeholder items', () => {
     renderNav();
     expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('Klanten');
     expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('3');
-    expect(screen.getByTestId('beheer-nav-facturen')).toHaveTextContent('Facturen');
-    expect(screen.getByTestId('beheer-nav-facturen')).toHaveTextContent('7');
     expect(screen.getByTestId('beheer-nav-bestellingen')).toHaveTextContent('Bestellingen');
     expect(screen.getByTestId('beheer-nav-bestellingen')).toHaveTextContent('5');
     expect(screen.getByTestId('beheer-nav-materiaalsoorten')).toHaveTextContent('Materiaalsoorten');
@@ -47,7 +44,7 @@ describe('BeheerNav', () => {
     expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('Activiteit');
     expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('12');
 
-    ['retouren', 'prijsgroepen', 'glassartDesign'].forEach((id) => {
+    ['prijsgroepen', 'glassartDesign'].forEach((id) => {
       expect(screen.getByTestId(`beheer-nav-${id}`)).toBeDisabled();
     });
   });
