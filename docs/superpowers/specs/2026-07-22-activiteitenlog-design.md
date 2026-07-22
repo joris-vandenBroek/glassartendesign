@@ -69,7 +69,7 @@ match /activiteiten/{id} {
 
 - Nieuw menu-item **Activiteit** in `BeheerNav.tsx`, naast de bestaande actieve items (Klanten, Facturen) — geen aparte rechten nodig, elke medewerker die al bij Beheer mag ziet dit ook.
 - Nieuwe `src/components/beheer/ActiviteitSection.tsx`, gebouwd op de bestaande generieke `DataTable`. Kolommen: **Tijdstip**, **Type** (vertaald label, bv. "Kunstwerk bekeken"), **Klant** (naam), **E-mail**. Standaard gesorteerd op tijdstip, nieuwste eerst.
-- Filter: globale zoekbalk (zoekt op naam/e-mail, bestaand `DataTable`-patroon) + rij quick-filter-links per type (zelfde patroon als de status-quick-filters bij Klanten/Facturen).
+- Filter: globale zoekbalk (zoekt op naam/e-mail/type-label, bestaand `DataTable`-patroon). **Afwijking van het oorspronkelijke ontwerp:** de "quick-filter-links per type" uit de eerste versie van deze sectie zijn tijdens de implementatie niet gebouwd — zie "Niet in scope".
 - **Query-limiet:** in tegenstelling tot Klanten/Facturen (die de hele collectie ophalen) kan `activiteiten` onbegrensd blijven groeien. De sectie haalt daarom alleen de **meest recente 500** documenten op (`orderBy('timestamp', 'desc'), limit(500)`), niet de volledige collectie. Oudere activiteiten blijven gewoon in Firestore staan, maar zijn zonder verdere uitbreiding (paginering/datumfilter) niet zichtbaar in dit scherm — expliciet uitgesteld, zie "Niet in scope".
 
 ## Vertalingen
@@ -83,6 +83,7 @@ Nieuwe sleutels alleen in `messages/nl.json`, in de bestaande (Nederlands-only) 
 - **Paginering/datumfilter voorbij de meest recente 500 activiteiten** — YAGNI voor de huidige schaal; kan later toegevoegd worden als 500 niet meer voldoet.
 - **Actie-specifieke detailvelden** (welk kunstwerk, welk bestelnummer, etc.) — bewust weggelaten, alleen type + wie + wanneer.
 - **Bulk-acties of export** vanuit het Activiteit-scherm.
+- **Quick-filter-links per type.** De bestaande `DataTable`-component ondersteunt alleen een simpele aan/uit-toggle (`StatusQuickFilter`: één actieve waarde vs. "alle"), zoals gebruikt bij Klanten/Facturen — geen meervoudige per-waarde selector voor de 7 activiteit-types. Zo'n uitbreiding zou de gedeelde `DataTable` moeten aanpassen (en daarmee ook Klanten/Facturen/Bestellingen raken, die 'm al gebruiken). Bewust uitgesteld: het vertaalde type-label staat wél als gewone kolomwaarde in elke rij, dus de bestaande globale zoekbalk vindt een activiteit al door het Nederlandse type (bv. "Kunstwerk bekeken") te typen — functioneel gedekt, alleen niet als losse klikbare chips. Besproken en akkoord bevonden (2026-07-22) tijdens de eindreview van de implementatie.
 
 ## Risico's / aandachtspunten
 
