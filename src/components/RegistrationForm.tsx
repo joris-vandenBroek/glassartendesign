@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { createUserWithEmailAndPassword, deleteUser, signOut, type UserCredential } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { logActiviteit, ONBEKENDE_ACTOR } from '@/lib/logActiviteit';
 
 export function RegistrationForm() {
   const t = useTranslations('registrationPage');
@@ -13,6 +14,14 @@ export function RegistrationForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const hasLoggedVisit = useRef(false);
+
+  useEffect(() => {
+    if (!hasLoggedVisit.current) {
+      hasLoggedVisit.current = true;
+      void logActiviteit('word_klant_bezocht', ONBEKENDE_ACTOR);
+    }
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,6 +69,11 @@ export function RegistrationForm() {
         }
         throw setDocError;
       }
+      void logActiviteit('word_klant_aanvraag', {
+        id: credential.user.uid,
+        email,
+        naam: formData.get('companyName') as string,
+      });
       await signOut(auth);
       setIsSubmitted(true);
     } catch (error) {
