@@ -7,6 +7,7 @@ import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from '@/components/be
 import messages from '../../../messages/nl.json';
 
 const updateDocMock = vi.fn();
+const logActiviteitMock = vi.fn();
 
 vi.mock('@/lib/firebase', () => ({
   db: {},
@@ -15,6 +16,18 @@ vi.mock('@/lib/firebase', () => ({
 vi.mock('firebase/firestore', () => ({
   doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
   updateDoc: (...args: unknown[]) => updateDocMock(...args),
+}));
+
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
 }));
 
 const KUNSTWERKEN: Kunstwerk[] = [
@@ -72,6 +85,7 @@ function renderModal(bestelling: Bestelling | null) {
 
 beforeEach(() => {
   updateDocMock.mockReset();
+  logActiviteitMock.mockReset();
 });
 
 describe('BestellingModal', () => {
@@ -134,5 +148,39 @@ describe('BestellingModal', () => {
 
     expect(await screen.findByTestId('bestelling-modal-error')).toBeInTheDocument();
     expect(onUpdated).not.toHaveBeenCalled();
+  });
+
+  it('logs bestelling_goedgekeurd with the logged-in medewerker on approval', async () => {
+    updateDocMock.mockResolvedValue(undefined);
+    renderModal(BESTELLING);
+    fireEvent.click(screen.getByTestId('bestelling-modal-goedkeuren'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('bestelling_goedgekeurd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs bestelling_afgewezen with the logged-in medewerker on rejection', async () => {
+    updateDocMock.mockResolvedValue(undefined);
+    renderModal(BESTELLING);
+    fireEvent.click(screen.getByTestId('bestelling-modal-afwijzen'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('bestelling_afgewezen', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('does not log when updateDoc fails', async () => {
+    updateDocMock.mockRejectedValue(new Error('offline'));
+    renderModal(BESTELLING);
+    fireEvent.click(screen.getByTestId('bestelling-modal-afwijzen'));
+    await screen.findByTestId('bestelling-modal-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });
