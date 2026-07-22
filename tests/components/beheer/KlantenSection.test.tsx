@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { KlantenSection, type Klant } from '@/components/beheer/KlantenSection';
+import type { Prijsgroep } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
 
 const updateDocMock = vi.fn();
@@ -40,7 +41,7 @@ const KLANTEN: Klant[] = [
     postcode: '1234 AB',
     city: 'Teststad',
     status: 'Beoordelen',
-    prijsgroep: '',
+    prijsgroepId: null,
   },
   {
     id: 'uid-2',
@@ -54,15 +55,26 @@ const KLANTEN: Klant[] = [
     postcode: '4321 BA',
     city: 'Anderstad',
     status: 'Goedgekeurd',
-    prijsgroep: 'Standaard',
+    prijsgroepId: 'pg-1',
   },
+];
+
+const PRIJSGROEPEN: Prijsgroep[] = [
+  { id: 'pg-1', naam: 'Standaard', kortingspercentage: 0 },
+  { id: 'pg-2', naam: 'Premium', kortingspercentage: 10 },
 ];
 
 function renderSection(overrides: Partial<React.ComponentProps<typeof KlantenSection>> = {}) {
   const onKlantUpdated = vi.fn();
   render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <KlantenSection klanten={KLANTEN} loadError={null} onKlantUpdated={onKlantUpdated} {...overrides} />
+      <KlantenSection
+        klanten={KLANTEN}
+        prijsgroepen={PRIJSGROEPEN}
+        loadError={null}
+        onKlantUpdated={onKlantUpdated}
+        {...overrides}
+      />
     </NextIntlClientProvider>
   );
   return { onKlantUpdated };
@@ -107,11 +119,11 @@ describe('KlantenSection', () => {
     updateDocMock.mockResolvedValue(undefined);
     const { onKlantUpdated } = renderSection();
     fireEvent.click(screen.getByTestId('data-table-row-uid-1'));
-    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'Premium' } });
+    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'pg-2' } });
     fireEvent.click(screen.getByTestId('klant-modal-goedkeuren'));
 
     await waitFor(() =>
-      expect(onKlantUpdated).toHaveBeenCalledWith({ ...KLANTEN[0], status: 'Goedgekeurd', prijsgroep: 'Premium' })
+      expect(onKlantUpdated).toHaveBeenCalledWith({ ...KLANTEN[0], status: 'Goedgekeurd', prijsgroepId: 'pg-2' })
     );
     await waitFor(() => expect(screen.queryByTestId('klant-modal')).not.toBeInTheDocument());
   });

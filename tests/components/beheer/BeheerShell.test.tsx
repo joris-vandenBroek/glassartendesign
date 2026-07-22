@@ -54,7 +54,7 @@ const KLANT_DATA = {
   postcode: '1234 AB',
   city: 'Teststad',
   status: 'Beoordelen',
-  prijsgroep: '',
+  prijsgroepId: null,
 };
 
 // Non-empty by default so the auto-seed path never triggers in these

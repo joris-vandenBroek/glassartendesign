@@ -57,7 +57,7 @@ export function RegistrationForm() {
           invoicePostcode: (formData.get('invoicePostcode') as string) || '',
           invoiceCity: (formData.get('invoiceCity') as string) || '',
           status: 'Beoordelen',
-          prijsgroep: '',
+          prijsgroepId: null,
           createdAt: serverTimestamp(),
         });
       } catch (setDocError) {

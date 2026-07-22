@@ -25,10 +25,14 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));
     }
+    match /prijsgroepen/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));
+    }
     match /klanten/{uid} {
       allow create: if request.auth != null && request.auth.uid == uid &&
         request.resource.data.status == 'Beoordelen' &&
-        request.resource.data.prijsgroep == '';
+        request.resource.data.prijsgroepId == null;
       allow read: if request.auth != null &&
         (request.auth.uid == uid || exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
       allow update: if request.auth != null && exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid));

@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { KlantModal } from '@/components/beheer/KlantModal';
 import type { Klant } from '@/components/beheer/KlantenSection';
+import type { Prijsgroep } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
 
 const updateDocMock = vi.fn();
@@ -41,15 +42,20 @@ const KLANT: Klant = {
   postcode: '1234 AB',
   city: 'Teststad',
   status: 'Beoordelen',
-  prijsgroep: '',
+  prijsgroepId: null,
 };
 
-function renderModal(klant: Klant | null) {
+const PRIJSGROEPEN: Prijsgroep[] = [
+  { id: 'pg-1', naam: 'Standaard', kortingspercentage: 0 },
+  { id: 'pg-2', naam: 'Premium', kortingspercentage: 10 },
+];
+
+function renderModal(klant: Klant | null, prijsgroepen: Prijsgroep[] | null = PRIJSGROEPEN) {
   const onClose = vi.fn();
   const onUpdated = vi.fn();
   render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <KlantModal klant={klant} onClose={onClose} onUpdated={onUpdated} />
+      <KlantModal klant={klant} prijsgroepen={prijsgroepen} onClose={onClose} onUpdated={onUpdated} />
     </NextIntlClientProvider>
   );
   return { onClose, onUpdated };
@@ -66,34 +72,42 @@ describe('KlantModal', () => {
     expect(screen.queryByTestId('klant-modal')).not.toBeInTheDocument();
   });
 
-  it('shows the klant details and pre-fills the prijsgroep field', () => {
-    renderModal({ ...KLANT, prijsgroep: 'Standaard' });
+  it('shows the klant details and pre-selects the prijsgroep dropdown', () => {
+    renderModal({ ...KLANT, prijsgroepId: 'pg-1' });
     expect(screen.getByTestId('klant-modal')).toHaveTextContent('Testbedrijf BV');
     expect(screen.getByTestId('klant-modal')).toHaveTextContent('12345678');
-    expect(screen.getByTestId('klant-modal-prijsgroep')).toHaveValue('Standaard');
+    expect(screen.getByTestId('klant-modal-prijsgroep')).toHaveValue('pg-1');
   });
 
-  it('disables Goedkeuren until a prijsgroep is filled in', () => {
+  it('disables Goedkeuren until a prijsgroep is selected', () => {
     renderModal(KLANT);
     expect(screen.getByTestId('klant-modal-goedkeuren')).toBeDisabled();
-    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'Standaard' } });
+    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'pg-1' } });
     expect(screen.getByTestId('klant-modal-goedkeuren')).not.toBeDisabled();
+  });
+
+  it('lists every prijsgroep as a dropdown option', () => {
+    renderModal(KLANT);
+    const options = screen.getByTestId('klant-modal-prijsgroep').querySelectorAll('option');
+    expect(Array.from(options).map((option) => option.textContent)).toEqual(
+      expect.arrayContaining(['Standaard', 'Premium'])
+    );
   });
 
   it('approves the klant and calls onUpdated with the updated klant', async () => {
     updateDocMock.mockResolvedValue(undefined);
     const { onUpdated } = renderModal(KLANT);
-    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'Premium' } });
+    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'pg-2' } });
     fireEvent.click(screen.getByTestId('klant-modal-goedkeuren'));
 
     await waitFor(() =>
       expect(updateDocMock).toHaveBeenCalledWith(
         { collectionName: 'klanten', id: 'uid-1' },
-        { status: 'Goedgekeurd', prijsgroep: 'Premium' }
+        { status: 'Goedgekeurd', prijsgroepId: 'pg-2' }
       )
     );
     await waitFor(() =>
-      expect(onUpdated).toHaveBeenCalledWith({ ...KLANT, status: 'Goedgekeurd', prijsgroep: 'Premium' })
+      expect(onUpdated).toHaveBeenCalledWith({ ...KLANT, status: 'Goedgekeurd', prijsgroepId: 'pg-2' })
     );
   });
 
@@ -123,7 +137,7 @@ describe('KlantModal', () => {
   it('logs klant_goedgekeurd with the logged-in medewerker on approval', async () => {
     updateDocMock.mockResolvedValue(undefined);
     renderModal(KLANT);
-    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'Premium' } });
+    fireEvent.change(screen.getByTestId('klant-modal-prijsgroep'), { target: { value: 'pg-2' } });
     fireEvent.click(screen.getByTestId('klant-modal-goedkeuren'));
     await waitFor(() =>
       expect(logActiviteitMock).toHaveBeenCalledWith('klant_goedgekeurd', {

@@ -8,22 +8,24 @@ import { Modal } from '@/components/Modal';
 import { useAdminAuth } from '@/lib/useAdminAuth';
 import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import type { Klant } from './KlantenSection';
+import type { Prijsgroep } from './materiaalTypes';
 
 interface KlantModalProps {
   klant: Klant | null;
+  prijsgroepen: Prijsgroep[] | null;
   onClose: () => void;
   onUpdated: (klant: Klant) => void;
 }
 
-export function KlantModal({ klant, onClose, onUpdated }: KlantModalProps) {
+export function KlantModal({ klant, prijsgroepen, onClose, onUpdated }: KlantModalProps) {
   const t = useTranslations('beheer');
-  const [prijsgroep, setPrijsgroep] = useState('');
+  const [prijsgroepId, setPrijsgroepId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { user } = useAdminAuth();
 
   useEffect(() => {
     if (klant) {
-      setPrijsgroep(klant.prijsgroep);
+      setPrijsgroepId(klant.prijsgroepId ?? '');
       setError(null);
     }
   }, [klant]);
@@ -31,9 +33,9 @@ export function KlantModal({ klant, onClose, onUpdated }: KlantModalProps) {
   async function handleGoedkeuren() {
     if (!klant) return;
     try {
-      await updateDoc(doc(db, 'klanten', klant.id), { status: 'Goedgekeurd', prijsgroep });
+      await updateDoc(doc(db, 'klanten', klant.id), { status: 'Goedgekeurd', prijsgroepId });
       void logActiviteit('klant_goedgekeurd', actorFromMedewerker(user));
-      onUpdated({ ...klant, status: 'Goedgekeurd', prijsgroep });
+      onUpdated({ ...klant, status: 'Goedgekeurd', prijsgroepId });
     } catch {
       setError(t('klantenActionError'));
     }
@@ -70,13 +72,21 @@ export function KlantModal({ klant, onClose, onUpdated }: KlantModalProps) {
 
           <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
             {t('klantenLabelPrijsgroep')}
-            <input
-              type="text"
-              value={prijsgroep}
-              onChange={(event) => setPrijsgroep(event.target.value)}
+            <select
+              value={prijsgroepId}
+              onChange={(event) => setPrijsgroepId(event.target.value)}
               data-testid="klant-modal-prijsgroep"
               className="rounded-sm bg-black/40 px-3 py-2 text-sm text-white"
-            />
+            >
+              <option value="" disabled>
+                {t('klantenLabelPrijsgroep')}
+              </option>
+              {(prijsgroepen ?? []).map((prijsgroep) => (
+                <option key={prijsgroep.id} value={prijsgroep.id}>
+                  {prijsgroep.naam}
+                </option>
+              ))}
+            </select>
           </label>
 
           {error && (
@@ -89,7 +99,7 @@ export function KlantModal({ klant, onClose, onUpdated }: KlantModalProps) {
             <button
               type="button"
               onClick={handleGoedkeuren}
-              disabled={!prijsgroep}
+              disabled={!prijsgroepId}
               data-testid="klant-modal-goedkeuren"
               className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink disabled:opacity-40"
             >

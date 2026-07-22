@@ -59,7 +59,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
               postcode: data.postcode,
               city: data.city,
               status: data.status,
-              prijsgroep: data.prijsgroep,
+              prijsgroepId: data.prijsgroepId,
             } as Klant;
           })
         );
@@ -238,7 +238,12 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
       </GlassPanel>
       <GlassPanel className="w-full !max-w-none">
         {activeSection === 'klanten' ? (
-          <KlantenSection klanten={klanten} loadError={loadError} onKlantUpdated={handleKlantUpdated} />
+          <KlantenSection
+            klanten={klanten}
+            prijsgroepen={prijsgroepen.items}
+            loadError={loadError}
+            onKlantUpdated={handleKlantUpdated}
+          />
         ) : activeSection === 'bestellingen' ? (
           <BestellingenSection
             bestellingen={bestellingen}
@@ -303,6 +308,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
         ) : activeSection === 'prijsgroepen' ? (
           <PrijsgroepenSection
             prijsgroepen={prijsgroepen.items}
+            klanten={klanten}
             loadError={prijsgroepen.error === 'load' ? t('prijsgroepenLoadError') : null}
             onAdd={prijsgroepen.add}
             onUpdate={prijsgroepen.update}

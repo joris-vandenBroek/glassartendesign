@@ -165,7 +165,7 @@ describe('RegistrationForm', () => {
         postcode: '1234 AB',
         city: 'Teststad',
         status: 'Beoordelen',
-        prijsgroep: '',
+        prijsgroepId: null,
       })
     );
     expect(signOutMock).toHaveBeenCalledWith({});

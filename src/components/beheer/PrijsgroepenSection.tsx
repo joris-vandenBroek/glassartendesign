@@ -7,9 +7,11 @@ import { Modal } from '@/components/Modal';
 import { useAdminAuth } from '@/lib/useAdminAuth';
 import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import type { Prijsgroep } from './materiaalTypes';
+import type { Klant } from './KlantenSection';
 
 interface PrijsgroepenSectionProps {
   prijsgroepen: Prijsgroep[] | null;
+  klanten: Klant[] | null;
   loadError: string | null;
   onAdd: (data: Omit<Prijsgroep, 'id'>) => Promise<boolean>;
   onUpdate: (id: string, data: Omit<Prijsgroep, 'id'>) => Promise<boolean>;
@@ -20,6 +22,7 @@ type ModalState = { mode: 'add' } | { mode: 'edit'; prijsgroep: Prijsgroep } | n
 
 export function PrijsgroepenSection({
   prijsgroepen,
+  klanten,
   loadError,
   onAdd,
   onUpdate,
@@ -80,6 +83,11 @@ export function PrijsgroepenSection({
 
   async function handleRemove() {
     if (modalState?.mode !== 'edit') return;
+    const inUse = (klanten ?? []).some((klant) => klant.prijsgroepId === modalState.prijsgroep.id);
+    if (inUse) {
+      setActionError(t('prijsgroepenVerwijderBlocked'));
+      return;
+    }
     const success = await onRemove(modalState.prijsgroep.id);
     if (success) {
       void logActiviteit('prijsgroep_verwijderd', actorFromMedewerker(user));

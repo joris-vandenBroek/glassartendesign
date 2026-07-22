@@ -32,6 +32,7 @@ function renderSection(overrides: Partial<React.ComponentProps<typeof Prijsgroep
     <NextIntlClientProvider locale="nl" messages={messages}>
       <PrijsgroepenSection
         prijsgroepen={PRIJSGROEPEN}
+        klanten={[]}
         loadError={null}
         onAdd={onAdd}
         onUpdate={onUpdate}
@@ -128,5 +129,26 @@ describe('PrijsgroepenSection', () => {
       'Er is iets misgegaan. Probeer het opnieuw.'
     );
     expect(logActiviteitMock).not.toHaveBeenCalled();
+  });
+
+  it('blocks deleting a prijsgroep that is still assigned to a klant', async () => {
+    const { onRemove } = renderSection({
+      klanten: [{ id: 'uid-1', prijsgroepId: 'pg-1' } as never],
+    });
+    fireEvent.click(screen.getByTestId('data-table-row-pg-1'));
+    fireEvent.click(screen.getByTestId('prijsgroep-modal-verwijderen'));
+    expect(await screen.findByTestId('prijsgroep-modal-error')).toHaveTextContent(
+      'Deze prijsgroep is nog aan een klant toegewezen en kan niet verwijderd worden.'
+    );
+    expect(onRemove).not.toHaveBeenCalled();
+  });
+
+  it('deletes a prijsgroep no klant has assigned', async () => {
+    const { onRemove } = renderSection({
+      klanten: [{ id: 'uid-1', prijsgroepId: 'pg-2' } as never],
+    });
+    fireEvent.click(screen.getByTestId('data-table-row-pg-1'));
+    fireEvent.click(screen.getByTestId('prijsgroep-modal-verwijderen'));
+    await waitFor(() => expect(onRemove).toHaveBeenCalledWith('pg-1'));
   });
 });
