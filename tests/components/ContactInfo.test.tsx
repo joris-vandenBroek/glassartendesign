@@ -119,9 +119,18 @@ describe('ContactInfo', () => {
     expect(screen.getByText(/IBAN/)).toBeInTheDocument();
   });
 
-  it('renders nothing while the document has not loaded yet', () => {
+  it('renders the seed data immediately as a fallback while the real document is still loading', () => {
     getDocMock.mockReturnValue(new Promise(() => {}));
     renderWithIntl(<ContactInfo />, 'nl', messages);
-    expect(screen.queryByTestId('contact-address')).not.toBeInTheDocument();
+    expect(screen.getByTestId('contact-address')).toHaveTextContent(
+      BEDRIJFSGEGEVENS.bezoekadres
+    );
+  });
+
+  it('never attempts to seed the document from the public contact page', async () => {
+    mockDoc(BEDRIJFSGEGEVENS);
+    renderWithIntl(<ContactInfo />, 'nl', messages);
+    await screen.findByTestId('contact-address');
+    expect(setDocMock).not.toHaveBeenCalled();
   });
 });

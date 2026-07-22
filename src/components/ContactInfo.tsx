@@ -13,25 +13,20 @@ function vertaling(tekst: Record<Taal, string>, locale: string): string {
 export function ContactInfo() {
   const t = useTranslations('contactPage');
   const locale = useLocale();
-  const { data } = useFirestoreDocument<Bedrijfsgegevens>('instellingen', 'bedrijfsgegevens', {
-    seed: BEDRIJFSGEGEVENS_SEED,
-  });
-
-  if (!data) {
-    return null;
-  }
+  const { data } = useFirestoreDocument<Bedrijfsgegevens>('instellingen', 'bedrijfsgegevens');
+  const bedrijfsgegevens = data ?? BEDRIJFSGEGEVENS_SEED;
 
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    data.bezoekadres
+    bedrijfsgegevens.bezoekadres
   )}`;
-  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(data.bezoekadres)}&output=embed`;
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(bedrijfsgegevens.bezoekadres)}&output=embed`;
 
   return (
     <div className="flex flex-col gap-6 text-sm text-white/80">
       <div>
         <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('visitLabel')}</p>
         <p data-testid="contact-address" className="mt-2">
-          {data.bezoekadres}
+          {bedrijfsgegevens.bezoekadres}
         </p>
         <a
           href={directionsUrl}
@@ -53,7 +48,7 @@ export function ContactInfo() {
 
       <div>
         <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('contactsLabel')}</p>
-        {data.contactpersonen.map((persoon, index) => (
+        {bedrijfsgegevens.contactpersonen.map((persoon, index) => (
           <p key={persoon.id} className={index === 0 ? 'mt-2' : 'mt-3'} data-testid={`contact-person-${index}`}>
             <strong className="text-white">{persoon.naam}</strong> — {vertaling(persoon.rol, locale)}
             <br />
@@ -71,17 +66,17 @@ export function ContactInfo() {
       <div>
         <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('emailLabel')}</p>
         <a
-          href={`mailto:${data.email}`}
+          href={`mailto:${bedrijfsgegevens.email}`}
           data-testid="contact-email"
           className="mt-2 inline-block underline decoration-white/30"
         >
-          {data.email}
+          {bedrijfsgegevens.email}
         </a>
       </div>
 
       <div>
         <a
-          href={`https://wa.me/${data.whatsappNummer}`}
+          href={`https://wa.me/${bedrijfsgegevens.whatsappNummer}`}
           target="_blank"
           rel="noopener noreferrer"
           data-testid="contact-whatsapp"
@@ -93,17 +88,17 @@ export function ContactInfo() {
 
       <div>
         <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('hoursLabel')}</p>
-        <p className="mt-2">{vertaling(data.openingstijden, locale)}</p>
+        <p className="mt-2">{vertaling(bedrijfsgegevens.openingstijden, locale)}</p>
       </div>
 
       <div>
         <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('companyLabel')}</p>
         <p className="mt-2">
-          {t('kvkLabel')}: {data.kvkNummer}
+          {t('kvkLabel')}: {bedrijfsgegevens.kvkNummer}
           <br />
-          {t('btwLabel')}: {data.btwNummer}
+          {t('btwLabel')}: {bedrijfsgegevens.btwNummer}
           <br />
-          {t('ibanLabel')}: {data.iban}
+          {t('ibanLabel')}: {bedrijfsgegevens.iban}
         </p>
       </div>
     </div>
