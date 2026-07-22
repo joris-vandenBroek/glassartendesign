@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Modal } from '@/components/Modal';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import type { Klant } from './KlantenSection';
 
 interface KlantModalProps {
@@ -17,6 +19,7 @@ export function KlantModal({ klant, onClose, onUpdated }: KlantModalProps) {
   const t = useTranslations('beheer');
   const [prijsgroep, setPrijsgroep] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAdminAuth();
 
   useEffect(() => {
     if (klant) {
@@ -29,6 +32,7 @@ export function KlantModal({ klant, onClose, onUpdated }: KlantModalProps) {
     if (!klant) return;
     try {
       await updateDoc(doc(db, 'klanten', klant.id), { status: 'Goedgekeurd', prijsgroep });
+      void logActiviteit('klant_goedgekeurd', actorFromMedewerker(user));
       onUpdated({ ...klant, status: 'Goedgekeurd', prijsgroep });
     } catch {
       setError(t('klantenActionError'));
@@ -39,6 +43,7 @@ export function KlantModal({ klant, onClose, onUpdated }: KlantModalProps) {
     if (!klant) return;
     try {
       await updateDoc(doc(db, 'klanten', klant.id), { status: 'Afgewezen' });
+      void logActiviteit('klant_afgewezen', actorFromMedewerker(user));
       onUpdated({ ...klant, status: 'Afgewezen' });
     } catch {
       setError(t('klantenActionError'));

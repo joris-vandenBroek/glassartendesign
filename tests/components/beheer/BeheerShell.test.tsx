@@ -24,6 +24,18 @@ vi.mock('firebase/firestore', () => ({
   limit: vi.fn(),
 }));
 
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: vi.fn(),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
+
 function makeSnapshot(docsData: Array<{ id: string; data: Record<string, unknown> }>) {
   return {
     empty: docsData.length === 0,
