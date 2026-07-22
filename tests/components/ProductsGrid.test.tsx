@@ -1,23 +1,43 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { ProductsGrid } from '@/components/ProductsGrid';
 import { CartProvider } from '@/lib/useCart';
+import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import messages from '../../messages/nl.json';
 
 const getDocsMock = vi.fn();
+const getDocMock = vi.fn();
+const onAuthStateChangedMock = vi.fn();
+const logActiviteitMock = vi.fn();
 
 vi.mock('@/lib/firebase', () => ({
   db: {},
+  auth: {},
+}));
+
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: (...args: unknown[]) => onAuthStateChangedMock(...args),
 }));
 
 vi.mock('firebase/firestore', () => ({
   collection: vi.fn((_db, name) => ({ name })),
   doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
   getDocs: (...args: unknown[]) => getDocsMock(...args),
+  getDoc: (...args: unknown[]) => getDocMock(...args),
   addDoc: vi.fn(),
   updateDoc: vi.fn(),
   deleteDoc: vi.fn(),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromCustomer: (
+    user: { uid: string; email: string | null; companyName: string | null; contactPerson: string | null } | null
+  ) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.companyName ?? user.contactPerson ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
 }));
 
 function makeSnapshot(docsData: Array<{ id: string; data: Record<string, unknown> }>) {
@@ -95,16 +115,26 @@ function mockCollections() {
 function renderProductsGrid() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <CartProvider>
-        <ProductsGrid />
-      </CartProvider>
+      <CustomerAuthProvider>
+        <CartProvider>
+          <ProductsGrid />
+        </CartProvider>
+      </CustomerAuthProvider>
     </NextIntlClientProvider>
   );
 }
 
 beforeEach(() => {
   getDocsMock.mockReset();
+  getDocMock.mockReset();
+  onAuthStateChangedMock.mockReset();
+  logActiviteitMock.mockReset();
   mockCollections();
+  getDocMock.mockResolvedValue({ exists: () => false });
+  onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+    callback(null);
+    return () => {};
+  });
 });
 
 describe('ProductsGrid', () => {
@@ -172,5 +202,35 @@ describe('ProductsGrid', () => {
     renderProductsGrid();
     await screen.findAllByTestId('product-card');
     expect(screen.getAllByTestId('watermark-overlay').length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('logs kunstwerk_bekeken with the logged-in klant when a card is clicked', async () => {
+    getDocMock.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ status: 'Goedgekeurd', companyName: 'Testbedrijf BV' }),
+    });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-1', email: 'klant@example.com' });
+      return () => {};
+    });
+    renderProductsGrid();
+    const cards = await screen.findAllByTestId('product-card');
+    await waitFor(() => expect(getDocMock).toHaveBeenCalled());
+    fireEvent.click(cards[0]);
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('kunstwerk_bekeken', {
+        id: 'uid-1',
+        email: 'klant@example.com',
+        naam: 'Testbedrijf BV',
+      })
+    );
+  });
+
+  it('does not log kunstwerk_bekeken for an anonymous visitor', async () => {
+    renderProductsGrid();
+    const cards = await screen.findAllByTestId('product-card');
+    fireEvent.click(cards[0]);
+    expect(screen.getByTestId('product-modal')).toBeInTheDocument();
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

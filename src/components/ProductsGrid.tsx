@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
 import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
+import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';
 import { WatermarkedImage } from './WatermarkedImage';
 import { ProductModal } from './ProductModal';
 import type { Segment, Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materiaalTypes';
@@ -15,6 +17,7 @@ export function ProductsGrid() {
   const tCollections = useTranslations('collectionsPage');
   const [activeFilter, setActiveFilter] = useState(ALL_FILTER);
   const [selectedKunstwerk, setSelectedKunstwerk] = useState<Kunstwerk | null>(null);
+  const { user } = useCustomerAuth();
 
   const segmenten = useFirestoreCollection<Segment>('segmenten');
   const kunstwerken = useFirestoreCollection<Kunstwerk>('kunstwerken');
@@ -36,6 +39,13 @@ export function ProductsGrid() {
     return isActive
       ? 'rounded-full bg-silver px-4 py-1.5 text-xs font-head tracking-wide text-ink'
       : 'rounded-full border border-white/20 px-4 py-1.5 text-xs font-head tracking-wide text-white/70 hover:border-gold/40 hover:text-gold';
+  }
+
+  function handleSelect(kunstwerk: Kunstwerk) {
+    setSelectedKunstwerk(kunstwerk);
+    if (user) {
+      void logActiviteit('kunstwerk_bekeken', actorFromCustomer(user));
+    }
   }
 
   return (
@@ -78,13 +88,13 @@ export function ProductsGrid() {
               role="button"
               tabIndex={0}
               aria-label={omschrijving}
-              onClick={() => setSelectedKunstwerk(kunstwerk)}
+              onClick={() => handleSelect(kunstwerk)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   if (event.key === ' ') {
                     event.preventDefault();
                   }
-                  setSelectedKunstwerk(kunstwerk);
+                  handleSelect(kunstwerk);
                 }
               }}
               className="group relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:-translate-y-1"
