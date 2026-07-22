@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
 import { useKunstwerkFotoUpload } from '@/lib/useKunstwerkFotoUpload';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import type { Kunstwerk, Segment, Materiaal, Maat, PrijsRegel } from './materiaalTypes';
 
 interface KunstwerkenSectionProps {
@@ -54,6 +56,7 @@ export function KunstwerkenSection({
 }: KunstwerkenSectionProps) {
   const t = useTranslations('beheer');
   const { uploading, error: fotoUploadError, upload } = useKunstwerkFotoUpload();
+  const { user } = useAdminAuth();
   const [modalState, setModalState] = useState<ModalState>(null);
   const [foto, setFoto] = useState(LEGE_FORM.foto);
   const [segmentIds, setSegmentIds] = useState<string[]>(LEGE_FORM.segmentIds);
@@ -173,6 +176,10 @@ export function KunstwerkenSection({
     };
     const success = modalState.mode === 'add' ? await onAdd(data) : await onUpdate(modalState.kunstwerk.id, data);
     if (success) {
+      void logActiviteit(
+        modalState.mode === 'add' ? 'kunstwerk_toegevoegd' : 'kunstwerk_gewijzigd',
+        actorFromMedewerker(user)
+      );
       closeModal();
     } else {
       setActionError(t('kunstwerkenActionError'));
@@ -183,6 +190,7 @@ export function KunstwerkenSection({
     if (modalState?.mode !== 'edit') return;
     const success = await onRemove(modalState.kunstwerk.id);
     if (success) {
+      void logActiviteit('kunstwerk_verwijderd', actorFromMedewerker(user));
       closeModal();
     } else {
       setActionError(t('kunstwerkenActionError'));
