@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import type { Segment } from './materiaalTypes';
 
 interface SegmentenSectionProps {
@@ -21,6 +23,7 @@ export function SegmentenSection({ segmenten, loadError, onAdd, onUpdate, onRemo
   const [modalState, setModalState] = useState<ModalState>(null);
   const [omschrijving, setOmschrijving] = useState('');
   const [actionError, setActionError] = useState<string | null>(null);
+  const { user } = useAdminAuth();
 
   if (loadError) {
     return (
@@ -57,6 +60,10 @@ export function SegmentenSection({ segmenten, loadError, onAdd, onUpdate, onRemo
         ? await onAdd({ omschrijving })
         : await onUpdate(modalState.segment.id, { omschrijving });
     if (success) {
+      void logActiviteit(
+        modalState.mode === 'add' ? 'segment_toegevoegd' : 'segment_gewijzigd',
+        actorFromMedewerker(user)
+      );
       closeModal();
     } else {
       setActionError(t('segmentenActionError'));
@@ -67,6 +74,7 @@ export function SegmentenSection({ segmenten, loadError, onAdd, onUpdate, onRemo
     if (modalState?.mode !== 'edit') return;
     const success = await onRemove(modalState.segment.id);
     if (success) {
+      void logActiviteit('segment_verwijderd', actorFromMedewerker(user));
       closeModal();
     } else {
       setActionError(t('segmentenActionError'));
