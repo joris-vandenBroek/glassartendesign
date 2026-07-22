@@ -262,6 +262,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           <MaterialenSection
             materialen={materialen.items}
             materiaalsoorten={materiaalsoorten.items}
+            kunstwerken={kunstwerken.items}
             loadError={materialen.error === 'load' ? t('materialenLoadError') : null}
             onAdd={materialen.add}
             onUpdate={materialen.update}
