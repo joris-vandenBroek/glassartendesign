@@ -310,6 +310,7 @@
     "materiaalsoortenVerwijderen": "Verwijderen",
     "materiaalsoortenVerwijderBlocked": "Deze materiaalsoort is nog gekoppeld aan materialen en kan niet verwijderd worden.",
     "materialenVerwijderBlocked": "Dit materiaal is nog gekoppeld aan een kunstwerk en kan niet verwijderd worden.",
+    "matenVerwijderBlocked": "Deze maat is nog gekoppeld aan een kunstwerk en kan niet verwijderd worden.",
     "materialenLoadError": "Kon de materialen niet laden. Probeer de pagina te verversen.",
     "materialenActionError": "Er is iets misgegaan. Probeer het opnieuw.",
     "materialenEmpty": "Geen materialen gevonden.",

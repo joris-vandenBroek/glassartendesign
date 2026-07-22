@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
-import type { Maat } from './materiaalTypes';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
+import type { Maat, Kunstwerk } from './materiaalTypes';
 
 interface MatenSectionProps {
   maten: Maat[] | null;
+  kunstwerken: Kunstwerk[] | null;
   loadError: string | null;
   onAdd: (data: Omit<Maat, 'id'>) => Promise<boolean>;
   onUpdate: (id: string, data: Omit<Maat, 'id'>) => Promise<boolean>;
@@ -16,8 +19,9 @@ interface MatenSectionProps {
 
 type ModalState = { mode: 'add' } | { mode: 'edit'; maat: Maat } | null;
 
-export function MatenSection({ maten, loadError, onAdd, onUpdate, onRemove }: MatenSectionProps) {
+export function MatenSection({ maten, kunstwerken, loadError, onAdd, onUpdate, onRemove }: MatenSectionProps) {
   const t = useTranslations('beheer');
+  const { user } = useAdminAuth();
   const [modalState, setModalState] = useState<ModalState>(null);
   const [breedte, setBreedte] = useState('');
   const [hoogte, setHoogte] = useState('');
@@ -58,6 +62,10 @@ export function MatenSection({ maten, loadError, onAdd, onUpdate, onRemove }: Ma
     const data = { breedte: Number(breedte), hoogte: Number(hoogte) };
     const success = modalState.mode === 'add' ? await onAdd(data) : await onUpdate(modalState.maat.id, data);
     if (success) {
+      void logActiviteit(
+        modalState.mode === 'add' ? 'maat_toegevoegd' : 'maat_gewijzigd',
+        actorFromMedewerker(user)
+      );
       closeModal();
     } else {
       setActionError(t('matenActionError'));
@@ -66,8 +74,14 @@ export function MatenSection({ maten, loadError, onAdd, onUpdate, onRemove }: Ma
 
   async function handleRemove() {
     if (modalState?.mode !== 'edit') return;
+    const inUse = (kunstwerken ?? []).some((kunstwerk) => kunstwerk.maatIds.includes(modalState.maat.id));
+    if (inUse) {
+      setActionError(t('matenVerwijderBlocked'));
+      return;
+    }
     const success = await onRemove(modalState.maat.id);
     if (success) {
+      void logActiviteit('maat_verwijderd', actorFromMedewerker(user));
       closeModal();
     } else {
       setActionError(t('matenActionError'));

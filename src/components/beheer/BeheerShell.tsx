@@ -271,6 +271,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
         ) : activeSection === 'maten' ? (
           <MatenSection
             maten={maten.items}
+            kunstwerken={kunstwerken.items}
             loadError={maten.error === 'load' ? t('matenLoadError') : null}
             onAdd={maten.add}
             onUpdate={maten.update}
