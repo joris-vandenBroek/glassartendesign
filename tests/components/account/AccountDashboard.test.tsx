@@ -10,10 +10,21 @@ import messages from '../../../messages/nl.json';
 const replaceMock = vi.fn();
 const onAuthStateChangedMock = vi.fn();
 const getDocMock = vi.fn();
+const logActiviteitMock = vi.fn();
 
 vi.mock('@/i18n/navigation', () => ({
   usePathname: () => '/account',
   useRouter: () => ({ replace: replaceMock }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromCustomer: (
+    user: { uid: string; email: string | null; companyName: string | null; contactPerson: string | null } | null
+  ) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.companyName ?? user.contactPerson ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
 }));
 
 vi.mock('@/lib/firebase', () => ({
@@ -52,6 +63,7 @@ beforeEach(() => {
   replaceMock.mockClear();
   onAuthStateChangedMock.mockReset();
   getDocMock.mockReset();
+  logActiviteitMock.mockReset();
 });
 
 describe('AccountDashboard', () => {
@@ -87,5 +99,34 @@ describe('AccountDashboard', () => {
     fireEvent.click(screen.getByTestId('account-nav-settings'));
     expect(screen.getByTestId('settings-section')).toBeInTheDocument();
     expect(screen.queryByTestId('orders-section')).not.toBeInTheDocument();
+  });
+
+  it('logs account_bezocht exactly once with the logged-in klant', async () => {
+    getDocMock.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ status: 'Goedgekeurd', companyName: 'Testbedrijf BV' }),
+    });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-1', email: 'klant@example.com' });
+      return () => {};
+    });
+    renderDashboard();
+    await waitFor(() => expect(screen.getByTestId('orders-section')).toBeInTheDocument());
+    expect(logActiviteitMock).toHaveBeenCalledTimes(1);
+    expect(logActiviteitMock).toHaveBeenCalledWith('account_bezocht', {
+      id: 'uid-1',
+      email: 'klant@example.com',
+      naam: 'Testbedrijf BV',
+    });
+  });
+
+  it('does not log account_bezocht when redirected for not being logged in', async () => {
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback(null);
+      return () => {};
+    });
+    renderDashboard();
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/'));
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

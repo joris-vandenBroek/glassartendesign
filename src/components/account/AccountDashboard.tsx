@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { useRouter } from '@/i18n/navigation';
 import { GlassPanel } from '@/components/GlassPanel';
+import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';
 import { AccountNav, type AccountSection } from './AccountNav';
 import { OrdersSection } from './OrdersSection';
 import { InvoicesDueSection } from './InvoicesDueSection';
@@ -22,15 +23,23 @@ const SECTION_COMPONENTS: Record<AccountSection, () => JSX.Element> = {
 };
 
 export function AccountDashboard() {
-  const { isCustomer, isHydrated } = useCustomerAuth();
+  const { isCustomer, isHydrated, user } = useCustomerAuth();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<AccountSection>('orders');
+  const hasLoggedVisit = useRef(false);
 
   useEffect(() => {
     if (isHydrated && !isCustomer) {
       router.replace('/');
     }
   }, [isHydrated, isCustomer, router]);
+
+  useEffect(() => {
+    if (isHydrated && isCustomer && !hasLoggedVisit.current) {
+      hasLoggedVisit.current = true;
+      void logActiviteit('account_bezocht', actorFromCustomer(user));
+    }
+  }, [isHydrated, isCustomer, user]);
 
   if (!isHydrated || !isCustomer) {
     return null;
