@@ -389,6 +389,21 @@
     "prijsgroepenLabelKortingspercentage": "Kortingspercentage",
     "prijsgroepenToevoegen": "Prijsgroep toevoegen",
     "prijsgroepenOpslaan": "Opslaan",
-    "prijsgroepenVerwijderen": "Verwijderen"
+    "prijsgroepenVerwijderen": "Verwijderen",
+    "glassartDesignLoadError": "Kon de bedrijfsgegevens niet laden. Probeer de pagina te verversen.",
+    "glassartDesignActionError": "Er is iets misgegaan. Probeer het opnieuw.",
+    "glassartDesignLabelBezoekadres": "Bezoekadres",
+    "glassartDesignLabelContactpersonen": "Contactpersonen",
+    "glassartDesignLabelNaam": "Naam",
+    "glassartDesignLabelTelefoon": "Telefoonnummer",
+    "glassartDesignLabelRol": "Rol",
+    "glassartDesignContactpersoonToevoegen": "+ Contactpersoon toevoegen",
+    "glassartDesignLabelEmail": "E-mailadres",
+    "glassartDesignLabelWhatsapp": "WhatsApp-nummer",
+    "glassartDesignLabelIban": "IBAN",
+    "glassartDesignLabelKvk": "KvK-nummer",
+    "glassartDesignLabelBtw": "BTW-nummer",
+    "glassartDesignLabelOpeningstijden": "Openingstijden",
+    "glassartDesignOpslaan": "Opslaan"
   }
 }
