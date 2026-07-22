@@ -28,6 +28,8 @@ function TestConsumer() {
     <div>
       <div data-testid="user">{user ? user.email : 'none'}</div>
       <div data-testid="is-customer">{String(isCustomer)}</div>
+      <div data-testid="company-name">{user?.companyName ?? 'none'}</div>
+      <div data-testid="contact-person">{user?.contactPerson ?? 'none'}</div>
     </div>
   );
 }
@@ -114,5 +116,31 @@ describe('useCustomerAuth', () => {
     await waitFor(() => expect(hookValue?.isHydrated).toBe(true));
     await hookValue!.logout();
     expect(signOutMock).toHaveBeenCalledWith({});
+  });
+
+  it('exposes companyName and contactPerson from the klanten document', async () => {
+    getDocMock.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ status: 'Goedgekeurd', companyName: 'Testbedrijf BV', contactPerson: 'Jan Jansen' }),
+    });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-4', email: 'klant4@example.com' });
+      return () => {};
+    });
+    renderProvider();
+    await waitFor(() => expect(screen.getByTestId('company-name')).toHaveTextContent('Testbedrijf BV'));
+    expect(screen.getByTestId('contact-person')).toHaveTextContent('Jan Jansen');
+  });
+
+  it('exposes null companyName/contactPerson when no klanten document exists', async () => {
+    getDocMock.mockResolvedValue({ exists: () => false });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-5', email: 'klant5@example.com' });
+      return () => {};
+    });
+    renderProvider();
+    await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('klant5@example.com'));
+    expect(screen.getByTestId('company-name')).toHaveTextContent('none');
+    expect(screen.getByTestId('contact-person')).toHaveTextContent('none');
   });
 });

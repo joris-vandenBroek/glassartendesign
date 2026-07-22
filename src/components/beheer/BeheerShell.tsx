@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { GlassPanel } from '@/components/GlassPanel';
 import { BeheerNav, type BeheerSection } from './BeheerNav';
@@ -14,7 +14,9 @@ import { MaterialenSection } from './MaterialenSection';
 import { MatenSection } from './MatenSection';
 import { SegmentenSection } from './SegmentenSection';
 import { KunstwerkenSection } from './KunstwerkenSection';
+import { ActiviteitSection, type Activiteit } from './ActiviteitSection';
 import type { Materiaalsoort, Materiaal, Maat, Segment, Kunstwerk } from './materiaalTypes';
+import type { ActiviteitType } from '@/lib/logActiviteit';
 import { MOCK_ADMIN_INVOICES } from '@/data/mockAdminInvoices';
 import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
 import { MATERIAALSOORTEN_SEED, buildMaterialenSeed } from '@/data/materiaalsoortenSeed';
@@ -34,6 +36,8 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [rawBestellingen, setRawBestellingen] = useState<RawBestelling[] | null>(null);
   const [bestellingenLoadError, setBestellingenLoadError] = useState<string | null>(null);
+  const [activiteiten, setActiviteiten] = useState<Activiteit[] | null>(null);
+  const [activiteitenLoadError, setActiviteitenLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -122,6 +126,39 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
     };
   }, [t]);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function loadActiviteiten() {
+      try {
+        const snapshot = await getDocs(
+          query(collection(db, 'activiteiten'), orderBy('timestamp', 'desc'), limit(500))
+        );
+        if (cancelled) return;
+        setActiviteiten(
+          snapshot.docs.map((docSnapshot) => {
+            const data = docSnapshot.data();
+            return {
+              id: docSnapshot.id,
+              type: data.type as ActiviteitType,
+              actorEmail: data.actorEmail,
+              actorNaam: data.actorNaam,
+              timestamp: data.timestamp?.toDate() ?? null,
+            } as Activiteit;
+          })
+        );
+        setActiviteitenLoadError(null);
+      } catch {
+        if (!cancelled) {
+          setActiviteitenLoadError(t('activiteitLoadError'));
+        }
+      }
+    }
+    loadActiviteiten();
+    return () => {
+      cancelled = true;
+    };
+  }, [t]);
+
   function handleKlantUpdated(updated: Klant) {
     setKlanten((current) => (current ?? []).map((klant) => (klant.id === updated.id ? updated : klant)));
   }
@@ -173,6 +210,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   const matenCount = (maten.items ?? []).length;
   const segmentenCount = (segmenten.items ?? []).length;
   const kunstwerkenCount = (kunstwerken.items ?? []).length;
+  const activiteitCount = (activiteiten ?? []).length;
 
   return (
     <div
@@ -195,6 +233,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           matenCount={matenCount}
           segmentenCount={segmentenCount}
           kunstwerkenCount={kunstwerkenCount}
+          activiteitCount={activiteitCount}
         />
       </GlassPanel>
       <GlassPanel className="w-full !max-w-none">
@@ -250,7 +289,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
             onUpdate={segmenten.update}
             onRemove={segmenten.remove}
           />
-        ) : (
+        ) : activeSection === 'kunstwerken' ? (
           <KunstwerkenSection
             kunstwerken={kunstwerken.items}
             segmenten={segmenten.items}
@@ -261,6 +300,8 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
             onUpdate={kunstwerken.update}
             onRemove={kunstwerken.remove}
           />
+        ) : (
+          <ActiviteitSection activiteiten={activiteiten} loadError={activiteitenLoadError} />
         )}
       </GlassPanel>
     </div>

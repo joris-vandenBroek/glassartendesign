@@ -8,10 +8,16 @@ const createUserMock = vi.fn();
 const signOutMock = vi.fn();
 const setDocMock = vi.fn();
 const deleteUserMock = vi.fn();
+const logActiviteitMock = vi.fn();
 
 vi.mock('@/lib/firebase', () => ({
   auth: {},
   db: {},
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  ONBEKENDE_ACTOR: { id: null, email: 'Onbekend', naam: 'Onbekend' },
 }));
 
 vi.mock('firebase/auth', () => ({
@@ -62,6 +68,7 @@ beforeEach(() => {
   signOutMock.mockReset();
   setDocMock.mockReset();
   deleteUserMock.mockReset();
+  logActiviteitMock.mockReset();
 });
 
 describe('RegistrationForm', () => {
@@ -208,5 +215,40 @@ describe('RegistrationForm', () => {
       'Er is iets misgegaan, probeer het opnieuw.'
     );
     expect(deleteUserMock).toHaveBeenCalledWith(createdUser);
+  });
+
+  it('logs word_klant_bezocht as Onbekend exactly once on mount', () => {
+    renderForm();
+    expect(logActiviteitMock).toHaveBeenCalledTimes(1);
+    expect(logActiviteitMock).toHaveBeenCalledWith('word_klant_bezocht', {
+      id: null,
+      email: 'Onbekend',
+      naam: 'Onbekend',
+    });
+  });
+
+  it('logs word_klant_aanvraag with the new account and company name on successful submit', async () => {
+    createUserMock.mockResolvedValue({ user: { uid: 'uid-123' } });
+    setDocMock.mockResolvedValue(undefined);
+    signOutMock.mockResolvedValue(undefined);
+    renderForm();
+    fillRequiredFields();
+    fireEvent.submit(screen.getByTestId('word-klant-submit').closest('form')!);
+    await waitFor(() => expect(screen.getByTestId('word-klant-confirmation')).toBeInTheDocument());
+    expect(logActiviteitMock).toHaveBeenCalledWith('word_klant_aanvraag', {
+      id: 'uid-123',
+      email: 'jan@example.com',
+      naam: 'Testbedrijf BV',
+    });
+  });
+
+  it('does not log word_klant_aanvraag when the account creation fails', async () => {
+    createUserMock.mockRejectedValue({ code: 'auth/email-already-in-use' });
+    renderForm();
+    fillRequiredFields();
+    fireEvent.submit(screen.getByTestId('word-klant-submit').closest('form')!);
+    await screen.findByTestId('word-klant-submit-error');
+    expect(logActiviteitMock).toHaveBeenCalledTimes(1); // only the page-visit log
+    expect(logActiviteitMock).not.toHaveBeenCalledWith('word_klant_aanvraag', expect.anything());
   });
 });

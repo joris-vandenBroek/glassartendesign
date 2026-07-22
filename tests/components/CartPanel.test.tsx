@@ -10,7 +10,18 @@ const onAuthStateChangedMock = vi.fn();
 const getDocMock = vi.fn();
 const addDocMock = vi.fn();
 const fetchMock = vi.fn();
+const logActiviteitMock = vi.fn();
 vi.stubGlobal('fetch', fetchMock);
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromCustomer: (
+    user: { uid: string; email: string | null; companyName: string | null; contactPerson: string | null } | null
+  ) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.companyName ?? user.contactPerson ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
 
 vi.mock('@/i18n/navigation', () => ({
   Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
@@ -88,9 +99,12 @@ function signedOut() {
 }
 
 function signedInAsApprovedCustomer() {
-  getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Goedgekeurd' }) });
+  getDocMock.mockResolvedValue({
+    exists: () => true,
+    data: () => ({ status: 'Goedgekeurd', companyName: 'Testbedrijf BV' }),
+  });
   onAuthStateChangedMock.mockImplementation((_auth, callback) => {
-    callback({ uid: 'uid-1', email: 'klant@example.com' });
+    callback({ uid: 'uid-1', email: 'klant@example.com', companyName: 'Testbedrijf BV', contactPerson: null });
     return () => {};
   });
 }
@@ -101,6 +115,7 @@ beforeEach(() => {
   getDocMock.mockReset();
   addDocMock.mockReset();
   fetchMock.mockReset();
+  logActiviteitMock.mockReset();
   fetchMock.mockResolvedValue({ ok: true });
   signedInAsApprovedCustomer();
 });
@@ -331,5 +346,33 @@ describe('CartPanel', () => {
     renderCartPanel();
     fireEvent.click(screen.getByTestId('cart-icon'));
     expect(screen.getByTestId('cart-clear')).toBeDisabled();
+  });
+
+  it('logs bestelling_geplaatst with the logged-in klant when the order succeeds', async () => {
+    addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+
+    await screen.findByTestId('cart-order-confirmation');
+    expect(logActiviteitMock).toHaveBeenCalledWith('bestelling_geplaatst', {
+      id: 'uid-1',
+      email: 'klant@example.com',
+      naam: 'Testbedrijf BV',
+    });
+  });
+
+  it('does not log bestelling_geplaatst when the Firestore write fails', async () => {
+    addDocMock.mockRejectedValue(new Error('permission-denied'));
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+
+    await screen.findByTestId('cart-place-order-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

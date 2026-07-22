@@ -12,6 +12,7 @@ import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 import { formatCurrency } from '@/data/mockAdminInvoices';
 import { WatermarkedImage } from './WatermarkedImage';
 import { Link } from '@/i18n/navigation';
+import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';
 
 export function CartPanel() {
   const t = useTranslations('cart');
@@ -64,6 +65,7 @@ export function CartPanel() {
       );
       clear();
       setOrderPlaced(true);
+      void logActiviteit('bestelling_geplaatst', actorFromCustomer(user));
       if (user.email) {
         void sendConfirmationEmail(user.email);
       }

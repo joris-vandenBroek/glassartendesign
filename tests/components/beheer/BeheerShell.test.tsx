@@ -19,6 +19,9 @@ vi.mock('firebase/firestore', () => ({
   addDoc: (...args: unknown[]) => addDocMock(...args),
   updateDoc: vi.fn(),
   deleteDoc: vi.fn(),
+  query: vi.fn((collectionRef) => collectionRef),
+  orderBy: vi.fn(),
+  limit: vi.fn(),
 }));
 
 function makeSnapshot(docsData: Array<{ id: string; data: Record<string, unknown> }>) {
@@ -48,6 +51,7 @@ const KLANT_DATA = {
 const DEFAULT_COLLECTIONS: Record<string, Array<{ id: string; data: Record<string, unknown> }>> = {
   klanten: [],
   bestelheaders: [],
+  activiteiten: [],
   materiaalsoorten: [{ id: 'soort-1', data: { omschrijving: 'Veiligheidsglas' } }],
   materialen: [{ id: 'mat-1', data: { materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Test' } }],
   maten: [{ id: 'maat-1', data: { breedte: 40, hoogte: 60 } }],
@@ -234,5 +238,26 @@ describe('BeheerShell', () => {
     expect(await screen.findByTestId('kunstwerken-error')).toHaveTextContent(
       'Kon de kunstwerken niet laden. Probeer de pagina te verversen.'
     );
+  });
+
+  it('shows the Activiteit section with the loaded count on its nav item', async () => {
+    mockCollections({
+      activiteiten: [
+        {
+          id: 'log-1',
+          data: {
+            type: 'kunstwerk_bekeken',
+            actorEmail: 'klant@example.com',
+            actorNaam: 'Testbedrijf BV',
+            timestamp: { toDate: () => new Date('2026-07-22T10:00:00') },
+          },
+        },
+      ],
+    });
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('1'));
+    fireEvent.click(screen.getByTestId('beheer-nav-activiteit'));
+    expect(await screen.findByTestId('activiteit-section')).toBeInTheDocument();
+    expect(screen.getByTestId('data-table-row-log-1')).toHaveTextContent('Kunstwerk bekeken');
   });
 });
