@@ -2,7 +2,6 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
-import { ReturnsProvider } from '@/lib/useReturns';
 import { MockProfileProvider } from '@/lib/useMockProfile';
 import { AccountDashboard } from '@/components/account/AccountDashboard';
 import messages from '../../../messages/nl.json';
@@ -49,11 +48,9 @@ function renderDashboard() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <CustomerAuthProvider>
-        <ReturnsProvider>
-          <MockProfileProvider>
-            <AccountDashboard />
-          </MockProfileProvider>
-        </ReturnsProvider>
+        <MockProfileProvider>
+          <AccountDashboard />
+        </MockProfileProvider>
       </CustomerAuthProvider>
     </NextIntlClientProvider>
   );

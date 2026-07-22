@@ -45,12 +45,9 @@ beforeEach(() => {
 });
 
 describe('AccountNav', () => {
-  it('renders all 6 section buttons plus a logout button', () => {
+  it('renders all 3 section buttons plus a logout button', () => {
     renderNav();
     expect(screen.getByTestId('account-nav-orders')).toBeInTheDocument();
-    expect(screen.getByTestId('account-nav-invoicesDue')).toBeInTheDocument();
-    expect(screen.getByTestId('account-nav-invoicesPaid')).toBeInTheDocument();
-    expect(screen.getByTestId('account-nav-returns')).toBeInTheDocument();
     expect(screen.getByTestId('account-nav-conversations')).toBeInTheDocument();
     expect(screen.getByTestId('account-nav-settings')).toBeInTheDocument();
     expect(screen.getByTestId('account-nav-logout')).toBeInTheDocument();
@@ -64,8 +61,8 @@ describe('AccountNav', () => {
 
   it('calls onSelect with the clicked section id', () => {
     const { onSelect } = renderNav();
-    fireEvent.click(screen.getByTestId('account-nav-returns'));
-    expect(onSelect).toHaveBeenCalledWith('returns');
+    fireEvent.click(screen.getByTestId('account-nav-settings'));
+    expect(onSelect).toHaveBeenCalledWith('settings');
   });
 
   it('calls signOut when the logout button is clicked', () => {

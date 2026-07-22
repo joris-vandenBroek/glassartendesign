@@ -1,7 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { ReturnsProvider } from '@/lib/useReturns';
 import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import { OrdersSection } from '@/components/account/OrdersSection';
 import messages from '../../../messages/nl.json';
@@ -32,9 +31,7 @@ function renderSection() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <CustomerAuthProvider>
-        <ReturnsProvider>
-          <OrdersSection />
-        </ReturnsProvider>
+        <OrdersSection />
       </CustomerAuthProvider>
     </NextIntlClientProvider>
   );

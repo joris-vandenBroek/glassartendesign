@@ -7,7 +7,7 @@ import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
-import { formatCurrency } from '@/data/mockAdminInvoices';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { WatermarkedImage } from './WatermarkedImage';
 import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materiaalTypes';
 

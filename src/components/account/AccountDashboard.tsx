@@ -7,17 +7,11 @@ import { GlassPanel } from '@/components/GlassPanel';
 import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';
 import { AccountNav, type AccountSection } from './AccountNav';
 import { OrdersSection } from './OrdersSection';
-import { InvoicesDueSection } from './InvoicesDueSection';
-import { InvoicesPaidSection } from './InvoicesPaidSection';
-import { ReturnsSection } from './ReturnsSection';
 import { ConversationsSection } from './ConversationsSection';
 import { SettingsSection } from './SettingsSection';
 
 const SECTION_COMPONENTS: Record<AccountSection, () => JSX.Element> = {
   orders: OrdersSection,
-  invoicesDue: InvoicesDueSection,
-  invoicesPaid: InvoicesPaidSection,
-  returns: ReturnsSection,
   conversations: ConversationsSection,
   settings: SettingsSection,
 };

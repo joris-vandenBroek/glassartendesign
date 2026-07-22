@@ -182,9 +182,6 @@
   },
   "accountPage": {
     "navOrders": "Bestellingen",
-    "navInvoicesDue": "Te betalen facturen",
-    "navInvoicesPaid": "Betaalde facturen",
-    "navReturns": "Retourneren",
     "navConversations": "Gesprekgeschiedenis",
     "navSettings": "Instellingen",
     "logout": "Uitloggen",
@@ -196,33 +193,6 @@
       "modalClose": "Sluiten",
       "modalLineUnknown": "Onbekend artikel",
       "loadError": "Bestellingen konden niet worden geladen. Probeer het later opnieuw."
-    },
-    "invoices": {
-      "empty": "Geen facturen gevonden.",
-      "downloadPdf": "Download PDF",
-      "items": {
-        "invoice1": { "description": "Hotel lobby set – 3 panelen" },
-        "invoice2": { "description": "Abstract paneel 60x90cm" },
-        "invoice3": { "description": "Kantoorproject – 5 panelen" },
-        "invoice4": { "description": "Wellness paneel 40x60cm" },
-        "invoice5": { "description": "Restaurant wandpaneel 80x120cm" },
-        "invoice6": { "description": "Losse haken set" }
-      }
-    },
-    "returns": {
-      "selectOrderLabel": "Selecteer een bestelling",
-      "reasonLabel": "Reden",
-      "reasonDamaged": "Beschadigd",
-      "reasonNotAsExpected": "Voldoet niet aan verwachting",
-      "reasonWrongOrder": "Verkeerd besteld",
-      "reasonOther": "Anders",
-      "noteLabel": "Toelichting",
-      "submit": "Meld aan voor retour",
-      "confirmationTitle": "Retour aangemeld",
-      "confirmationMessage": "We nemen contact met u op over de afhandeling.",
-      "noEligibleOrders": "Er zijn geen bestellingen beschikbaar om te retourneren.",
-      "existingReturnsTitle": "Eerder aangemelde retouren",
-      "statusRegistered": "Retour aangemeld"
     },
     "conversations": {
       "empty": "Geen gesprekken gevonden.",
@@ -271,9 +241,7 @@
     "loggedInAs": "Ingelogd als {email}",
     "logout": "Uitloggen",
     "navKlanten": "Klanten",
-    "navFacturen": "Facturen",
     "navBestellingen": "Bestellingen",
-    "navRetouren": "Retouren",
     "navPrijsgroepen": "Prijsgroepen",
     "navMaten": "Maten",
     "navMaterialen": "Materialen",
@@ -310,14 +278,6 @@
     "klantenAfwijzen": "Afwijzen",
     "klantenQuickTeBeoordelen": "Te beoordelen klanten",
     "klantenQuickAlle": "Alle klanten",
-    "facturenColInvoiceNumber": "Factuurnummer",
-    "facturenColDate": "Factuurdatum",
-    "facturenColCompanyName": "Bedrijfsnaam",
-    "facturenColAmount": "Factuurbedrag",
-    "facturenColStatus": "Status",
-    "facturenEmpty": "Geen facturen gevonden.",
-    "facturenQuickTeBetalen": "Te betalen facturen",
-    "facturenQuickAlle": "Alle facturen",
     "navMateriaalsoorten": "Materiaalsoorten",
     "materiaalsoortenLoadError": "Kon de materiaalsoorten niet laden. Probeer de pagina te verversen.",
     "materiaalsoortenActionError": "Er is iets misgegaan. Probeer het opnieuw.",

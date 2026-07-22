@@ -9,7 +9,7 @@ import { useCart } from '@/lib/useCart';
 import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { generateBestelnr } from '@/lib/generateBestelnr';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
-import { formatCurrency } from '@/data/mockAdminInvoices';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { WatermarkedImage } from './WatermarkedImage';
 import { Link } from '@/i18n/navigation';
 import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';

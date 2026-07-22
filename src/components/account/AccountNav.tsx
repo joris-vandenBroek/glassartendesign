@@ -3,13 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useCustomerAuth } from '@/lib/useCustomerAuth';
 
-export type AccountSection =
-  | 'orders'
-  | 'invoicesDue'
-  | 'invoicesPaid'
-  | 'returns'
-  | 'conversations'
-  | 'settings';
+export type AccountSection = 'orders' | 'conversations' | 'settings';
 
 interface AccountNavProps {
   activeSection: AccountSection;
@@ -18,9 +12,6 @@ interface AccountNavProps {
 
 const SECTIONS: { id: AccountSection; labelKey: string }[] = [
   { id: 'orders', labelKey: 'navOrders' },
-  { id: 'invoicesDue', labelKey: 'navInvoicesDue' },
-  { id: 'invoicesPaid', labelKey: 'navInvoicesPaid' },
-  { id: 'returns', labelKey: 'navReturns' },
   { id: 'conversations', labelKey: 'navConversations' },
   { id: 'settings', labelKey: 'navSettings' },
 ];

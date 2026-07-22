@@ -7,7 +7,6 @@ import { db } from '@/lib/firebase';
 import { GlassPanel } from '@/components/GlassPanel';
 import { BeheerNav, type BeheerSection } from './BeheerNav';
 import { KlantenSection, type Klant } from './KlantenSection';
-import { FacturenSection } from './FacturenSection';
 import { BestellingenSection, type Bestelling, type BestellingLine } from './BestellingenSection';
 import { MateriaalsoortenSection } from './MateriaalsoortenSection';
 import { MaterialenSection } from './MaterialenSection';
@@ -17,7 +16,6 @@ import { KunstwerkenSection } from './KunstwerkenSection';
 import { ActiviteitSection, type Activiteit } from './ActiviteitSection';
 import type { Materiaalsoort, Materiaal, Maat, Segment, Kunstwerk } from './materiaalTypes';
 import type { ActiviteitType } from '@/lib/logActiviteit';
-import { MOCK_ADMIN_INVOICES } from '@/data/mockAdminInvoices';
 import { useFirestoreCollection } from '@/lib/useFirestoreCollection';
 import { MATERIAALSOORTEN_SEED, buildMaterialenSeed } from '@/data/materiaalsoortenSeed';
 import { SEGMENTEN_SEED, MATEN_SEED, buildKunstwerkenSeed } from '@/data/kunstwerkenSeed';
@@ -203,7 +201,6 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   });
 
   const klantenCount = (klanten ?? []).filter((klant) => klant.status === 'Beoordelen').length;
-  const facturenCount = MOCK_ADMIN_INVOICES.filter((invoice) => invoice.status === 'Te betalen').length;
   const bestellingenCount = (bestellingen ?? []).filter((b) => b.status === 'Te beoordelen').length;
   const materiaalsoortenCount = (materiaalsoorten.items ?? []).length;
   const materialenCount = (materialen.items ?? []).length;
@@ -226,7 +223,6 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
           onSelect={setActiveSection}
           onLogout={onLogout}
           klantenCount={klantenCount}
-          facturenCount={facturenCount}
           bestellingenCount={bestellingenCount}
           materiaalsoortenCount={materiaalsoortenCount}
           materialenCount={materialenCount}
@@ -239,8 +235,6 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
       <GlassPanel className="w-full !max-w-none">
         {activeSection === 'klanten' ? (
           <KlantenSection klanten={klanten} loadError={loadError} onKlantUpdated={handleKlantUpdated} />
-        ) : activeSection === 'facturen' ? (
-          <FacturenSection />
         ) : activeSection === 'bestellingen' ? (
           <BestellingenSection
             bestellingen={bestellingen}

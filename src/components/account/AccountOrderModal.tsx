@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Modal } from '@/components/Modal';
 import { WatermarkedImage } from '@/components/WatermarkedImage';
 import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
-import { formatCurrency } from '@/data/mockAdminInvoices';
+import { formatCurrency } from '@/lib/formatCurrency';
 import type { DisplayOrder } from '@/lib/useAllOrders';
 import type { Kunstwerk, Materiaal, Maat } from '@/components/beheer/materiaalTypes';
 

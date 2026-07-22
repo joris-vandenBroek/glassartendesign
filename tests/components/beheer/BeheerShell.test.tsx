@@ -123,15 +123,6 @@ describe('BeheerShell', () => {
     await waitFor(() => expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('1'));
   });
 
-  it('switches to the Facturen section when its nav item is clicked', async () => {
-    mockCollections();
-    renderShell();
-    await waitFor(() => expect(getDocsMock).toHaveBeenCalled());
-    screen.getByTestId('beheer-nav-facturen').click();
-    expect(await screen.findByTestId('facturen-section')).toBeInTheDocument();
-    expect(screen.queryByTestId('klanten-section')).not.toBeInTheDocument();
-  });
-
   it('shows a load error on the Klanten section when getDocs fails for klanten', async () => {
     getDocsMock.mockImplementation((collectionRef: { name: string }) => {
       if (collectionRef.name === 'klanten') {
