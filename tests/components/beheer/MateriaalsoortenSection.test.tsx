@@ -1,9 +1,27 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { MateriaalsoortenSection } from '@/components/beheer/MateriaalsoortenSection';
 import type { Materiaalsoort, Materiaal } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
+
+const logActiviteitMock = vi.fn();
+
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
+
+beforeEach(() => {
+  logActiviteitMock.mockReset();
+});
 
 const SOORTEN: Materiaalsoort[] = [
   { id: 'soort-1', omschrijving: 'Veiligheidsglas' },
@@ -110,5 +128,64 @@ describe('MateriaalsoortenSection', () => {
       'Er is iets misgegaan. Probeer het opnieuw.'
     );
     expect(screen.getByTestId('materiaalsoort-modal')).toBeInTheDocument();
+  });
+
+  it('logs materiaalsoort_toegevoegd with the logged-in medewerker when adding', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('materiaalsoorten-add'));
+    fireEvent.change(screen.getByTestId('materiaalsoort-modal-omschrijving'), { target: { value: 'Acryl' } });
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('materiaalsoort_toegevoegd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs materiaalsoort_gewijzigd with the logged-in medewerker when editing', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-soort-2'));
+    fireEvent.change(screen.getByTestId('materiaalsoort-modal-omschrijving'), { target: { value: 'Dibond 3mm' } });
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('materiaalsoort_gewijzigd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs materiaalsoort_verwijderd with the logged-in medewerker when deleting', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-soort-2'));
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-verwijderen'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('materiaalsoort_verwijderd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('does not log when a blocked delete is attempted', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-soort-1'));
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-verwijderen'));
+    await screen.findByTestId('materiaalsoort-modal-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
+  });
+
+  it('does not log when adding fails', async () => {
+    const onAdd = vi.fn().mockResolvedValue(false);
+    renderSection({ onAdd });
+    fireEvent.click(screen.getByTestId('materiaalsoorten-add'));
+    fireEvent.change(screen.getByTestId('materiaalsoort-modal-omschrijving'), { target: { value: 'Acryl' } });
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
+    await screen.findByTestId('materiaalsoort-modal-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

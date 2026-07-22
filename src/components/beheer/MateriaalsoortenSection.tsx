@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import type { Materiaalsoort, Materiaal } from './materiaalTypes';
 
 interface MateriaalsoortenSectionProps {
@@ -29,6 +31,7 @@ export function MateriaalsoortenSection({
   const [modalState, setModalState] = useState<ModalState>(null);
   const [omschrijving, setOmschrijving] = useState('');
   const [actionError, setActionError] = useState<string | null>(null);
+  const { user } = useAdminAuth();
 
   if (loadError) {
     return (
@@ -65,6 +68,10 @@ export function MateriaalsoortenSection({
         ? await onAdd({ omschrijving })
         : await onUpdate(modalState.materiaalsoort.id, { omschrijving });
     if (success) {
+      void logActiviteit(
+        modalState.mode === 'add' ? 'materiaalsoort_toegevoegd' : 'materiaalsoort_gewijzigd',
+        actorFromMedewerker(user)
+      );
       closeModal();
     } else {
       setActionError(t('materiaalsoortenActionError'));
@@ -82,6 +89,7 @@ export function MateriaalsoortenSection({
     }
     const success = await onRemove(modalState.materiaalsoort.id);
     if (success) {
+      void logActiviteit('materiaalsoort_verwijderd', actorFromMedewerker(user));
       closeModal();
     } else {
       setActionError(t('materiaalsoortenActionError'));
