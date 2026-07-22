@@ -6,9 +6,30 @@ export type ActiviteitType =
   | 'mandje_toegevoegd'
   | 'bestelling_geplaatst'
   | 'account_bezocht'
-  | 'beheer_bezocht'
   | 'word_klant_bezocht'
-  | 'word_klant_aanvraag';
+  | 'word_klant_aanvraag'
+  | 'klant_goedgekeurd'
+  | 'klant_afgewezen'
+  | 'bestelling_goedgekeurd'
+  | 'bestelling_afgewezen'
+  | 'materiaalsoort_toegevoegd'
+  | 'materiaalsoort_gewijzigd'
+  | 'materiaalsoort_verwijderd'
+  | 'materiaal_toegevoegd'
+  | 'materiaal_gewijzigd'
+  | 'materiaal_verwijderd'
+  | 'maat_toegevoegd'
+  | 'maat_gewijzigd'
+  | 'maat_verwijderd'
+  | 'segment_toegevoegd'
+  | 'segment_gewijzigd'
+  | 'segment_verwijderd'
+  | 'kunstwerk_toegevoegd'
+  | 'kunstwerk_gewijzigd'
+  | 'kunstwerk_verwijderd'
+  | 'prijsgroep_toegevoegd'
+  | 'prijsgroep_gewijzigd'
+  | 'prijsgroep_verwijderd';
 
 export interface ActiviteitActor {
   id: string | null;
@@ -20,7 +41,7 @@ export const ONBEKENDE_ACTOR: ActiviteitActor = { id: null, email: 'Onbekend', n
 
 export async function logActiviteit(type: ActiviteitType, actor: ActiviteitActor): Promise<void> {
   try {
-    await addDoc(collection(db, 'activiteiten'), {
+    await addDoc(collection(db, 'activiteitenlog'), {
       type,
       actorId: actor.id,
       actorEmail: actor.email,

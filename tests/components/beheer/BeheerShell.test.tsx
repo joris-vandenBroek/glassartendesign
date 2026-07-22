@@ -51,7 +51,7 @@ const KLANT_DATA = {
 const DEFAULT_COLLECTIONS: Record<string, Array<{ id: string; data: Record<string, unknown> }>> = {
   klanten: [],
   bestelheaders: [],
-  activiteiten: [],
+  activiteitenlog: [],
   materiaalsoorten: [{ id: 'soort-1', data: { omschrijving: 'Veiligheidsglas' } }],
   materialen: [{ id: 'mat-1', data: { materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Test' } }],
   maten: [{ id: 'maat-1', data: { breedte: 40, hoogte: 60 } }],
@@ -233,7 +233,7 @@ describe('BeheerShell', () => {
 
   it('shows the Activiteit section with the loaded count on its nav item', async () => {
     mockCollections({
-      activiteiten: [
+      activiteitenlog: [
         {
           id: 'log-1',
           data: {

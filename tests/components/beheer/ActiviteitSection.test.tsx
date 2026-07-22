@@ -62,4 +62,18 @@ describe('ActiviteitSection', () => {
     expect(screen.getByTestId('data-table-row-log-1')).toBeInTheDocument();
     expect(screen.queryByTestId('data-table-row-log-2')).not.toBeInTheDocument();
   });
+
+  it('falls back to the raw type string when no label mapping exists (e.g. a retired event type)', () => {
+    renderSection([
+      {
+        id: 'log-3',
+        // @ts-expect-error -- simulating a legacy document with a since-removed type value
+        type: 'beheer_bezocht',
+        actorEmail: 'paul@glassartanddesign.com',
+        actorNaam: 'paul@glassartanddesign.com',
+        timestamp: new Date('2026-07-20T08:00:00'),
+      },
+    ]);
+    expect(screen.getByTestId('data-table-row-log-3')).toHaveTextContent('beheer_bezocht');
+  });
 });

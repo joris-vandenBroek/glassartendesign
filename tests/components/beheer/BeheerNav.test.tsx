@@ -41,7 +41,7 @@ describe('BeheerNav', () => {
     expect(screen.getByTestId('beheer-nav-segmenten')).toHaveTextContent('6');
     expect(screen.getByTestId('beheer-nav-kunstwerken')).toHaveTextContent('Kunstwerken');
     expect(screen.getByTestId('beheer-nav-kunstwerken')).toHaveTextContent('36');
-    expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('Activiteit');
+    expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('Activiteitenlog');
     expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('12');
 
     ['prijsgroepen', 'glassartDesign'].forEach((id) => {

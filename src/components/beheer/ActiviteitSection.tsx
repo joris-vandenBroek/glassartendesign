@@ -31,9 +31,30 @@ const TYPE_LABEL_KEYS: Record<ActiviteitType, string> = {
   mandje_toegevoegd: 'activiteitTypeMandjeToegevoegd',
   bestelling_geplaatst: 'activiteitTypeBestellingGeplaatst',
   account_bezocht: 'activiteitTypeAccountBezocht',
-  beheer_bezocht: 'activiteitTypeBeheerBezocht',
   word_klant_bezocht: 'activiteitTypeWordKlantBezocht',
   word_klant_aanvraag: 'activiteitTypeWordKlantAanvraag',
+  klant_goedgekeurd: 'activiteitTypeKlantGoedgekeurd',
+  klant_afgewezen: 'activiteitTypeKlantAfgewezen',
+  bestelling_goedgekeurd: 'activiteitTypeBestellingGoedgekeurd',
+  bestelling_afgewezen: 'activiteitTypeBestellingAfgewezen',
+  materiaalsoort_toegevoegd: 'activiteitTypeMateriaalsoortToegevoegd',
+  materiaalsoort_gewijzigd: 'activiteitTypeMateriaalsoortGewijzigd',
+  materiaalsoort_verwijderd: 'activiteitTypeMateriaalsoortVerwijderd',
+  materiaal_toegevoegd: 'activiteitTypeMateriaalToegevoegd',
+  materiaal_gewijzigd: 'activiteitTypeMateriaalGewijzigd',
+  materiaal_verwijderd: 'activiteitTypeMateriaalVerwijderd',
+  maat_toegevoegd: 'activiteitTypeMaatToegevoegd',
+  maat_gewijzigd: 'activiteitTypeMaatGewijzigd',
+  maat_verwijderd: 'activiteitTypeMaatVerwijderd',
+  segment_toegevoegd: 'activiteitTypeSegmentToegevoegd',
+  segment_gewijzigd: 'activiteitTypeSegmentGewijzigd',
+  segment_verwijderd: 'activiteitTypeSegmentVerwijderd',
+  kunstwerk_toegevoegd: 'activiteitTypeKunstwerkToegevoegd',
+  kunstwerk_gewijzigd: 'activiteitTypeKunstwerkGewijzigd',
+  kunstwerk_verwijderd: 'activiteitTypeKunstwerkVerwijderd',
+  prijsgroep_toegevoegd: 'activiteitTypePrijsgroepToegevoegd',
+  prijsgroep_gewijzigd: 'activiteitTypePrijsgroepGewijzigd',
+  prijsgroep_verwijderd: 'activiteitTypePrijsgroepVerwijderd',
 };
 
 export function ActiviteitSection({ activiteiten, loadError }: ActiviteitSectionProps) {
@@ -41,13 +62,16 @@ export function ActiviteitSection({ activiteiten, loadError }: ActiviteitSection
 
   const rows = useMemo<ActiviteitRow[]>(
     () =>
-      (activiteiten ?? []).map((activiteit) => ({
-        id: activiteit.id,
-        tijdstip: activiteit.timestamp ? activiteit.timestamp.toLocaleString('nl-NL') : '',
-        typeLabel: t(TYPE_LABEL_KEYS[activiteit.type]),
-        actorNaam: activiteit.actorNaam,
-        actorEmail: activiteit.actorEmail,
-      })),
+      (activiteiten ?? []).map((activiteit) => {
+        const labelKey = TYPE_LABEL_KEYS[activiteit.type];
+        return {
+          id: activiteit.id,
+          tijdstip: activiteit.timestamp ? activiteit.timestamp.toLocaleString('nl-NL') : '',
+          typeLabel: labelKey ? t(labelKey) : activiteit.type,
+          actorNaam: activiteit.actorNaam,
+          actorEmail: activiteit.actorEmail,
+        };
+      }),
     [activiteiten, t]
   );
 

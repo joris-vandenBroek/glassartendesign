@@ -129,7 +129,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
     async function loadActiviteiten() {
       try {
         const snapshot = await getDocs(
-          query(collection(db, 'activiteiten'), orderBy('timestamp', 'desc'), limit(500))
+          query(collection(db, 'activiteitenlog'), orderBy('timestamp', 'desc'), limit(500))
         );
         if (cancelled) return;
         setActiviteiten(
