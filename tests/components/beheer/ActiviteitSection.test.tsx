@@ -42,6 +42,19 @@ describe('ActiviteitSection', () => {
     expect(screen.getByTestId('data-table-row-log-2')).toHaveTextContent('Onbekend');
   });
 
+  it('shows the translated label for bedrijfsgegevens_gewijzigd', () => {
+    renderSection([
+      {
+        id: 'log-4',
+        type: 'bedrijfsgegevens_gewijzigd',
+        actorEmail: 'paul@glassartanddesign.com',
+        actorNaam: 'paul@glassartanddesign.com',
+        timestamp: new Date('2026-07-22T11:00:00'),
+      },
+    ]);
+    expect(screen.getByTestId('data-table-row-log-4')).toHaveTextContent('Bedrijfsgegevens gewijzigd');
+  });
+
   it('shows the load error banner when loadError is set', () => {
     renderSection([], 'Kon de activiteiten niet laden. Probeer de pagina te verversen.');
     expect(screen.getByTestId('activiteit-load-error')).toHaveTextContent(

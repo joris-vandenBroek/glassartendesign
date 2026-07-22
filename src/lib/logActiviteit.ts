@@ -29,7 +29,8 @@ export type ActiviteitType =
   | 'kunstwerk_verwijderd'
   | 'prijsgroep_toegevoegd'
   | 'prijsgroep_gewijzigd'
-  | 'prijsgroep_verwijderd';
+  | 'prijsgroep_verwijderd'
+  | 'bedrijfsgegevens_gewijzigd';
 
 export interface ActiviteitActor {
   id: string | null;

@@ -55,6 +55,7 @@ const TYPE_LABEL_KEYS: Record<ActiviteitType, string> = {
   prijsgroep_toegevoegd: 'activiteitTypePrijsgroepToegevoegd',
   prijsgroep_gewijzigd: 'activiteitTypePrijsgroepGewijzigd',
   prijsgroep_verwijderd: 'activiteitTypePrijsgroepVerwijderd',
+  bedrijfsgegevens_gewijzigd: 'activiteitTypeBedrijfsgegevensGewijzigd',
 };
 
 export function ActiviteitSection({ activiteiten, loadError }: ActiviteitSectionProps) {
