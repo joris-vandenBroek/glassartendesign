@@ -1,10 +1,39 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { ProductModal } from '@/components/ProductModal';
 import { CartProvider, useCart } from '@/lib/useCart';
+import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from '@/components/beheer/materiaalTypes';
 import messages from '../../messages/nl.json';
+
+const onAuthStateChangedMock = vi.fn();
+const getDocMock = vi.fn();
+const logActiviteitMock = vi.fn();
+
+vi.mock('@/lib/firebase', () => ({
+  auth: {},
+  db: {},
+}));
+
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: (...args: unknown[]) => onAuthStateChangedMock(...args),
+}));
+
+vi.mock('firebase/firestore', () => ({
+  doc: vi.fn((_db, collection, id) => ({ collection, id })),
+  getDoc: (...args: unknown[]) => getDocMock(...args),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromCustomer: (
+    user: { uid: string; email: string | null; companyName: string | null; contactPerson: string | null } | null
+  ) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.companyName ?? user.contactPerson ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
 
 const KUNSTWERK: Kunstwerk = {
   id: 'kw-1',
@@ -39,21 +68,30 @@ const MATERIAALSOORTEN: Materiaalsoort[] = [
 function renderModal(onClose: () => void = () => {}, kunstwerk: Kunstwerk | null = KUNSTWERK) {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <CartProvider>
-        <ProductModal
-          kunstwerk={kunstwerk}
-          materialen={MATERIALEN}
-          maten={MATEN}
-          materiaalsoorten={MATERIAALSOORTEN}
-          onClose={onClose}
-        />
-      </CartProvider>
+      <CustomerAuthProvider>
+        <CartProvider>
+          <ProductModal
+            kunstwerk={kunstwerk}
+            materialen={MATERIALEN}
+            maten={MATEN}
+            materiaalsoorten={MATERIAALSOORTEN}
+            onClose={onClose}
+          />
+        </CartProvider>
+      </CustomerAuthProvider>
     </NextIntlClientProvider>
   );
 }
 
 beforeEach(() => {
   window.localStorage.clear();
+  onAuthStateChangedMock.mockReset();
+  getDocMock.mockReset();
+  logActiviteitMock.mockReset();
+  onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+    callback(null);
+    return () => {};
+  });
   vi.useFakeTimers();
 });
 
@@ -148,16 +186,18 @@ describe('ProductModal', () => {
 
     render(
       <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal
-            kunstwerk={KUNSTWERK}
-            materialen={MATERIALEN}
-            maten={MATEN}
-            materiaalsoorten={MATERIAALSOORTEN}
-            onClose={onClose}
-          />
-          <Probe />
-        </CartProvider>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN}
+              onClose={onClose}
+            />
+            <Probe />
+          </CartProvider>
+        </CustomerAuthProvider>
       </NextIntlClientProvider>
     );
 
@@ -190,15 +230,17 @@ describe('ProductModal', () => {
 
     const { rerender } = render(
       <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal
-            kunstwerk={KUNSTWERK}
-            materialen={MATERIALEN}
-            maten={MATEN}
-            materiaalsoorten={MATERIAALSOORTEN}
-            onClose={onClose}
-          />
-        </CartProvider>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN}
+              onClose={onClose}
+            />
+          </CartProvider>
+        </CustomerAuthProvider>
       </NextIntlClientProvider>
     );
 
@@ -209,28 +251,32 @@ describe('ProductModal', () => {
 
     rerender(
       <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal
-            kunstwerk={null}
-            materialen={MATERIALEN}
-            maten={MATEN}
-            materiaalsoorten={MATERIAALSOORTEN}
-            onClose={onClose}
-          />
-        </CartProvider>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={null}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN}
+              onClose={onClose}
+            />
+          </CartProvider>
+        </CustomerAuthProvider>
       </NextIntlClientProvider>
     );
     rerender(
       <NextIntlClientProvider locale="nl" messages={messages}>
-        <CartProvider>
-          <ProductModal
-            kunstwerk={NEXT_KUNSTWERK}
-            materialen={MATERIALEN}
-            maten={MATEN}
-            materiaalsoorten={MATERIAALSOORTEN}
-            onClose={onClose}
-          />
-        </CartProvider>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={NEXT_KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN}
+              onClose={onClose}
+            />
+          </CartProvider>
+        </CustomerAuthProvider>
       </NextIntlClientProvider>
     );
 
@@ -271,5 +317,41 @@ describe('ProductModal', () => {
   it('shows a watermark overlay on the photo', () => {
     renderModal();
     expect(screen.getByTestId('watermark-overlay')).toBeInTheDocument();
+  });
+
+  it('logs mandje_toegevoegd with the logged-in klant when confirmed', async () => {
+    vi.useRealTimers();
+    getDocMock.mockResolvedValue({
+      exists: () => true,
+      data: () => ({ status: 'Goedgekeurd', companyName: 'Testbedrijf BV' }),
+    });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-1', email: 'klant@example.com' });
+      return () => {};
+    });
+    renderModal();
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getByTestId('product-modal-confirm'));
+    expect(logActiviteitMock).toHaveBeenCalledWith('mandje_toegevoegd', {
+      id: 'uid-1',
+      email: 'klant@example.com',
+      naam: 'Testbedrijf BV',
+    });
+  });
+
+  it('logs mandje_toegevoegd as Onbekend for an anonymous visitor', async () => {
+    vi.useRealTimers();
+    renderModal();
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getByTestId('product-modal-confirm'));
+    expect(logActiviteitMock).toHaveBeenCalledWith('mandje_toegevoegd', {
+      id: null,
+      email: 'Onbekend',
+      naam: 'Onbekend',
+    });
   });
 });

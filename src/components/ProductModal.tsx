@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCart } from '@/lib/useCart';
+import { useCustomerAuth } from '@/lib/useCustomerAuth';
+import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving';
 import { formatCurrency } from '@/data/mockAdminInvoices';
@@ -35,6 +37,7 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
   const [quantity, setQuantity] = useState(1);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { addItem } = useCart();
+  const { user } = useCustomerAuth();
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -107,6 +110,7 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
       prijs: prijsRegel.prijs,
       quantity,
     });
+    void logActiviteit('mandje_toegevoegd', actorFromCustomer(user));
     setIsConfirmed(true);
     closeTimeoutRef.current = setTimeout(() => {
       closeTimeoutRef.current = null;
