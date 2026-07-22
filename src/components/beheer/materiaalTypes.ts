@@ -39,3 +39,9 @@ export interface Kunstwerk {
   omschrijvingDe: string;
   omschrijvingEn: string;
 }
+
+export interface Prijsgroep {
+  id: string;
+  naam: string;
+  kortingspercentage: number;
+}

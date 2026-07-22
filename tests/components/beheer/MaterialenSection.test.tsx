@@ -1,9 +1,38 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { MaterialenSection } from '@/components/beheer/MaterialenSection';
-import type { Materiaal, Materiaalsoort } from '@/components/beheer/materiaalTypes';
+import type { Materiaal, Materiaalsoort, Kunstwerk } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
+
+const logActiviteitMock = vi.fn();
+
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
+
+const KUNSTWERKEN: Kunstwerk[] = [
+  {
+    id: 'kw-1',
+    foto: 'https://example.com/kw-1.jpg',
+    segmentIds: [],
+    materiaalIds: ['mat-1'],
+    maatIds: [],
+    prijzen: [],
+    omschrijvingNl: 'Hotel paneel',
+    omschrijvingFr: '',
+    omschrijvingDe: '',
+    omschrijvingEn: '',
+  },
+];
 
 const SOORTEN: Materiaalsoort[] = [
   { id: 'soort-1', omschrijving: 'Veiligheidsglas' },
@@ -24,6 +53,7 @@ function renderSection(overrides: Partial<React.ComponentProps<typeof Materialen
       <MaterialenSection
         materialen={MATERIALEN}
         materiaalsoorten={SOORTEN}
+        kunstwerken={KUNSTWERKEN}
         loadError={null}
         onAdd={onAdd}
         onUpdate={onUpdate}
@@ -36,6 +66,10 @@ function renderSection(overrides: Partial<React.ComponentProps<typeof Materialen
 }
 
 describe('MaterialenSection', () => {
+  beforeEach(() => {
+    logActiviteitMock.mockReset();
+  });
+
   it('shows the load error instead of the table when loadError is set', () => {
     renderSection({ loadError: 'Kon niet laden.' });
     expect(screen.getByTestId('materialen-error')).toHaveTextContent('Kon niet laden.');
@@ -120,5 +154,72 @@ describe('MaterialenSection', () => {
       'Er is iets misgegaan. Probeer het opnieuw.'
     );
     expect(screen.getByTestId('materiaal-modal')).toBeInTheDocument();
+  });
+
+  it('blocks deleting a materiaal that is still referenced by a kunstwerk', async () => {
+    const { onRemove } = renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-mat-1'));
+    fireEvent.click(screen.getByTestId('materiaal-modal-verwijderen'));
+    expect(await screen.findByTestId('materiaal-modal-error')).toHaveTextContent(
+      'Dit materiaal is nog gekoppeld aan een kunstwerk en kan niet verwijderd worden.'
+    );
+    expect(onRemove).not.toHaveBeenCalled();
+  });
+
+  it('deletes a materiaal with no linked kunstwerk', async () => {
+    const { onRemove } = renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-mat-2'));
+    fireEvent.click(screen.getByTestId('materiaal-modal-verwijderen'));
+    await waitFor(() => expect(onRemove).toHaveBeenCalledWith('mat-2'));
+  });
+
+  it('logs materiaal_toegevoegd when adding', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('materialen-add'));
+    fireEvent.change(screen.getByTestId('materiaal-modal-dikte'), { target: { value: '5' } });
+    fireEvent.change(screen.getByTestId('materiaal-modal-omschrijving'), { target: { value: 'Nieuw' } });
+    fireEvent.click(screen.getByTestId('materiaal-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('materiaal_toegevoegd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs materiaal_gewijzigd when editing', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-mat-2'));
+    fireEvent.change(screen.getByTestId('materiaal-modal-omschrijving'), { target: { value: 'Bijgewerkt' } });
+    fireEvent.click(screen.getByTestId('materiaal-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('materiaal_gewijzigd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs materiaal_verwijderd when deleting', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-mat-2'));
+    fireEvent.click(screen.getByTestId('materiaal-modal-verwijderen'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('materiaal_verwijderd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('does not log when a blocked delete is attempted', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-mat-1'));
+    fireEvent.click(screen.getByTestId('materiaal-modal-verwijderen'));
+    await screen.findByTestId('materiaal-modal-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

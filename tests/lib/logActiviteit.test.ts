@@ -31,7 +31,7 @@ describe('logActiviteit', () => {
       naam: 'Testbedrijf BV',
     });
     expect(addDocMock).toHaveBeenCalledWith(
-      { name: 'activiteiten' },
+      { name: 'activiteitenlog' },
       {
         type: 'kunstwerk_bekeken',
         actorId: 'uid-1',

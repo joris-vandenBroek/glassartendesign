@@ -13,6 +13,20 @@ vi.mock('@/lib/useKunstwerkFotoUpload', () => ({
   useKunstwerkFotoUpload: () => ({ uploading: mockUploading, error: mockUploadError, upload: uploadMock }),
 }));
 
+const logActiviteitMock = vi.fn();
+
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
+
 const SEGMENTEN: Segment[] = [
   { id: 'seg-1', omschrijving: 'Hotel' },
   { id: 'seg-2', omschrijving: 'Restaurant' },
@@ -66,6 +80,7 @@ beforeEach(() => {
   uploadMock.mockReset();
   mockUploading = false;
   mockUploadError = null;
+  logActiviteitMock.mockReset();
 });
 
 describe('KunstwerkenSection', () => {
@@ -202,5 +217,76 @@ describe('KunstwerkenSection', () => {
     expect(screen.getByTestId('kunstwerk-modal-foto-error')).toHaveTextContent(
       'De foto kon niet geüpload worden. Probeer het opnieuw.'
     );
+  });
+
+  it('logs kunstwerk_toegevoegd with the logged-in medewerker when adding', async () => {
+    uploadMock.mockResolvedValue('https://storage.example.com/nieuw.jpg');
+    renderSection();
+    fireEvent.click(screen.getByTestId('kunstwerken-add'));
+    const file = new File(['x'], 'foto.jpg', { type: 'image/jpeg' });
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-foto-input'), { target: { files: [file] } });
+    await waitFor(() => expect(screen.getByTestId('kunstwerk-modal-foto-preview')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-segment-seg-1'));
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-materiaal-mat-1'));
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-maat-maat-1'));
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '99' } });
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-omschrijving-nl'), { target: { value: 'Nieuw kunstwerk' } });
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-opslaan'));
+
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('kunstwerk_toegevoegd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs kunstwerk_gewijzigd with the logged-in medewerker when editing', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-kw-1'));
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '175' } });
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-opslaan'));
+
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('kunstwerk_gewijzigd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs kunstwerk_verwijderd with the logged-in medewerker when deleting', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-kw-1'));
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-verwijderen'));
+
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('kunstwerk_verwijderd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('does not log when adding fails', async () => {
+    uploadMock.mockResolvedValue('https://storage.example.com/nieuw.jpg');
+    const onAdd = vi.fn().mockResolvedValue(false);
+    renderSection({ onAdd });
+    fireEvent.click(screen.getByTestId('kunstwerken-add'));
+    const file = new File(['x'], 'foto.jpg', { type: 'image/jpeg' });
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-foto-input'), { target: { files: [file] } });
+    await waitFor(() => expect(screen.getByTestId('kunstwerk-modal-foto-preview')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-segment-seg-1'));
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-materiaal-mat-1'));
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-maat-maat-1'));
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '99' } });
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-omschrijving-nl'), { target: { value: 'Nieuw kunstwerk' } });
+    fireEvent.click(screen.getByTestId('kunstwerk-modal-opslaan'));
+
+    await screen.findByTestId('kunstwerk-modal-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

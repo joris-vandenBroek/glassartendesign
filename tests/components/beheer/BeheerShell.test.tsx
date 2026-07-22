@@ -24,6 +24,18 @@ vi.mock('firebase/firestore', () => ({
   limit: vi.fn(),
 }));
 
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: vi.fn(),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
+
 function makeSnapshot(docsData: Array<{ id: string; data: Record<string, unknown> }>) {
   return {
     empty: docsData.length === 0,
@@ -42,7 +54,7 @@ const KLANT_DATA = {
   postcode: '1234 AB',
   city: 'Teststad',
   status: 'Beoordelen',
-  prijsgroep: '',
+  prijsgroepId: null,
 };
 
 // Non-empty by default so the auto-seed path never triggers in these
@@ -51,11 +63,12 @@ const KLANT_DATA = {
 const DEFAULT_COLLECTIONS: Record<string, Array<{ id: string; data: Record<string, unknown> }>> = {
   klanten: [],
   bestelheaders: [],
-  activiteiten: [],
+  activiteitenlog: [],
   materiaalsoorten: [{ id: 'soort-1', data: { omschrijving: 'Veiligheidsglas' } }],
   materialen: [{ id: 'mat-1', data: { materiaalsoortId: 'soort-1', materiaaldikte: 4, omschrijving: 'Test' } }],
   maten: [{ id: 'maat-1', data: { breedte: 40, hoogte: 60 } }],
   segmenten: [{ id: 'seg-1', data: { omschrijving: 'Hotel' } }],
+  prijsgroepen: [],
   kunstwerken: [
     {
       id: 'kw-1',
@@ -233,7 +246,7 @@ describe('BeheerShell', () => {
 
   it('shows the Activiteit section with the loaded count on its nav item', async () => {
     mockCollections({
-      activiteiten: [
+      activiteitenlog: [
         {
           id: 'log-1',
           data: {
@@ -250,5 +263,19 @@ describe('BeheerShell', () => {
     fireEvent.click(screen.getByTestId('beheer-nav-activiteit'));
     expect(await screen.findByTestId('activiteit-section')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-log-1')).toHaveTextContent('Kunstwerk bekeken');
+  });
+
+  it('shows the prijsgroepen count and switches to the Prijsgroepen section', async () => {
+    mockCollections({
+      prijsgroepen: [
+        { id: 'pg-1', data: { naam: 'Standaard', kortingspercentage: 0 } },
+        { id: 'pg-2', data: { naam: 'Wholesale', kortingspercentage: 15 } },
+      ],
+    });
+    renderShell();
+    await waitFor(() => expect(screen.getByTestId('beheer-nav-prijsgroepen')).toHaveTextContent('2'));
+    screen.getByTestId('beheer-nav-prijsgroepen').click();
+    expect(await screen.findByTestId('prijsgroepen-section')).toBeInTheDocument();
+    expect(screen.getByTestId('data-table-row-pg-1')).toHaveTextContent('Standaard');
   });
 });

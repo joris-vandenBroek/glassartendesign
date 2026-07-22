@@ -1,9 +1,27 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { SegmentenSection } from '@/components/beheer/SegmentenSection';
 import type { Segment } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
+
+const logActiviteitMock = vi.fn();
+
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
+
+beforeEach(() => {
+  logActiviteitMock.mockReset();
+});
 
 const SEGMENTEN: Segment[] = [
   { id: 'seg-1', omschrijving: 'Hotel' },
@@ -90,5 +108,56 @@ describe('SegmentenSection', () => {
       'Er is iets misgegaan. Probeer het opnieuw.'
     );
     expect(screen.getByTestId('segment-modal')).toBeInTheDocument();
+  });
+
+  it('logs segment_toegevoegd with the logged-in medewerker when adding', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('segmenten-add'));
+    fireEvent.change(screen.getByTestId('segment-modal-omschrijving'), { target: { value: 'Wellness' } });
+    fireEvent.click(screen.getByTestId('segment-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('segment_toegevoegd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs segment_gewijzigd with the logged-in medewerker when editing', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-seg-2'));
+    fireEvent.change(screen.getByTestId('segment-modal-omschrijving'), { target: { value: 'Restaurants' } });
+    fireEvent.click(screen.getByTestId('segment-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('segment_gewijzigd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs segment_verwijderd with the logged-in medewerker when deleting', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-seg-1'));
+    fireEvent.click(screen.getByTestId('segment-modal-verwijderen'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('segment_verwijderd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('does not log when adding fails', async () => {
+    const onAdd = vi.fn().mockResolvedValue(false);
+    renderSection({ onAdd });
+    fireEvent.click(screen.getByTestId('segmenten-add'));
+    fireEvent.change(screen.getByTestId('segment-modal-omschrijving'), { target: { value: 'Wellness' } });
+    fireEvent.click(screen.getByTestId('segment-modal-opslaan'));
+    await screen.findByTestId('segment-modal-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

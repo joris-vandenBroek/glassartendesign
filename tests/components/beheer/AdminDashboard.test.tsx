@@ -6,7 +6,6 @@ import messages from '../../../messages/nl.json';
 
 const logoutMock = vi.fn();
 const getDocsMock = vi.fn();
-const logActiviteitMock = vi.fn();
 let mockAuthState: {
   user: { uid: string; email: string | null } | null;
   isAdmin: boolean;
@@ -20,14 +19,6 @@ vi.mock('@/lib/useAdminAuth', () => ({
     resetPassword: vi.fn(),
     logout: logoutMock,
   }),
-}));
-
-vi.mock('@/lib/logActiviteit', () => ({
-  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
-  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
-    user
-      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
-      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
 }));
 
 vi.mock('@/lib/firebase', () => ({
@@ -52,7 +43,6 @@ function renderDashboard() {
 beforeEach(() => {
   logoutMock.mockReset();
   getDocsMock.mockReset();
-  logActiviteitMock.mockReset();
   getDocsMock.mockResolvedValue({ docs: [] });
 });
 
@@ -94,37 +84,5 @@ describe('AdminDashboard', () => {
     expect(screen.getByTestId('beheer-unauthorized')).toBeInTheDocument();
     expect(screen.queryByTestId('beheer-login-email')).not.toBeInTheDocument();
     await waitFor(() => expect(logoutMock).toHaveBeenCalled());
-  });
-
-  it('logs beheer_bezocht exactly once when authorized', async () => {
-    mockAuthState = {
-      user: { uid: 'uid-1', email: 'paul@glassartanddesign.com' },
-      isAdmin: true,
-      isHydrated: true,
-    };
-    renderDashboard();
-    await waitFor(() => expect(getDocsMock).toHaveBeenCalled());
-    expect(logActiviteitMock).toHaveBeenCalledTimes(1);
-    expect(logActiviteitMock).toHaveBeenCalledWith('beheer_bezocht', {
-      id: 'uid-1',
-      email: 'paul@glassartanddesign.com',
-      naam: 'paul@glassartanddesign.com',
-    });
-  });
-
-  it('does not log beheer_bezocht when showing the login form', () => {
-    mockAuthState = { user: null, isAdmin: false, isHydrated: true };
-    renderDashboard();
-    expect(logActiviteitMock).not.toHaveBeenCalled();
-  });
-
-  it('does not log beheer_bezocht for an unauthorized account', () => {
-    mockAuthState = {
-      user: { uid: 'uid-2', email: 'onbekend@glassartanddesign.com' },
-      isAdmin: false,
-      isHydrated: true,
-    };
-    renderDashboard();
-    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { KlantModal } from './KlantModal';
+import type { Prijsgroep } from './materiaalTypes';
 
 export interface Klant {
   id: string;
@@ -17,16 +18,17 @@ export interface Klant {
   postcode: string;
   city: string;
   status: 'Beoordelen' | 'Goedgekeurd' | 'Afgewezen';
-  prijsgroep: string;
+  prijsgroepId: string | null;
 }
 
 interface KlantenSectionProps {
   klanten: Klant[] | null;
+  prijsgroepen: Prijsgroep[] | null;
   loadError: string | null;
   onKlantUpdated: (klant: Klant) => void;
 }
 
-export function KlantenSection({ klanten, loadError, onKlantUpdated }: KlantenSectionProps) {
+export function KlantenSection({ klanten, prijsgroepen, loadError, onKlantUpdated }: KlantenSectionProps) {
   const t = useTranslations('beheer');
   const [selectedKlant, setSelectedKlant] = useState<Klant | null>(null);
 
@@ -69,6 +71,7 @@ export function KlantenSection({ klanten, loadError, onKlantUpdated }: KlantenSe
       />
       <KlantModal
         klant={selectedKlant}
+        prijsgroepen={prijsgroepen}
         onClose={() => setSelectedKlant(null)}
         onUpdated={(updated) => {
           onKlantUpdated(updated);

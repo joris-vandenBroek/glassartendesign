@@ -1,9 +1,38 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { MatenSection } from '@/components/beheer/MatenSection';
-import type { Maat } from '@/components/beheer/materiaalTypes';
+import type { Maat, Kunstwerk } from '@/components/beheer/materiaalTypes';
 import messages from '../../../messages/nl.json';
+
+const logActiviteitMock = vi.fn();
+
+vi.mock('@/lib/useAdminAuth', () => ({
+  useAdminAuth: () => ({ user: { uid: 'staff-1', email: 'paul@glassartanddesign.com' } }),
+}));
+
+vi.mock('@/lib/logActiviteit', () => ({
+  logActiviteit: (...args: unknown[]) => logActiviteitMock(...args),
+  actorFromMedewerker: (user: { uid: string; email: string | null } | null) =>
+    user
+      ? { id: user.uid, email: user.email ?? 'Onbekend', naam: user.email ?? 'Onbekend' }
+      : { id: null, email: 'Onbekend', naam: 'Onbekend' },
+}));
+
+const KUNSTWERKEN: Kunstwerk[] = [
+  {
+    id: 'kw-1',
+    foto: 'https://example.com/kw-1.jpg',
+    segmentIds: [],
+    materiaalIds: [],
+    maatIds: ['maat-1'],
+    prijzen: [],
+    omschrijvingNl: 'Hotel paneel',
+    omschrijvingFr: '',
+    omschrijvingDe: '',
+    omschrijvingEn: '',
+  },
+];
 
 const MATEN: Maat[] = [
   { id: 'maat-1', breedte: 40, hoogte: 60 },
@@ -16,13 +45,25 @@ function renderSection(overrides: Partial<React.ComponentProps<typeof MatenSecti
   const onRemove = vi.fn().mockResolvedValue(true);
   render(
     <NextIntlClientProvider locale="nl" messages={messages}>
-      <MatenSection maten={MATEN} loadError={null} onAdd={onAdd} onUpdate={onUpdate} onRemove={onRemove} {...overrides} />
+      <MatenSection
+        maten={MATEN}
+        kunstwerken={KUNSTWERKEN}
+        loadError={null}
+        onAdd={onAdd}
+        onUpdate={onUpdate}
+        onRemove={onRemove}
+        {...overrides}
+      />
     </NextIntlClientProvider>
   );
   return { onAdd, onUpdate, onRemove };
 }
 
 describe('MatenSection', () => {
+  beforeEach(() => {
+    logActiviteitMock.mockReset();
+  });
+
   it('shows the load error instead of the table when loadError is set', () => {
     renderSection({ loadError: 'Kon niet laden.' });
     expect(screen.getByTestId('maten-error')).toHaveTextContent('Kon niet laden.');
@@ -78,9 +119,9 @@ describe('MatenSection', () => {
 
   it('deletes a maat', async () => {
     const { onRemove } = renderSection();
-    fireEvent.click(screen.getByTestId('data-table-row-maat-1'));
+    fireEvent.click(screen.getByTestId('data-table-row-maat-2'));
     fireEvent.click(screen.getByTestId('maat-modal-verwijderen'));
-    await waitFor(() => expect(onRemove).toHaveBeenCalledWith('maat-1'));
+    await waitFor(() => expect(onRemove).toHaveBeenCalledWith('maat-2'));
   });
 
   it('shows an action error and keeps the modal open when adding fails', async () => {
@@ -94,5 +135,72 @@ describe('MatenSection', () => {
       'Er is iets misgegaan. Probeer het opnieuw.'
     );
     expect(screen.getByTestId('maat-modal')).toBeInTheDocument();
+  });
+
+  it('blocks deleting a maat that is still referenced by a kunstwerk', async () => {
+    const { onRemove } = renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-maat-1'));
+    fireEvent.click(screen.getByTestId('maat-modal-verwijderen'));
+    expect(await screen.findByTestId('maat-modal-error')).toHaveTextContent(
+      'Deze maat is nog gekoppeld aan een kunstwerk en kan niet verwijderd worden.'
+    );
+    expect(onRemove).not.toHaveBeenCalled();
+  });
+
+  it('deletes a maat with no linked kunstwerk', async () => {
+    const { onRemove } = renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-maat-2'));
+    fireEvent.click(screen.getByTestId('maat-modal-verwijderen'));
+    await waitFor(() => expect(onRemove).toHaveBeenCalledWith('maat-2'));
+  });
+
+  it('logs maat_toegevoegd when adding', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('maten-add'));
+    fireEvent.change(screen.getByTestId('maat-modal-breedte'), { target: { value: '50' } });
+    fireEvent.change(screen.getByTestId('maat-modal-hoogte'), { target: { value: '70' } });
+    fireEvent.click(screen.getByTestId('maat-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('maat_toegevoegd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs maat_gewijzigd when editing', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-maat-2'));
+    fireEvent.change(screen.getByTestId('maat-modal-breedte'), { target: { value: '65' } });
+    fireEvent.click(screen.getByTestId('maat-modal-opslaan'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('maat_gewijzigd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('logs maat_verwijderd when deleting', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-maat-2'));
+    fireEvent.click(screen.getByTestId('maat-modal-verwijderen'));
+    await waitFor(() =>
+      expect(logActiviteitMock).toHaveBeenCalledWith('maat_verwijderd', {
+        id: 'staff-1',
+        email: 'paul@glassartanddesign.com',
+        naam: 'paul@glassartanddesign.com',
+      })
+    );
+  });
+
+  it('does not log when a blocked delete is attempted', async () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-row-maat-1'));
+    fireEvent.click(screen.getByTestId('maat-modal-verwijderen'));
+    await screen.findByTestId('maat-modal-error');
+    expect(logActiviteitMock).not.toHaveBeenCalled();
   });
 });

@@ -4,11 +4,14 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
-import type { Materiaal, Materiaalsoort } from './materiaalTypes';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
+import type { Materiaal, Materiaalsoort, Kunstwerk } from './materiaalTypes';
 
 interface MaterialenSectionProps {
   materialen: Materiaal[] | null;
   materiaalsoorten: Materiaalsoort[] | null;
+  kunstwerken: Kunstwerk[] | null;
   loadError: string | null;
   onAdd: (data: Omit<Materiaal, 'id'>) => Promise<boolean>;
   onUpdate: (id: string, data: Omit<Materiaal, 'id'>) => Promise<boolean>;
@@ -21,12 +24,14 @@ type MateriaalRow = Materiaal & { materiaalsoortNaam: string };
 export function MaterialenSection({
   materialen,
   materiaalsoorten,
+  kunstwerken,
   loadError,
   onAdd,
   onUpdate,
   onRemove,
 }: MaterialenSectionProps) {
   const t = useTranslations('beheer');
+  const { user } = useAdminAuth();
   const [modalState, setModalState] = useState<ModalState>(null);
   const [materiaalsoortId, setMateriaalsoortId] = useState('');
   const [materiaaldikte, setMateriaaldikte] = useState('');
@@ -82,6 +87,10 @@ export function MaterialenSection({
     const success =
       modalState.mode === 'add' ? await onAdd(data) : await onUpdate(modalState.materiaal.id, data);
     if (success) {
+      void logActiviteit(
+        modalState.mode === 'add' ? 'materiaal_toegevoegd' : 'materiaal_gewijzigd',
+        actorFromMedewerker(user)
+      );
       closeModal();
     } else {
       setActionError(t('materialenActionError'));
@@ -90,8 +99,16 @@ export function MaterialenSection({
 
   async function handleRemove() {
     if (modalState?.mode !== 'edit') return;
+    const inUse = (kunstwerken ?? []).some((kunstwerk) =>
+      kunstwerk.materiaalIds.includes(modalState.materiaal.id)
+    );
+    if (inUse) {
+      setActionError(t('materialenVerwijderBlocked'));
+      return;
+    }
     const success = await onRemove(modalState.materiaal.id);
     if (success) {
+      void logActiviteit('materiaal_verwijderd', actorFromMedewerker(user));
       closeModal();
     } else {
       setActionError(t('materialenActionError'));

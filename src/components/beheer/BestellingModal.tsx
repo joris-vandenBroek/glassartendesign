@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Modal } from '@/components/Modal';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import { formatCurrency } from '@/lib/formatCurrency';
 import type { Bestelling } from './BestellingenSection';
 import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './materiaalTypes';
@@ -30,6 +32,7 @@ export function BestellingModal({
 }: BestellingModalProps) {
   const t = useTranslations('beheer');
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAdminAuth();
 
   useEffect(() => {
     if (bestelling) {
@@ -45,6 +48,7 @@ export function BestellingModal({
     if (!bestelling) return;
     try {
       await updateDoc(doc(db, 'bestelheaders', bestelling.id), { status: 'Goedgekeurd' });
+      void logActiviteit('bestelling_goedgekeurd', actorFromMedewerker(user));
       onUpdated({ ...bestelling, status: 'Goedgekeurd' });
     } catch {
       setError(t('bestellingenActionError'));
@@ -55,6 +59,7 @@ export function BestellingModal({
     if (!bestelling) return;
     try {
       await updateDoc(doc(db, 'bestelheaders', bestelling.id), { status: 'Afgewezen' });
+      void logActiviteit('bestelling_afgewezen', actorFromMedewerker(user));
       onUpdated({ ...bestelling, status: 'Afgewezen' });
     } catch {
       setError(t('bestellingenActionError'));
