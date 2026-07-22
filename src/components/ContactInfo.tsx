@@ -1,30 +1,40 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { useFirestoreDocument } from '@/lib/useFirestoreDocument';
+import { BEDRIJFSGEGEVENS_SEED } from '@/data/bedrijfsgegevensSeed';
+import type { Bedrijfsgegevens, Taal } from './beheer/bedrijfsgegevensTypes';
 
-const ADDRESS = 'Den Heuvel 21, 5688 EM Oirschot';
-const DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-  ADDRESS
-)}`;
-const MAP_EMBED_URL = `https://www.google.com/maps?q=${encodeURIComponent(
-  ADDRESS
-)}&output=embed`;
-const WHATSAPP_NUMBER = '31600000000';
+function vertaling(tekst: Record<Taal, string>, locale: string): string {
+  const taal = (Object.prototype.hasOwnProperty.call(tekst, locale) ? locale : 'nl') as Taal;
+  return tekst[taal] || tekst.nl;
+}
 
 export function ContactInfo() {
   const t = useTranslations('contactPage');
+  const locale = useLocale();
+  const { data } = useFirestoreDocument<Bedrijfsgegevens>('instellingen', 'bedrijfsgegevens', {
+    seed: BEDRIJFSGEGEVENS_SEED,
+  });
+
+  if (!data) {
+    return null;
+  }
+
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    data.bezoekadres
+  )}`;
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(data.bezoekadres)}&output=embed`;
 
   return (
     <div className="flex flex-col gap-6 text-sm text-white/80">
       <div>
-        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">
-          {t('visitLabel')}
-        </p>
+        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('visitLabel')}</p>
         <p data-testid="contact-address" className="mt-2">
-          {ADDRESS}
+          {data.bezoekadres}
         </p>
         <a
-          href={DIRECTIONS_URL}
+          href={directionsUrl}
           target="_blank"
           rel="noopener noreferrer"
           data-testid="contact-directions"
@@ -34,7 +44,7 @@ export function ContactInfo() {
         </a>
         <iframe
           data-testid="contact-map"
-          src={MAP_EMBED_URL}
+          src={mapEmbedUrl}
           title={t('visitLabel')}
           loading="lazy"
           className="mt-4 h-48 w-full rounded border border-white/10"
@@ -42,49 +52,36 @@ export function ContactInfo() {
       </div>
 
       <div>
-        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">
-          {t('contactsLabel')}
-        </p>
-        <p className="mt-2">
-          <strong className="text-white">Paul van den Hout</strong> — {t('projectsContact')}
-          <br />
-          <a
-            href="tel:+31651404089"
-            data-testid="contact-phone-projects"
-            className="underline decoration-white/30"
-          >
-            06 51404089
-          </a>
-        </p>
-        <p className="mt-3">
-          <strong className="text-white">Hem Brekoo</strong> — {t('b2bContact')}
-          <br />
-          <a
-            href="tel:+31653736756"
-            data-testid="contact-phone-b2b"
-            className="underline decoration-white/30"
-          >
-            06 53736756
-          </a>
-        </p>
+        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('contactsLabel')}</p>
+        {data.contactpersonen.map((persoon, index) => (
+          <p key={persoon.id} className={index === 0 ? 'mt-2' : 'mt-3'} data-testid={`contact-person-${index}`}>
+            <strong className="text-white">{persoon.naam}</strong> — {vertaling(persoon.rol, locale)}
+            <br />
+            <a
+              href={`tel:${persoon.telefoon}`}
+              data-testid={`contact-phone-${index}`}
+              className="underline decoration-white/30"
+            >
+              {persoon.telefoon}
+            </a>
+          </p>
+        ))}
       </div>
 
       <div>
-        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">
-          {t('emailLabel')}
-        </p>
+        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('emailLabel')}</p>
         <a
-          href="mailto:info@glassartdesign.nl"
+          href={`mailto:${data.email}`}
           data-testid="contact-email"
           className="mt-2 inline-block underline decoration-white/30"
         >
-          info@glassartdesign.nl
+          {data.email}
         </a>
       </div>
 
       <div>
         <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}`}
+          href={`https://wa.me/${data.whatsappNummer}`}
           target="_blank"
           rel="noopener noreferrer"
           data-testid="contact-whatsapp"
@@ -95,22 +92,18 @@ export function ContactInfo() {
       </div>
 
       <div>
-        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">
-          {t('hoursLabel')}
-        </p>
-        <p className="mt-2">{t('hoursValue')}</p>
+        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('hoursLabel')}</p>
+        <p className="mt-2">{vertaling(data.openingstijden, locale)}</p>
       </div>
 
       <div>
-        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">
-          {t('companyLabel')}
-        </p>
+        <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/50">{t('companyLabel')}</p>
         <p className="mt-2">
-          {t('kvkLabel')}: 12345678
+          {t('kvkLabel')}: {data.kvkNummer}
           <br />
-          {t('btwLabel')}: NL123456789B01
+          {t('btwLabel')}: {data.btwNummer}
           <br />
-          {t('ibanLabel')}: NL00 BANK 0123 4567 89
+          {t('ibanLabel')}: {data.iban}
         </p>
       </div>
     </div>
