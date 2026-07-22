@@ -21,6 +21,7 @@ function renderNav(activeSection: BeheerSection = 'klanten') {
         matenCount={2}
         segmentenCount={6}
         kunstwerkenCount={36}
+        activiteitCount={12}
       />
     </NextIntlClientProvider>
   );
@@ -28,7 +29,7 @@ function renderNav(activeSection: BeheerSection = 'klanten') {
 }
 
 describe('BeheerNav', () => {
-  it('renders the 8 active items with their counters, and the 3 disabled placeholder items', () => {
+  it('renders the 9 active items with their counters, and the 3 disabled placeholder items', () => {
     renderNav();
     expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('Klanten');
     expect(screen.getByTestId('beheer-nav-klanten')).toHaveTextContent('3');
@@ -43,6 +44,8 @@ describe('BeheerNav', () => {
     expect(screen.getByTestId('beheer-nav-segmenten')).toHaveTextContent('6');
     expect(screen.getByTestId('beheer-nav-kunstwerken')).toHaveTextContent('Kunstwerken');
     expect(screen.getByTestId('beheer-nav-kunstwerken')).toHaveTextContent('36');
+    expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('Activiteit');
+    expect(screen.getByTestId('beheer-nav-activiteit')).toHaveTextContent('12');
 
     ['retouren', 'prijsgroepen', 'glassartDesign'].forEach((id) => {
       expect(screen.getByTestId(`beheer-nav-${id}`)).toBeDisabled();

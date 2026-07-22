@@ -10,7 +10,8 @@ export type BeheerSection =
   | 'materialen'
   | 'maten'
   | 'segmenten'
-  | 'kunstwerken';
+  | 'kunstwerken'
+  | 'activiteit';
 
 interface BeheerNavProps {
   activeSection: BeheerSection;
@@ -24,6 +25,7 @@ interface BeheerNavProps {
   matenCount: number;
   segmentenCount: number;
   kunstwerkenCount: number;
+  activiteitCount: number;
 }
 
 const ACTIVE_ITEMS: { id: BeheerSection; labelKey: string }[] = [
@@ -35,6 +37,7 @@ const ACTIVE_ITEMS: { id: BeheerSection; labelKey: string }[] = [
   { id: 'maten', labelKey: 'navMaten' },
   { id: 'segmenten', labelKey: 'navSegmenten' },
   { id: 'kunstwerken', labelKey: 'navKunstwerken' },
+  { id: 'activiteit', labelKey: 'navActiviteit' },
 ];
 
 const DISABLED_ITEMS: { id: string; labelKey: string }[] = [
@@ -55,6 +58,7 @@ export function BeheerNav({
   matenCount,
   segmentenCount,
   kunstwerkenCount,
+  activiteitCount,
 }: BeheerNavProps) {
   const t = useTranslations('beheer');
   const counts: Record<BeheerSection, number> = {
@@ -66,6 +70,7 @@ export function BeheerNav({
     maten: matenCount,
     segmenten: segmentenCount,
     kunstwerken: kunstwerkenCount,
+    activiteit: activiteitCount,
   };
 
   return (
