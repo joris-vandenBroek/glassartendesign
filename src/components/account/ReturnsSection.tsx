@@ -14,7 +14,7 @@ const REASON_KEYS = [
 
 export function ReturnsSection() {
   const t = useTranslations('accountPage.returns');
-  const orders = useAllOrders();
+  const { orders } = useAllOrders();
   const { returnsByOrderId, registerReturn } = useReturns();
   const eligibleOrders = orders.filter((order) => !order.hasReturnRequest);
   const registeredOrders = orders.filter((order) => order.hasReturnRequest);

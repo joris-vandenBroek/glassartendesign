@@ -51,27 +51,6 @@
       "title": "Artist Collections"
     }
   },
-  "orders": {
-    "reorder": "Reorder",
-    "items": {
-      "order1": {
-        "description": "Abstract panel 60x90cm",
-        "status": "Pending"
-      },
-      "order2": {
-        "description": "Hotel lobby set – 3 panels",
-        "status": "In production"
-      },
-      "order3": {
-        "description": "Wellness panel 40x60cm",
-        "status": "Shipped"
-      },
-      "order4": {
-        "description": "Restaurant wall panel 80x120cm",
-        "status": "Delivered"
-      }
-    }
-  },
   "cart": {
     "title": "Cart",
     "addToCart": "Add to cart",
@@ -87,6 +66,7 @@
     "placeOrderError": "Something went wrong placing the order. Please try again.",
     "orderConfirmation": "We've received your order and will process it as soon as possible.",
     "orderEmailSubject": "Order confirmation — Glassart & Design",
+    "emailError": "Your order was placed, but we couldn't send the confirmation email.",
     "remove": "Remove",
     "requestedStatus": "Requested",
     "added": "Added!",
@@ -209,10 +189,13 @@
     "navSettings": "Settings",
     "logout": "Log out",
     "orders": {
-      "lineSummary": "{lines, plural, one {# line} other {# lines}}, {quantity, plural, one {# piece} other {# pieces}}",
+      "lineSummary": "{lines, plural, one {# order line} other {# order lines}}, totaling {quantity, plural, one {# piece} other {# pieces}}",
       "statusTeBeoordelen": "Under review",
       "statusGoedgekeurd": "Approved",
-      "statusAfgewezen": "Rejected"
+      "statusAfgewezen": "Rejected",
+      "modalClose": "Close",
+      "modalLineUnknown": "Unknown item",
+      "loadError": "Couldn't load your orders. Please try again later."
     },
     "invoices": {
       "empty": "No invoices found.",

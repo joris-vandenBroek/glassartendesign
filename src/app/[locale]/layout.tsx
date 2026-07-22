@@ -6,7 +6,6 @@ import { NavBar } from '@/components/NavBar';
 import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
 import { AdminAuthProvider } from '@/lib/useAdminAuth';
 import { CartProvider } from '@/lib/useCart';
-import { OrdersProvider } from '@/lib/useOrders';
 import { ReturnsProvider } from '@/lib/useReturns';
 import { MockProfileProvider } from '@/lib/useMockProfile';
 
@@ -33,14 +32,12 @@ export default async function LocaleLayout({
       <AdminAuthProvider>
         <CustomerAuthProvider>
           <CartProvider>
-            <OrdersProvider>
-              <ReturnsProvider>
-                <MockProfileProvider>
-                  <NavBar />
-                  {children}
-                </MockProfileProvider>
-              </ReturnsProvider>
-            </OrdersProvider>
+            <ReturnsProvider>
+              <MockProfileProvider>
+                <NavBar />
+                {children}
+              </MockProfileProvider>
+            </ReturnsProvider>
           </CartProvider>
         </CustomerAuthProvider>
       </AdminAuthProvider>

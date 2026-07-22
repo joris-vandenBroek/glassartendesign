@@ -2,7 +2,6 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { CustomerAuthProvider } from '@/lib/useCustomerAuth';
-import { OrdersProvider } from '@/lib/useOrders';
 import { ReturnsProvider } from '@/lib/useReturns';
 import { MockProfileProvider } from '@/lib/useMockProfile';
 import { AccountDashboard } from '@/components/account/AccountDashboard';
@@ -39,13 +38,11 @@ function renderDashboard() {
   return render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <CustomerAuthProvider>
-        <OrdersProvider>
-          <ReturnsProvider>
-            <MockProfileProvider>
-              <AccountDashboard />
-            </MockProfileProvider>
-          </ReturnsProvider>
-        </OrdersProvider>
+        <ReturnsProvider>
+          <MockProfileProvider>
+            <AccountDashboard />
+          </MockProfileProvider>
+        </ReturnsProvider>
       </CustomerAuthProvider>
     </NextIntlClientProvider>
   );

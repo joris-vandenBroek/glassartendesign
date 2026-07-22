@@ -51,27 +51,6 @@
       "title": "Artist Collections"
     }
   },
-  "orders": {
-    "reorder": "Bestel opnieuw",
-    "items": {
-      "order1": {
-        "description": "Abstract paneel 60x90cm",
-        "status": "In behandeling"
-      },
-      "order2": {
-        "description": "Hotel lobby set – 3 panelen",
-        "status": "In productie"
-      },
-      "order3": {
-        "description": "Wellness paneel 40x60cm",
-        "status": "Verzonden"
-      },
-      "order4": {
-        "description": "Restaurant wandpaneel 80x120cm",
-        "status": "Geleverd"
-      }
-    }
-  },
   "cart": {
     "title": "Mandje",
     "addToCart": "Toevoegen aan mandje",
@@ -87,6 +66,7 @@
     "placeOrderError": "Er ging iets mis bij het plaatsen van de bestelling. Probeer het opnieuw.",
     "orderConfirmation": "Uw bestelling is door ons ontvangen en zal zo spoedig mogelijk worden verwerkt.",
     "orderEmailSubject": "Bevestiging van uw bestelling — Glassart & Design",
+    "emailError": "Uw bestelling is geplaatst, maar de bevestigingsmail kon niet worden verzonden.",
     "remove": "Verwijderen",
     "requestedStatus": "Aangevraagd",
     "added": "Toegevoegd!",
@@ -209,10 +189,13 @@
     "navSettings": "Instellingen",
     "logout": "Uitloggen",
     "orders": {
-      "lineSummary": "{lines, plural, one {# regel} other {# regels}}, {quantity, plural, one {# stuk} other {# stuks}}",
+      "lineSummary": "{lines, plural, one {# bestelregel} other {# bestelregels}}, totaal {quantity, plural, one {# stuk} other {# stuks}}",
       "statusTeBeoordelen": "Te beoordelen",
       "statusGoedgekeurd": "Goedgekeurd",
-      "statusAfgewezen": "Afgewezen"
+      "statusAfgewezen": "Afgewezen",
+      "modalClose": "Sluiten",
+      "modalLineUnknown": "Onbekend artikel",
+      "loadError": "Bestellingen konden niet worden geladen. Probeer het later opnieuw."
     },
     "invoices": {
       "empty": "Geen facturen gevonden.",

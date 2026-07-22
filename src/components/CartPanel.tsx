@@ -7,6 +7,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useCart } from '@/lib/useCart';
 import { useCustomerAuth } from '@/lib/useCustomerAuth';
+import { generateBestelnr } from '@/lib/generateBestelnr';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 import { formatCurrency } from '@/data/mockAdminInvoices';
 import { WatermarkedImage } from './WatermarkedImage';
@@ -17,6 +18,7 @@ export function CartPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [placeOrderError, setPlaceOrderError] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const { items, isHydrated, totalQuantity, totalPrice, removeItem, clear } = useCart();
   const { user, isCustomer } = useCustomerAuth();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -25,6 +27,7 @@ export function CartPanel() {
   function handleClose() {
     setIsOpen(false);
     setOrderPlaced(false);
+    setEmailError(false);
   }
 
   useOverlayDismiss({
@@ -39,9 +42,12 @@ export function CartPanel() {
       return;
     }
     setPlaceOrderError(null);
+    setEmailError(false);
     try {
+      const bestelnr = await generateBestelnr();
       const headerDoc = await addDoc(collection(db, 'bestelheaders'), {
         klantId: user.uid,
+        bestelnr,
         besteldatum: serverTimestamp(),
         status: 'Te beoordelen',
       });
@@ -73,7 +79,7 @@ export function CartPanel() {
       return;
     }
     try {
-      await fetch(endpoint, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,8 +89,13 @@ export function CartPanel() {
           body: t('orderConfirmation'),
         }),
       });
+      if (!response.ok) {
+        setEmailError(true);
+      }
     } catch {
-      // Best-effort only -- the order itself already succeeded via Firestore.
+      // Best-effort -- the order itself already succeeded via Firestore, so
+      // this only surfaces a soft warning rather than blocking the order.
+      setEmailError(true);
     }
   }
 
@@ -141,9 +152,16 @@ export function CartPanel() {
 
               <div className="flex-1 overflow-y-auto px-5 py-4">
                 {orderPlaced ? (
-                  <p data-testid="cart-order-confirmation" className="text-center text-xs text-white/80">
-                    {t('orderConfirmation')}
-                  </p>
+                  <div className="flex flex-col gap-2">
+                    <p data-testid="cart-order-confirmation" className="text-center text-xs text-white/80">
+                      {t('orderConfirmation')}
+                    </p>
+                    {emailError && (
+                      <p data-testid="cart-order-email-error" className="text-center text-xs text-amber-400">
+                        {t('emailError')}
+                      </p>
+                    )}
+                  </div>
                 ) : items.length === 0 ? (
                   <p data-testid="cart-empty" className="text-center text-xs text-white/60">
                     {t('empty')}

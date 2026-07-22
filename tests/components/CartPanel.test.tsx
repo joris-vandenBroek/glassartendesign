@@ -29,12 +29,21 @@ vi.mock('firebase/auth', () => ({
   onAuthStateChanged: (...args: unknown[]) => onAuthStateChangedMock(...args),
 }));
 
+const runTransactionMock = vi.fn(async (...args: unknown[]) => {
+  const updateFn = args[1] as (transaction: unknown) => unknown;
+  return updateFn({
+    get: vi.fn().mockResolvedValue({ exists: () => false, data: () => ({}) }),
+    set: vi.fn(),
+  });
+});
+
 vi.mock('firebase/firestore', () => ({
   doc: vi.fn((_db, collection, id) => ({ collection, id })),
   getDoc: (...args: unknown[]) => getDocMock(...args),
   collection: vi.fn((_db, ...path) => ({ path })),
   addDoc: (...args: unknown[]) => addDocMock(...args),
   serverTimestamp: () => 'SERVER_TIMESTAMP',
+  runTransaction: (...args: unknown[]) => runTransactionMock(...args),
 }));
 
 const SEED_ITEM = {
@@ -171,7 +180,12 @@ describe('CartPanel', () => {
     expect(addDocMock).toHaveBeenNthCalledWith(
       1,
       { path: ['bestelheaders'] },
-      { klantId: 'uid-1', besteldatum: 'SERVER_TIMESTAMP', status: 'Te beoordelen' }
+      {
+        klantId: 'uid-1',
+        bestelnr: 'GD-00001',
+        besteldatum: 'SERVER_TIMESTAMP',
+        status: 'Te beoordelen',
+      }
     );
     expect(addDocMock).toHaveBeenNthCalledWith(
       2,
@@ -217,7 +231,7 @@ describe('CartPanel', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('still shows the order confirmation even if sending the email fails', async () => {
+  it('still shows the order confirmation, plus a soft warning, if sending the email fails', async () => {
     vi.stubEnv('NEXT_PUBLIC_MAIL_ENDPOINT_URL', 'https://example.com/mail.php');
     vi.stubEnv('NEXT_PUBLIC_MAIL_SECRET', 'test-secret');
     fetchMock.mockRejectedValue(new Error('network error'));
@@ -229,6 +243,23 @@ describe('CartPanel', () => {
     fireEvent.click(screen.getByTestId('cart-place-order'));
 
     expect(await screen.findByTestId('cart-order-confirmation')).toBeInTheDocument();
+    expect(await screen.findByTestId('cart-order-email-error')).toHaveTextContent(
+      "Uw bestelling is geplaatst, maar de bevestigingsmail kon niet worden verzonden."
+    );
+  });
+
+  it('shows the email warning when the mail endpoint responds with a non-ok status', async () => {
+    vi.stubEnv('NEXT_PUBLIC_MAIL_ENDPOINT_URL', 'https://example.com/mail.php');
+    vi.stubEnv('NEXT_PUBLIC_MAIL_SECRET', 'test-secret');
+    fetchMock.mockResolvedValue({ ok: false });
+    addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
+    renderCartPanel();
+    fireEvent.click(screen.getByTestId('seed-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+
+    expect(await screen.findByTestId('cart-order-email-error')).toBeInTheDocument();
   });
 
   it('clears the confirmation message once the panel is closed and reopened', async () => {

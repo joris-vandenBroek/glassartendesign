@@ -4,42 +4,57 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { MOCK_ORDERS } from '@/data/mockOrders';
-import { useOrders } from './useOrders';
+import { formatOrderDateTime } from '@/lib/formatOrderDateTime';
 import { useReturns } from './useReturns';
 import { useCustomerAuth } from './useCustomerAuth';
+
+export interface DisplayOrderLine {
+  id: string;
+  kunstwerkId: string | null;
+  maatId: string | null;
+  materiaalId: string | null;
+  prijs: number;
+  quantity: number;
+}
 
 export interface DisplayOrder {
   id: string;
   date: string;
+  time: string;
   description: string;
-  status: string;
   hasReturnRequest: boolean;
+  lines: DisplayOrderLine[] | null;
 }
 
 interface RealOrder {
   id: string;
-  date: string;
-  status: string;
+  date: Date | null;
   lineCount: number;
   totalQuantity: number;
+  lines: DisplayOrderLine[];
 }
 
-export function useAllOrders(): DisplayOrder[] {
-  const tOrders = useTranslations('orders');
+export interface UseAllOrdersResult {
+  orders: DisplayOrder[];
+  loadError: boolean;
+}
+
+export function useAllOrders(): UseAllOrdersResult {
   const tAccount = useTranslations('accountPage');
-  const { placedOrders } = useOrders();
   const { returnsByOrderId } = useReturns();
   const { user } = useCustomerAuth();
   const [realOrders, setRealOrders] = useState<RealOrder[]>([]);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     if (!user) {
       setRealOrders([]);
+      setLoadError(false);
       return;
     }
     let cancelled = false;
     async function loadRealOrders() {
+      setLoadError(false);
       try {
         const headersSnapshot = await getDocs(
           query(collection(db, 'bestelheaders'), where('klantId', '==', user!.uid))
@@ -49,17 +64,25 @@ export function useAllOrders(): DisplayOrder[] {
             const linesSnapshot = await getDocs(
               collection(db, 'bestelheaders', headerDoc.id, 'bestellines')
             );
-            const totalQuantity = linesSnapshot.docs.reduce(
-              (sum, lineDoc) => sum + (lineDoc.data().quantity ?? 0),
-              0
-            );
+            const lines: DisplayOrderLine[] = linesSnapshot.docs.map((lineDoc) => {
+              const lineData = lineDoc.data();
+              return {
+                id: lineDoc.id,
+                kunstwerkId: lineData.kunstwerkId ?? null,
+                maatId: lineData.maatId ?? null,
+                materiaalId: lineData.materiaalId ?? null,
+                prijs: lineData.prijs ?? 0,
+                quantity: lineData.quantity ?? 0,
+              };
+            });
+            const totalQuantity = lines.reduce((sum, line) => sum + line.quantity, 0);
             const data = headerDoc.data();
             return {
-              id: headerDoc.id,
-              date: data.besteldatum?.toDate().toISOString().slice(0, 10) ?? '',
-              status: data.status,
-              lineCount: linesSnapshot.docs.length,
+              id: data.bestelnr ?? headerDoc.id,
+              date: data.besteldatum?.toDate() ?? null,
+              lineCount: lines.length,
               totalQuantity,
+              lines,
             };
           })
         );
@@ -69,6 +92,7 @@ export function useAllOrders(): DisplayOrder[] {
       } catch {
         if (!cancelled) {
           setRealOrders([]);
+          setLoadError(true);
         }
       }
     }
@@ -78,47 +102,24 @@ export function useAllOrders(): DisplayOrder[] {
     };
   }, [user]);
 
-  return useMemo(() => {
-    const statusLabels: Record<string, string> = {
-      'Te beoordelen': tAccount('orders.statusTeBeoordelen'),
-      Goedgekeurd: tAccount('orders.statusGoedgekeurd'),
-      Afgewezen: tAccount('orders.statusAfgewezen'),
-    };
-
-    const real: DisplayOrder[] = realOrders.map((order) => ({
-      id: order.id,
-      date: order.date,
-      description: tAccount('orders.lineSummary', {
-        lines: order.lineCount,
-        quantity: order.totalQuantity,
-      }),
-      status: statusLabels[order.status] ?? order.status,
-      hasReturnRequest: false,
-    }));
-
-    const placed: DisplayOrder[] = placedOrders.map((order) => ({
-      id: order.id,
-      date: order.date,
-      description: order.description,
-      status: order.status,
-      hasReturnRequest: false,
-    }));
-
-    const seeded: DisplayOrder[] = MOCK_ORDERS.map((order) => ({
-      id: order.id,
-      date: order.date,
-      description: tOrders(`items.${order.messageKey}.description`),
-      status: tOrders(`items.${order.messageKey}.status`),
-      hasReturnRequest: false,
-    }));
-
-    return [...real, ...placed, ...seeded].map((order) => {
-      const hasReturnRequest = Boolean(returnsByOrderId[order.id]);
+  const orders = useMemo(() => {
+    return realOrders.map((order) => {
+      const { date, time } = order.date
+        ? formatOrderDateTime(order.date)
+        : { date: '', time: '' };
       return {
-        ...order,
-        status: hasReturnRequest ? tAccount('returns.statusRegistered') : order.status,
-        hasReturnRequest,
+        id: order.id,
+        date,
+        time,
+        description: tAccount('orders.lineSummary', {
+          lines: order.lineCount,
+          quantity: order.totalQuantity,
+        }),
+        hasReturnRequest: Boolean(returnsByOrderId[order.id]),
+        lines: order.lines,
       };
     });
-  }, [realOrders, placedOrders, returnsByOrderId, tOrders, tAccount]);
+  }, [realOrders, returnsByOrderId, tAccount]);
+
+  return useMemo(() => ({ orders, loadError }), [orders, loadError]);
 }

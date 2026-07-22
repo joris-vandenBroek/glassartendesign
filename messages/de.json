@@ -51,27 +51,6 @@
       "title": "Artist Collections"
     }
   },
-  "orders": {
-    "reorder": "Erneut bestellen",
-    "items": {
-      "order1": {
-        "description": "Abstraktes Panel 60x90cm",
-        "status": "In Bearbeitung"
-      },
-      "order2": {
-        "description": "Hotel-Lobby-Set – 3 Paneele",
-        "status": "In Produktion"
-      },
-      "order3": {
-        "description": "Wellness-Panel 40x60cm",
-        "status": "Versandt"
-      },
-      "order4": {
-        "description": "Restaurant-Wandpaneel 80x120cm",
-        "status": "Geliefert"
-      }
-    }
-  },
   "cart": {
     "title": "Warenkorb",
     "addToCart": "In den Warenkorb",
@@ -87,6 +66,7 @@
     "placeOrderError": "Beim Platzieren der Bestellung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "orderConfirmation": "Wir haben Ihre Bestellung erhalten und werden sie so schnell wie möglich bearbeiten.",
     "orderEmailSubject": "Bestellbestätigung — Glassart & Design",
+    "emailError": "Ihre Bestellung wurde aufgegeben, aber die Bestätigungs-E-Mail konnte nicht gesendet werden.",
     "remove": "Entfernen",
     "requestedStatus": "Angefragt",
     "added": "Hinzugefügt!",
@@ -209,10 +189,13 @@
     "navSettings": "Einstellungen",
     "logout": "Abmelden",
     "orders": {
-      "lineSummary": "{lines, plural, one {# Position} other {# Positionen}}, {quantity} Stück",
+      "lineSummary": "{lines, plural, one {# Bestellposition} other {# Bestellpositionen}}, insgesamt {quantity} Stück",
       "statusTeBeoordelen": "In Prüfung",
       "statusGoedgekeurd": "Genehmigt",
-      "statusAfgewezen": "Abgelehnt"
+      "statusAfgewezen": "Abgelehnt",
+      "modalClose": "Schließen",
+      "modalLineUnknown": "Unbekannter Artikel",
+      "loadError": "Bestellungen konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
     },
     "invoices": {
       "empty": "Keine Rechnungen gefunden.",

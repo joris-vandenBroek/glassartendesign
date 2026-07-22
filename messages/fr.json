@@ -51,27 +51,6 @@
       "title": "Artist Collections"
     }
   },
-  "orders": {
-    "reorder": "Commander à nouveau",
-    "items": {
-      "order1": {
-        "description": "Panneau abstrait 60x90cm",
-        "status": "En cours de traitement"
-      },
-      "order2": {
-        "description": "Ensemble hall d'hôtel – 3 panneaux",
-        "status": "En production"
-      },
-      "order3": {
-        "description": "Panneau bien-être 40x60cm",
-        "status": "Expédié"
-      },
-      "order4": {
-        "description": "Panneau mural restaurant 80x120cm",
-        "status": "Livré"
-      }
-    }
-  },
   "cart": {
     "title": "Panier",
     "addToCart": "Ajouter au panier",
@@ -87,6 +66,7 @@
     "placeOrderError": "Une erreur s'est produite lors de la commande. Veuillez réessayer.",
     "orderConfirmation": "Nous avons bien reçu votre commande et la traiterons dans les plus brefs délais.",
     "orderEmailSubject": "Confirmation de votre commande — Glassart & Design",
+    "emailError": "Votre commande a été passée, mais l'e-mail de confirmation n'a pas pu être envoyé.",
     "remove": "Supprimer",
     "requestedStatus": "Demandée",
     "added": "Ajouté !",
@@ -209,10 +189,13 @@
     "navSettings": "Paramètres",
     "logout": "Déconnexion",
     "orders": {
-      "lineSummary": "{lines, plural, one {# ligne} other {# lignes}}, {quantity, plural, one {# pièce} other {# pièces}}",
+      "lineSummary": "{lines, plural, one {# ligne de commande} other {# lignes de commande}}, au total {quantity, plural, one {# pièce} other {# pièces}}",
       "statusTeBeoordelen": "En cours d'examen",
       "statusGoedgekeurd": "Approuvée",
-      "statusAfgewezen": "Refusée"
+      "statusAfgewezen": "Refusée",
+      "modalClose": "Fermer",
+      "modalLineUnknown": "Article inconnu",
+      "loadError": "Impossible de charger vos commandes. Veuillez réessayer plus tard."
     },
     "invoices": {
       "empty": "Aucune facture trouvée.",
