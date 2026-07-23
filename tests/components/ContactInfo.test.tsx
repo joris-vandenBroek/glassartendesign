@@ -101,13 +101,27 @@ describe('ContactInfo', () => {
     );
   });
 
-  it('renders a WhatsApp link with the Firestore number', async () => {
+  it('renders a WhatsApp link and visible number for contact person Paul van den Hout', async () => {
     mockDoc(BEDRIJFSGEGEVENS);
+    renderWithIntl(<ContactInfo />, 'nl', messages);
+    expect(await screen.findByTestId('contact-whatsapp')).toHaveAttribute(
+      'href',
+      'https://wa.me/31651404089'
+    );
+    expect(screen.getByTestId('contact-whatsapp-number')).toHaveTextContent('+31651404089');
+  });
+
+  it('falls back to the generic WhatsApp number when Paul van den Hout is not a contact person', async () => {
+    mockDoc({
+      ...BEDRIJFSGEGEVENS,
+      contactpersonen: [BEDRIJFSGEGEVENS.contactpersonen[1]],
+    });
     renderWithIntl(<ContactInfo />, 'nl', messages);
     expect(await screen.findByTestId('contact-whatsapp')).toHaveAttribute(
       'href',
       'https://wa.me/31600000000'
     );
+    expect(screen.queryByTestId('contact-whatsapp-number')).not.toBeInTheDocument();
   });
 
   it('renders opening hours for the active locale and the company registration block', async () => {

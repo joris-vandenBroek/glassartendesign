@@ -21,6 +21,13 @@ export function ContactInfo() {
   )}`;
   const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(bedrijfsgegevens.bezoekadres)}&output=embed`;
 
+  const whatsappContact = bedrijfsgegevens.contactpersonen.find((persoon) =>
+    persoon.naam.startsWith('Paul van den Hout')
+  );
+  const whatsappNummer = whatsappContact
+    ? whatsappContact.telefoon.replace(/[^\d]/g, '')
+    : bedrijfsgegevens.whatsappNummer;
+
   return (
     <div className="flex flex-col gap-6 text-sm text-white/80">
       <div>
@@ -76,7 +83,7 @@ export function ContactInfo() {
 
       <div>
         <a
-          href={`https://wa.me/${bedrijfsgegevens.whatsappNummer}`}
+          href={`https://wa.me/${whatsappNummer}`}
           target="_blank"
           rel="noopener noreferrer"
           data-testid="contact-whatsapp"
@@ -84,6 +91,11 @@ export function ContactInfo() {
         >
           {t('whatsappLabel')}
         </a>
+        {whatsappContact && (
+          <span data-testid="contact-whatsapp-number" className="ml-2 text-xs text-white/70">
+            {whatsappContact.telefoon}
+          </span>
+        )}
       </div>
 
       <div>
