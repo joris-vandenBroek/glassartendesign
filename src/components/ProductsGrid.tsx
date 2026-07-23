@@ -90,6 +90,9 @@ export function ProductsGrid() {
             kunstwerk.materiaalIds.includes(materiaal.id)
           );
           const beschikbareMaten = (maten.items ?? []).filter((maat) => kunstwerk.maatIds.includes(maat.id));
+          const collectieLabels = kunstwerk.segmentIds.map(
+            (segmentId) => segmenten.items?.find((segment) => segment.id === segmentId)?.omschrijving ?? segmentId
+          );
           return (
             <div
               key={kunstwerk.id}
@@ -113,9 +116,13 @@ export function ProductsGrid() {
                 className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-br from-gold/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               />
               <KunstwerkSpecCard
-                fotoSlot={<WatermarkedImage src={kunstwerk.foto} alt={omschrijving} className="aspect-[2/3] w-full" />}
-                naam={kunstwerk.naam || omschrijving}
+                fotoSlot={
+                  <WatermarkedImage src={kunstwerk.foto} alt={omschrijving} className="h-full w-full" fit="contain" />
+                }
+                code={kunstwerk.naam}
+                titel={omschrijving}
                 artiest={kunstwerk.artiest}
+                collectieLabels={collectieLabels}
                 materiaalLabels={beschikbareMaterialen.map((materiaal) =>
                   materiaalLabel(materiaal, materiaalsoortNaamById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId)
                 )}

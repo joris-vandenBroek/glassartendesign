@@ -6,11 +6,12 @@ export interface WatermarkedImageProps {
   src: string;
   alt: string;
   className?: string;
+  fit?: 'cover' | 'contain';
 }
 
 const WATERMARK_TEXT = '© Glassart & Design';
 
-export function WatermarkedImage({ src, alt, className }: WatermarkedImageProps) {
+export function WatermarkedImage({ src, alt, className, fit = 'cover' }: WatermarkedImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasReady, setCanvasReady] = useState(false);
@@ -40,7 +41,15 @@ export function WatermarkedImage({ src, alt, className }: WatermarkedImageProps)
       canvas!.height = h * dpr;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const scale = Math.max(w / image.naturalWidth, h / image.naturalHeight) || 1;
+      if (fit === 'contain') {
+        ctx!.fillStyle = '#ffffff';
+        ctx!.fillRect(0, 0, w, h);
+      }
+
+      const scale =
+        fit === 'contain'
+          ? Math.min(w / image.naturalWidth, h / image.naturalHeight) || 1
+          : Math.max(w / image.naturalWidth, h / image.naturalHeight) || 1;
       const drawWidth = image.naturalWidth * scale;
       const drawHeight = image.naturalHeight * scale;
       ctx!.drawImage(image, (w - drawWidth) / 2, (h - drawHeight) / 2, drawWidth, drawHeight);
@@ -86,7 +95,7 @@ export function WatermarkedImage({ src, alt, className }: WatermarkedImageProps)
       cancelled = true;
       resizeObserver?.disconnect();
     };
-  }, [src]);
+  }, [src, fit]);
 
   return (
     <div ref={containerRef} data-testid="watermarked-image" className={`relative overflow-hidden ${className ?? ''}`}>
@@ -100,7 +109,7 @@ export function WatermarkedImage({ src, alt, className }: WatermarkedImageProps)
       />
       {!canvasReady && (
         <>
-          <img src={src} alt={alt} className="h-full w-full object-cover" />
+          <img src={src} alt={alt} className={`h-full w-full ${fit === 'contain' ? 'object-contain' : 'object-cover'}`} />
           <div
             data-testid="watermark-overlay"
             aria-hidden="true"

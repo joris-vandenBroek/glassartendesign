@@ -8,12 +8,13 @@ import { KunstwerkSpecCard } from '@/components/KunstwerkSpecCard';
 import { useKunstwerkFotoUpload } from '@/lib/useKunstwerkFotoUpload';
 import { useAdminAuth } from '@/lib/useAdminAuth';
 import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
-import type { Kunstwerk, Segment, Materiaal, Maat, PrijsRegel } from './materiaalTypes';
+import type { Kunstwerk, Segment, Materiaal, Materiaalsoort, Maat, PrijsRegel } from './materiaalTypes';
 
 interface KunstwerkenSectionProps {
   kunstwerken: Kunstwerk[] | null;
   segmenten: Segment[] | null;
   materialen: Materiaal[] | null;
+  materiaalsoorten: Materiaalsoort[] | null;
   maten: Maat[] | null;
   loadError: string | null;
   onAdd: (data: Omit<Kunstwerk, 'id'>) => Promise<boolean>;
@@ -51,6 +52,7 @@ export function KunstwerkenSection({
   kunstwerken,
   segmenten,
   materialen,
+  materiaalsoorten,
   maten,
   loadError,
   onAdd,
@@ -81,6 +83,17 @@ export function KunstwerkenSection({
     (segmenten ?? []).forEach((segment) => map.set(segment.id, segment.omschrijving));
     return map;
   }, [segmenten]);
+
+  const materiaalsoortNaamById = useMemo(() => {
+    const map = new Map<string, string>();
+    (materiaalsoorten ?? []).forEach((soort) => map.set(soort.id, soort.omschrijving));
+    return map;
+  }, [materiaalsoorten]);
+
+  function materiaalLabel(materiaal: Materiaal): string {
+    const soortNaam = materiaalsoortNaamById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId;
+    return `${materiaal.materiaaldikte}mm — ${soortNaam}`;
+  }
 
   if (loadError) {
     return (
@@ -385,7 +398,7 @@ export function KunstwerkenSection({
                   onChange={() => setMateriaalIds((current) => toggle(current, materiaal.id))}
                   data-testid={`kunstwerk-modal-materiaal-${materiaal.id}`}
                 />
-                {`${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}`}
+                {materiaalLabel(materiaal)}
               </label>
             ))}
           </fieldset>
@@ -496,14 +509,16 @@ export function KunstwerkenSection({
             <KunstwerkSpecCard
               fotoSlot={
                 foto ? (
-                  <img src={foto} alt={naam} data-testid="kunstwerk-spec-card-foto" className="aspect-[2/3] w-full object-cover" />
+                  <img src={foto} alt={naam} data-testid="kunstwerk-spec-card-foto" className="h-full w-full object-contain" />
                 ) : undefined
               }
-              naam={naam}
+              code={naam}
+              titel={omschrijvingNl}
               artiest={artiest}
+              collectieLabels={segmentIds.map((segmentId) => segmentNaamById.get(segmentId) ?? segmentId)}
               materiaalLabels={(materialen ?? [])
                 .filter((materiaal) => materiaalIds.includes(materiaal.id))
-                .map((materiaal) => `${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}`)}
+                .map(materiaalLabel)}
               maatLabels={(maten ?? [])
                 .filter((maat) => maatIds.includes(maat.id))
                 .map((maat) => `${maat.breedte}×${maat.hoogte} cm`)}

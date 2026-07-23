@@ -32,6 +32,7 @@
     "filterAll": "All"
   },
   "kunstwerkSpecCard": {
+    "collectie": "Collection",
     "materiaal": "Material",
     "formaten": "Sizes",
     "tagline": "Gallery quality printing"
