@@ -11,7 +11,9 @@ export interface BestellingLine {
   kunstwerkId: string | null;
   maatId: string | null;
   materiaalId: string | null;
-  prijs: number;
+  breedte?: number;
+  hoogte?: number;
+  prijs: number | null;
   quantity: number;
 }
 
@@ -34,6 +36,7 @@ interface BestellingenSectionProps {
   materiaalsoorten: Materiaalsoort[] | null;
   loadError: string | null;
   onBestellingUpdated: (bestelling: Bestelling) => void;
+  onLinePrijsVastgesteld: (bestellingId: string, lineId: string, prijs: number) => void;
 }
 
 export function BestellingenSection({
@@ -44,9 +47,19 @@ export function BestellingenSection({
   materiaalsoorten,
   loadError,
   onBestellingUpdated,
+  onLinePrijsVastgesteld,
 }: BestellingenSectionProps) {
   const t = useTranslations('beheer');
   const [selectedBestelling, setSelectedBestelling] = useState<Bestelling | null>(null);
+
+  function handleLinePrijsVastgesteld(bestellingId: string, lineId: string, prijs: number) {
+    onLinePrijsVastgesteld(bestellingId, lineId, prijs);
+    setSelectedBestelling((current) =>
+      current && current.id === bestellingId
+        ? { ...current, lines: current.lines.map((line) => (line.id === lineId ? { ...line, prijs } : line)) }
+        : current
+    );
+  }
 
   if (loadError) {
     return (
@@ -98,6 +111,7 @@ export function BestellingenSection({
           onBestellingUpdated(updated);
           setSelectedBestelling(null);
         }}
+        onLinePrijsVastgesteld={handleLinePrijsVastgesteld}
       />
     </div>
   );

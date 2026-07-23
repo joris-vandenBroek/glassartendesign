@@ -31,7 +31,8 @@ export type ActiviteitType =
   | 'prijsgroep_gewijzigd'
   | 'prijsgroep_verwijderd'
   | 'bedrijfsgegevens_gewijzigd'
-  | 'mandje_eigen_maat_toegevoegd';
+  | 'mandje_eigen_maat_toegevoegd'
+  | 'bestelling_prijs_vastgesteld';
 
 export interface ActiviteitActor {
   id: string | null;
