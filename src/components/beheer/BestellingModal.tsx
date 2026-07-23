@@ -42,7 +42,7 @@ export function BestellingModal({
       setError(null);
       setPrijsDrafts({});
     }
-  }, [bestelling]);
+  }, [bestelling?.id]);
 
   const materiaalsoortNaamById = new Map(
     (materiaalsoorten ?? []).map((soort) => [soort.id, soort.omschrijving])
