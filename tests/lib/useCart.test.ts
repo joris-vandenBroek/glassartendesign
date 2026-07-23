@@ -92,4 +92,32 @@ describe('useCart', () => {
     expect(result.current.items).toEqual([]);
     expect(window.localStorage.getItem('glassart-cart')).toBeNull();
   });
+
+  it('treats a null prijs as 0 in totalPrice, and counts it in unpricedLineCount', () => {
+    const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
+    act(() => {
+      result.current.addItem({ ...SAMPLE_ITEM, maatId: '', breedte: 90, hoogte: 140, prijs: null, quantity: 1 });
+    });
+    expect(result.current.totalPrice).toBe(0);
+    expect(result.current.unpricedLineCount).toBe(1);
+  });
+
+  it('does not count a priced item in unpricedLineCount', () => {
+    const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
+    act(() => {
+      result.current.addItem(SAMPLE_ITEM);
+    });
+    expect(result.current.unpricedLineCount).toBe(0);
+  });
+
+  it('gives two different custom sizes of the same kunstwerk+materiaal separate cart lines', () => {
+    const { result } = renderHook(() => useCart(), { wrapper: CartProvider });
+    act(() => {
+      result.current.addItem({ ...SAMPLE_ITEM, maatId: '', breedte: 90, hoogte: 140, prijs: null, quantity: 1 });
+    });
+    act(() => {
+      result.current.addItem({ ...SAMPLE_ITEM, maatId: '', breedte: 70, hoogte: 110, prijs: null, quantity: 1 });
+    });
+    expect(result.current.items).toHaveLength(2);
+  });
 });
