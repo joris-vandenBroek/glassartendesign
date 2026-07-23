@@ -20,7 +20,7 @@ export function CartPanel() {
   const [placeOrderError, setPlaceOrderError] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [emailError, setEmailError] = useState(false);
-  const { items, isHydrated, totalQuantity, totalPrice, removeItem, clear } = useCart();
+  const { items, isHydrated, totalQuantity, totalPrice, unpricedLineCount, removeItem, clear } = useCart();
   const { user, isCustomer } = useCustomerAuth();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -60,6 +60,8 @@ export function CartPanel() {
             materiaalId: item.materiaalId,
             prijs: item.prijs,
             quantity: item.quantity,
+            ...(item.breedte != null ? { breedte: item.breedte } : {}),
+            ...(item.hoogte != null ? { hoogte: item.hoogte } : {}),
           })
         )
       );
@@ -182,7 +184,9 @@ export function CartPanel() {
                           <p className="text-white/50">
                             {item.materiaalLabel} · {item.maatLabel} · ×{item.quantity}
                           </p>
-                          <p className="text-white/50">{formatCurrency(item.prijs * item.quantity)}</p>
+                          <p className="text-white/50">
+                            {item.prijs !== null ? formatCurrency(item.prijs * item.quantity) : t('priceOnRequest')}
+                          </p>
                         </div>
                         <button
                           type="button"
@@ -205,6 +209,11 @@ export function CartPanel() {
                     <p data-testid="cart-total" className="flex justify-between text-sm text-white/80">
                       <span>{t('total')}</span>
                       <span>{formatCurrency(totalPrice)}</span>
+                    </p>
+                  )}
+                  {unpricedLineCount > 0 && (
+                    <p data-testid="cart-unpriced-note" className="text-xs text-white/60">
+                      {t('customSizeNote', { count: unpricedLineCount })}
                     </p>
                   )}
                   {isCustomer ? (

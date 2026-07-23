@@ -82,7 +82,8 @@
     "customSizeSuffix": " (eigen maat)",
     "customSizeMaxError": "Deze maat is te groot. Maximaal {maxBreedte}×{maxHoogte} cm.",
     "customSizeLeadTime": "Let op: bij deze maat is de levertijd minimaal {months, plural, one {# maand} other {# maanden}}.",
-    "priceOnRequest": "Prijs op aanvraag"
+    "priceOnRequest": "Prijs op aanvraag",
+    "customSizeNote": "{count, plural, one {+ # artikel, prijs volgt na offerte} other {+ # artikelen, prijs volgt na offerte}}"
   },
   "contactPage": {
     "title": "Contact",

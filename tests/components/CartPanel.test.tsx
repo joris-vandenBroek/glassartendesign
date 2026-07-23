@@ -375,4 +375,100 @@ describe('CartPanel', () => {
     await screen.findByTestId('cart-place-order-error');
     expect(logActiviteitMock).not.toHaveBeenCalled();
   });
+
+  it('shows the unpriced-items note and excludes a custom-size item from the total', () => {
+    function SeedCustom() {
+      const { addItem } = useCart();
+      return (
+        <button
+          type="button"
+          data-testid="seed-custom-cart"
+          onClick={() =>
+            addItem({
+              kunstwerkId: 'kw-2',
+              foto: 'https://example.com/kw-2.jpg',
+              omschrijving: 'Eigen maat paneel',
+              materiaalId: 'mat-2',
+              materiaalLabel: '3mm — Acryl',
+              maatId: '',
+              maatLabel: '90×140 cm (eigen maat)',
+              breedte: 90,
+              hoogte: 140,
+              prijs: null,
+              quantity: 1,
+            })
+          }
+        >
+          Seed custom
+        </button>
+      );
+    }
+    render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <SeedCustom />
+            <CartPanel />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </NextIntlClientProvider>
+    );
+    fireEvent.click(screen.getByTestId('seed-custom-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+
+    expect(screen.getByTestId('cart-total')).toHaveTextContent('€ 0,00');
+    expect(screen.getByTestId('cart-unpriced-note')).toHaveTextContent('+ 1 artikel, prijs volgt na offerte');
+    expect(screen.getByText('Prijs op aanvraag')).toBeInTheDocument();
+  });
+
+  it('writes breedte/hoogte and a null prijs to the bestelline for a custom-size cart item', async () => {
+    function SeedCustom() {
+      const { addItem } = useCart();
+      return (
+        <button
+          type="button"
+          data-testid="seed-custom-cart"
+          onClick={() =>
+            addItem({
+              kunstwerkId: 'kw-2',
+              foto: 'https://example.com/kw-2.jpg',
+              omschrijving: 'Eigen maat paneel',
+              materiaalId: 'mat-2',
+              materiaalLabel: '3mm — Acryl',
+              maatId: '',
+              maatLabel: '90×140 cm (eigen maat)',
+              breedte: 90,
+              hoogte: 140,
+              prijs: null,
+              quantity: 1,
+            })
+          }
+        >
+          Seed custom
+        </button>
+      );
+    }
+    addDocMock.mockResolvedValueOnce({ id: 'header-1' }).mockResolvedValue({ id: 'line-1' });
+    render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <SeedCustom />
+            <CartPanel />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </NextIntlClientProvider>
+    );
+    fireEvent.click(screen.getByTestId('seed-custom-cart'));
+    fireEvent.click(screen.getByTestId('cart-icon'));
+    await waitFor(() => expect(screen.getByTestId('cart-place-order')).not.toBeDisabled());
+    fireEvent.click(screen.getByTestId('cart-place-order'));
+
+    await screen.findByTestId('cart-order-confirmation');
+    expect(addDocMock).toHaveBeenNthCalledWith(
+      2,
+      { path: ['bestelheaders', 'header-1', 'bestellines'] },
+      { kunstwerkId: 'kw-2', maatId: '', materiaalId: 'mat-2', prijs: null, quantity: 1, breedte: 90, hoogte: 140 }
+    );
+  });
 });
