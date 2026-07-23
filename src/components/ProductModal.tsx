@@ -119,10 +119,9 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
 
   function handleMateriaalChange(nextMateriaalId: string) {
     setMateriaalId(nextMateriaalId);
-    // Switching materiaal always leaves "eigen maat" mode: a custom size
-    // (and its max-size validation) is specific to the previously selected
-    // soort, so force the customer to re-confirm it for the new one.
-    if (isCustomSize) {
+    const nextMateriaal = beschikbareMaterialen.find((materiaal) => materiaal.id === nextMateriaalId);
+    const nextSoort = (materiaalsoorten ?? []).find((soort) => soort.id === nextMateriaal?.materiaalsoortId);
+    if (isCustomSize && !nextSoort?.staatEigenMaatToe) {
       setMaatId(beschikbareMaten[0]?.id ?? '');
     }
   }

@@ -496,6 +496,10 @@ describe('ProductModal', () => {
   });
 
   it('resets to a standard maat when switching to a materiaal whose soort does not allow eigen maat', () => {
+    const MATERIAALSOORTEN_MIXED: Materiaalsoort[] = [
+      { id: 'soort-1', omschrijving: 'Veiligheidsglas', staatEigenMaatToe: true, levertijdMaandenEigenMaat: 3 },
+      { id: 'soort-2', omschrijving: 'Acryl' },
+    ];
     render(
       <NextIntlClientProvider locale="nl" messages={messages}>
         <CustomerAuthProvider>
@@ -504,18 +508,17 @@ describe('ProductModal', () => {
               kunstwerk={KUNSTWERK}
               materialen={MATERIALEN}
               maten={MATEN}
-              materiaalsoorten={MATERIAALSOORTEN_MET_EIGEN_MAAT}
+              materiaalsoorten={MATERIAALSOORTEN_MIXED}
               onClose={() => {}}
             />
           </CartProvider>
         </CustomerAuthProvider>
       </NextIntlClientProvider>
     );
-    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-2' } });
     fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: '__eigen_maat__' } });
     expect(screen.getByTestId('product-modal-maat-custom-breedte')).toBeInTheDocument();
 
-    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-1' } });
+    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-2' } });
     expect(screen.queryByTestId('product-modal-maat-custom-breedte')).not.toBeInTheDocument();
     expect(screen.getByTestId('product-modal-maat')).toHaveValue('maat-1');
   });

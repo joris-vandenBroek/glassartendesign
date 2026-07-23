@@ -29,6 +29,7 @@ interface ActiviteitSectionProps {
 const TYPE_LABEL_KEYS: Record<ActiviteitType, string> = {
   kunstwerk_bekeken: 'activiteitTypeKunstwerkBekeken',
   mandje_toegevoegd: 'activiteitTypeMandjeToegevoegd',
+  mandje_eigen_maat_toegevoegd: 'activiteitTypeMandjeEigenMaatToegevoegd',
   bestelling_geplaatst: 'activiteitTypeBestellingGeplaatst',
   account_bezocht: 'activiteitTypeAccountBezocht',
   word_klant_bezocht: 'activiteitTypeWordKlantBezocht',
