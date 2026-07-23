@@ -102,6 +102,11 @@ afterEach(() => {
 });
 
 describe('ProductModal', () => {
+  const MATERIAALSOORTEN_MET_EIGEN_MAAT: Materiaalsoort[] = [
+    { id: 'soort-1', omschrijving: 'Veiligheidsglas', staatEigenMaatToe: true, levertijdMaandenEigenMaat: 3 },
+    { id: 'soort-2', omschrijving: 'Acryl', staatEigenMaatToe: true, maxBreedte: 200, maxHoogte: 300 },
+  ];
+
   it('renders nothing when kunstwerk is null', () => {
     renderModal(() => {}, null);
     expect(screen.queryByTestId('product-modal')).not.toBeInTheDocument();
@@ -355,5 +360,163 @@ describe('ProductModal', () => {
       email: 'Onbekend',
       naam: 'Onbekend',
     });
+  });
+
+  it('does not offer an "eigen maat opgeven" option for a materiaal whose soort does not allow it', () => {
+    renderModal();
+    const options = Array.from(
+      screen.getByTestId('product-modal-maat').querySelectorAll('option')
+    ).map((option) => option.textContent);
+    expect(options).not.toContain('Eigen maat opgeven');
+  });
+
+  it('offers and selects "eigen maat opgeven", showing breedte/hoogte inputs and "Prijs op aanvraag"', () => {
+    render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN_MET_EIGEN_MAAT}
+              onClose={() => {}}
+            />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </NextIntlClientProvider>
+    );
+    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-2' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: '__eigen_maat__' } });
+    expect(screen.getByTestId('product-modal-maat-custom-breedte')).toBeInTheDocument();
+    expect(screen.getByTestId('product-modal-maat-custom-hoogte')).toBeInTheDocument();
+    expect(screen.getByTestId('product-modal-prijs')).toHaveTextContent('Prijs op aanvraag');
+    expect(screen.getByTestId('product-modal-confirm')).toBeDisabled();
+  });
+
+  it('shows a lead-time warning and no max error for an oversized custom veiligheidsglas size', () => {
+    render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN_MET_EIGEN_MAAT}
+              onClose={() => {}}
+            />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </NextIntlClientProvider>
+    );
+    fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: '__eigen_maat__' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat-custom-breedte'), { target: { value: '400' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat-custom-hoogte'), { target: { value: '500' } });
+    expect(screen.getByTestId('product-modal-maat-levertijd-warning')).toHaveTextContent(
+      'Let op: bij deze maat is de levertijd minimaal 3 maanden.'
+    );
+    expect(screen.queryByTestId('product-modal-maat-custom-error')).not.toBeInTheDocument();
+    expect(screen.getByTestId('product-modal-confirm')).not.toBeDisabled();
+  });
+
+  it('shows a max-size error and disables confirm for an oversized custom Acryl size', () => {
+    render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN_MET_EIGEN_MAAT}
+              onClose={() => {}}
+            />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </NextIntlClientProvider>
+    );
+    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-2' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: '__eigen_maat__' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat-custom-breedte'), { target: { value: '250' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat-custom-hoogte'), { target: { value: '280' } });
+    expect(screen.getByTestId('product-modal-maat-custom-error')).toHaveTextContent(
+      'Deze maat is te groot. Maximaal 200×300 cm.'
+    );
+    expect(screen.getByTestId('product-modal-confirm')).toBeDisabled();
+  });
+
+  it('adds a valid custom-size line to the cart with a null price and logs mandje_eigen_maat_toegevoegd', async () => {
+    vi.useRealTimers();
+    function Probe() {
+      const { items } = useCart();
+      return <div data-testid="probe">{JSON.stringify(items)}</div>;
+    }
+    render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN_MET_EIGEN_MAAT}
+              onClose={() => {}}
+            />
+            <Probe />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </NextIntlClientProvider>
+    );
+    fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: '__eigen_maat__' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat-custom-breedte'), { target: { value: '90' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat-custom-hoogte'), { target: { value: '140' } });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getByTestId('product-modal-confirm'));
+
+    const items = JSON.parse(screen.getByTestId('probe').textContent ?? '[]');
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      kunstwerkId: 'kw-1',
+      materiaalId: 'mat-1',
+      maatId: '',
+      breedte: 90,
+      hoogte: 140,
+      maatLabel: '90×140 cm (eigen maat)',
+      prijs: null,
+      quantity: 1,
+    });
+    expect(logActiviteitMock).toHaveBeenCalledWith('mandje_eigen_maat_toegevoegd', {
+      id: null,
+      email: 'Onbekend',
+      naam: 'Onbekend',
+    });
+  });
+
+  it('resets to a standard maat when switching to a materiaal whose soort does not allow eigen maat', () => {
+    render(
+      <NextIntlClientProvider locale="nl" messages={messages}>
+        <CustomerAuthProvider>
+          <CartProvider>
+            <ProductModal
+              kunstwerk={KUNSTWERK}
+              materialen={MATERIALEN}
+              maten={MATEN}
+              materiaalsoorten={MATERIAALSOORTEN_MET_EIGEN_MAAT}
+              onClose={() => {}}
+            />
+          </CartProvider>
+        </CustomerAuthProvider>
+      </NextIntlClientProvider>
+    );
+    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-2' } });
+    fireEvent.change(screen.getByTestId('product-modal-maat'), { target: { value: '__eigen_maat__' } });
+    expect(screen.getByTestId('product-modal-maat-custom-breedte')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByTestId('product-modal-materiaal'), { target: { value: 'mat-1' } });
+    expect(screen.queryByTestId('product-modal-maat-custom-breedte')).not.toBeInTheDocument();
+    expect(screen.getByTestId('product-modal-maat')).toHaveValue('maat-1');
   });
 });

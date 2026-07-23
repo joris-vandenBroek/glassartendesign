@@ -75,7 +75,14 @@
     "remove": "Remove",
     "requestedStatus": "Requested",
     "added": "Added!",
-    "close": "Close"
+    "close": "Close",
+    "customSizeOption": "Enter custom size",
+    "customWidthLabel": "Width (cm)",
+    "customHeightLabel": "Height (cm)",
+    "customSizeSuffix": " (custom size)",
+    "customSizeMaxError": "This size is too large. Maximum {maxBreedte}×{maxHoogte} cm.",
+    "customSizeLeadTime": "Note: this size has a lead time of at least {months, plural, one {# month} other {# months}}.",
+    "priceOnRequest": "Price on request"
   },
   "contactPage": {
     "title": "Contact",

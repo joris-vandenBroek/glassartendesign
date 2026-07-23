@@ -75,7 +75,14 @@
     "remove": "Entfernen",
     "requestedStatus": "Angefragt",
     "added": "Hinzugefügt!",
-    "close": "Schließen"
+    "close": "Schließen",
+    "customSizeOption": "Eigene Größe angeben",
+    "customWidthLabel": "Breite (cm)",
+    "customHeightLabel": "Höhe (cm)",
+    "customSizeSuffix": " (individuelle Größe)",
+    "customSizeMaxError": "Diese Größe ist zu groß. Maximal {maxBreedte}×{maxHoogte} cm.",
+    "customSizeLeadTime": "Achtung: bei dieser Größe beträgt die Lieferzeit mindestens {months, plural, one {# Monat} other {# Monate}}.",
+    "priceOnRequest": "Preis auf Anfrage"
   },
   "contactPage": {
     "title": "Kontakt",

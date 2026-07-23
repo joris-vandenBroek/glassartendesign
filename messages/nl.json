@@ -75,7 +75,14 @@
     "remove": "Verwijderen",
     "requestedStatus": "Aangevraagd",
     "added": "Toegevoegd!",
-    "close": "Sluiten"
+    "close": "Sluiten",
+    "customSizeOption": "Eigen maat opgeven",
+    "customWidthLabel": "Breedte (cm)",
+    "customHeightLabel": "Hoogte (cm)",
+    "customSizeSuffix": " (eigen maat)",
+    "customSizeMaxError": "Deze maat is te groot. Maximaal {maxBreedte}×{maxHoogte} cm.",
+    "customSizeLeadTime": "Let op: bij deze maat is de levertijd minimaal {months, plural, one {# maand} other {# maanden}}.",
+    "priceOnRequest": "Prijs op aanvraag"
   },
   "contactPage": {
     "title": "Contact",

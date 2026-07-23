@@ -12,6 +12,7 @@ import { WatermarkedImage } from './WatermarkedImage';
 import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materiaalTypes';
 
 const CONFIRM_FEEDBACK_MS = 600;
+const CUSTOM_MAAT_VALUE = '__eigen_maat__';
 
 export function materiaalLabel(materiaal: Materiaal, materiaalsoortNaam: string): string {
   return `${materiaal.materiaaldikte}mm ${materiaalsoortNaam}`;
@@ -19,6 +20,15 @@ export function materiaalLabel(materiaal: Materiaal, materiaalsoortNaam: string)
 
 export function maatLabel(maat: Maat): string {
   return `${maat.breedte}×${maat.hoogte} cm`;
+}
+
+function withinMax(breedte: number, hoogte: number, soort: Materiaalsoort | undefined): boolean {
+  if (!soort || soort.maxBreedte == null || soort.maxHoogte == null) {
+    return true;
+  }
+  const smallest = Math.min(breedte, hoogte);
+  const largest = Math.max(breedte, hoogte);
+  return smallest <= soort.maxBreedte && largest <= soort.maxHoogte;
 }
 
 interface ProductModalProps {
@@ -34,6 +44,8 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
   const locale = useLocale();
   const [materiaalId, setMateriaalId] = useState('');
   const [maatId, setMaatId] = useState('');
+  const [customBreedte, setCustomBreedte] = useState('');
+  const [customHoogte, setCustomHoogte] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { addItem } = useCart();
@@ -48,6 +60,8 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
     }
     setMateriaalId(kunstwerk.materiaalIds[0] ?? '');
     setMaatId(kunstwerk.maatIds[0] ?? '');
+    setCustomBreedte('');
+    setCustomHoogte('');
     setQuantity(1);
     setIsConfirmed(false);
   }, [kunstwerk]);
@@ -85,32 +99,75 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
     return materiaalLabel(materiaal, materiaalsoortNaamById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId);
   }
   const geselecteerdMateriaal = beschikbareMaterialen.find((materiaal) => materiaal.id === materiaalId);
-  const prijsRegel = kunstwerk.prijzen.find(
-    (regel) => regel.materiaalId === materiaalId && regel.maatId === maatId
+  const geselecteerdSoort = (materiaalsoorten ?? []).find(
+    (soort) => soort.id === geselecteerdMateriaal?.materiaalsoortId
   );
+  const isCustomSize = maatId === CUSTOM_MAAT_VALUE;
+  const prijsRegel = !isCustomSize
+    ? kunstwerk.prijzen.find((regel) => regel.materiaalId === materiaalId && regel.maatId === maatId)
+    : undefined;
   const omschrijving = resolveKunstwerkOmschrijving(kunstwerk, locale);
 
+  const customBreedteNum = Number(customBreedte);
+  const customHoogteNum = Number(customHoogte);
+  const customSizeFilledIn =
+    customBreedte !== '' && customHoogte !== '' && customBreedteNum > 0 && customHoogteNum > 0;
+  const customSizeExceedsMax = customSizeFilledIn && !withinMax(customBreedteNum, customHoogteNum, geselecteerdSoort);
+  const customSizeValid = customSizeFilledIn && !customSizeExceedsMax;
+
+  const canConfirm = isCustomSize ? customSizeValid : Boolean(prijsRegel);
+
+  function handleMateriaalChange(nextMateriaalId: string) {
+    setMateriaalId(nextMateriaalId);
+    // Switching materiaal always leaves "eigen maat" mode: a custom size
+    // (and its max-size validation) is specific to the previously selected
+    // soort, so force the customer to re-confirm it for the new one.
+    if (isCustomSize) {
+      setMaatId(beschikbareMaten[0]?.id ?? '');
+    }
+  }
+
   function handleConfirm() {
-    if (isConfirmed || !prijsRegel || !kunstwerk) {
+    if (isConfirmed || !canConfirm || !kunstwerk) {
       return;
     }
     const gekozenMateriaal = beschikbareMaterialen.find((materiaal) => materiaal.id === materiaalId);
-    const gekozenMaat = beschikbareMaten.find((maat) => maat.id === maatId);
-    if (!gekozenMateriaal || !gekozenMaat) {
+    if (!gekozenMateriaal) {
       return;
     }
-    addItem({
-      kunstwerkId: kunstwerk.id,
-      foto: kunstwerk.foto,
-      omschrijving,
-      materiaalId,
-      materiaalLabel: resolvedMateriaalLabel(gekozenMateriaal),
-      maatId,
-      maatLabel: maatLabel(gekozenMaat),
-      prijs: prijsRegel.prijs,
-      quantity,
-    });
-    void logActiviteit('mandje_toegevoegd', actorFromCustomer(user));
+    if (isCustomSize) {
+      addItem({
+        kunstwerkId: kunstwerk.id,
+        foto: kunstwerk.foto,
+        omschrijving,
+        materiaalId,
+        materiaalLabel: resolvedMateriaalLabel(gekozenMateriaal),
+        maatId: '',
+        maatLabel: `${customBreedteNum}×${customHoogteNum} cm${t('customSizeSuffix')}`,
+        breedte: customBreedteNum,
+        hoogte: customHoogteNum,
+        prijs: null,
+        quantity,
+      });
+      void logActiviteit('mandje_eigen_maat_toegevoegd', actorFromCustomer(user));
+    } else {
+      const gekozenMaat = beschikbareMaten.find((maat) => maat.id === maatId);
+      if (!gekozenMaat || !prijsRegel) {
+        return;
+      }
+      addItem({
+        kunstwerkId: kunstwerk.id,
+        foto: kunstwerk.foto,
+        omschrijving,
+        materiaalId,
+        materiaalLabel: resolvedMateriaalLabel(gekozenMateriaal),
+        maatId,
+        maatLabel: maatLabel(gekozenMaat),
+        prijs: prijsRegel.prijs,
+        quantity,
+      });
+      void logActiviteit('mandje_toegevoegd', actorFromCustomer(user));
+    }
     setIsConfirmed(true);
     closeTimeoutRef.current = setTimeout(() => {
       closeTimeoutRef.current = null;
@@ -152,7 +209,7 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
             <select
               data-testid="product-modal-materiaal"
               value={materiaalId}
-              onChange={(event) => setMateriaalId(event.target.value)}
+              onChange={(event) => handleMateriaalChange(event.target.value)}
               className="rounded-sm bg-black/40 px-2 py-1.5 text-sm text-white"
             >
               {beschikbareMaterialen.map((materiaal) => (
@@ -183,12 +240,60 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
                   {maatLabel(maat)}
                 </option>
               ))}
+              {geselecteerdSoort?.staatEigenMaatToe && (
+                <option value={CUSTOM_MAAT_VALUE}>{t('customSizeOption')}</option>
+              )}
             </select>
           </label>
-          {prijsRegel && (
+          {isCustomSize && (
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <label className="flex flex-1 flex-col gap-1 text-[0.65rem] uppercase tracking-wide text-white/60">
+                  {t('customWidthLabel')}
+                  <input
+                    type="number"
+                    data-testid="product-modal-maat-custom-breedte"
+                    value={customBreedte}
+                    onChange={(event) => setCustomBreedte(event.target.value)}
+                    className="rounded-sm bg-black/40 px-2 py-1.5 text-sm text-white"
+                  />
+                </label>
+                <label className="flex flex-1 flex-col gap-1 text-[0.65rem] uppercase tracking-wide text-white/60">
+                  {t('customHeightLabel')}
+                  <input
+                    type="number"
+                    data-testid="product-modal-maat-custom-hoogte"
+                    value={customHoogte}
+                    onChange={(event) => setCustomHoogte(event.target.value)}
+                    className="rounded-sm bg-black/40 px-2 py-1.5 text-sm text-white"
+                  />
+                </label>
+              </div>
+              {customSizeExceedsMax && (
+                <p data-testid="product-modal-maat-custom-error" className="text-xs text-red-400">
+                  {t('customSizeMaxError', {
+                    maxBreedte: geselecteerdSoort?.maxBreedte ?? 0,
+                    maxHoogte: geselecteerdSoort?.maxHoogte ?? 0,
+                  })}
+                </p>
+              )}
+              {Boolean(geselecteerdSoort?.levertijdMaandenEigenMaat) && (
+                <p data-testid="product-modal-maat-levertijd-warning" className="text-xs text-amber-400">
+                  {t('customSizeLeadTime', { months: geselecteerdSoort?.levertijdMaandenEigenMaat ?? 0 })}
+                </p>
+              )}
+            </div>
+          )}
+          {isCustomSize ? (
             <p data-testid="product-modal-prijs" className="text-sm text-white/80">
-              {formatCurrency(prijsRegel.prijs)}
+              {t('priceOnRequest')}
             </p>
+          ) : (
+            prijsRegel && (
+              <p data-testid="product-modal-prijs" className="text-sm text-white/80">
+                {formatCurrency(prijsRegel.prijs)}
+              </p>
+            )
           )}
           <div className="flex items-center justify-between gap-2 text-sm text-white/80">
             <span className="text-[0.65rem] uppercase tracking-wide text-white/60">{t('quantity')}</span>
@@ -218,7 +323,7 @@ export function ProductModal({ kunstwerk, materialen, maten, materiaalsoorten, o
             type="button"
             data-testid="product-modal-confirm"
             onClick={handleConfirm}
-            disabled={isConfirmed || !prijsRegel}
+            disabled={isConfirmed || !canConfirm}
             className={`rounded-sm px-4 py-2.5 text-xs tracking-[0.15em] transition disabled:opacity-40 ${
               isConfirmed ? 'cursor-default bg-green-500 text-white' : 'btn-gold'
             }`}
