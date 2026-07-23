@@ -86,6 +86,12 @@ describe('KlantModal', () => {
     expect(screen.getByTestId('klant-modal-goedkeuren')).not.toBeDisabled();
   });
 
+  it('hides the Goedkeuren button when the klant is already Goedgekeurd', () => {
+    renderModal({ ...KLANT, status: 'Goedgekeurd', prijsgroepId: 'pg-1' });
+    expect(screen.queryByTestId('klant-modal-goedkeuren')).not.toBeInTheDocument();
+    expect(screen.getByTestId('klant-modal-afwijzen')).toBeInTheDocument();
+  });
+
   it('lists every prijsgroep as a dropdown option', () => {
     renderModal(KLANT);
     const options = screen.getByTestId('klant-modal-prijsgroep').querySelectorAll('option');

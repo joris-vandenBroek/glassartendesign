@@ -14,6 +14,7 @@ export interface StatusQuickFilter<T> {
   activeValue: string;
   activeLabel: string;
   allLabel: string;
+  defaultActive?: boolean;
 }
 
 interface DataTableProps<T> {
@@ -38,7 +39,7 @@ export function DataTable<T extends object>({
   searchPlaceholder,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState('');
-  const [quickFilterActive, setQuickFilterActive] = useState(quickFilter !== undefined);
+  const [quickFilterActive, setQuickFilterActive] = useState(quickFilter?.defaultActive ?? quickFilter !== undefined);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 

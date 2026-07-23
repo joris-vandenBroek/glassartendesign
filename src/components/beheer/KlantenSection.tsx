@@ -65,6 +65,7 @@ export function KlantenSection({ klanten, prijsgroepen, loadError, onKlantUpdate
           activeValue: 'Beoordelen',
           activeLabel: t('klantenQuickTeBeoordelen'),
           allLabel: t('klantenQuickAlle'),
+          defaultActive: false,
         }}
         emptyLabel={t('klantenEmpty')}
         searchPlaceholder={t('dataTableSearchPlaceholder')}

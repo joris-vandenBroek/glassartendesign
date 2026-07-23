@@ -96,17 +96,17 @@ describe('KlantenSection', () => {
     expect(screen.queryByTestId('klanten-section')).not.toBeInTheDocument();
   });
 
-  it('shows only the "Beoordelen" klant by default (status filter defaults to Beoordelen)', () => {
+  it('shows all klanten by default (status filter defaults to "alle klanten")', () => {
     renderSection();
-    expect(screen.getByTestId('data-table-row-uid-1')).toBeInTheDocument();
-    expect(screen.queryByTestId('data-table-row-uid-2')).not.toBeInTheDocument();
-  });
-
-  it('shows all klanten after clicking the "alle klanten" quick filter link', () => {
-    renderSection();
-    fireEvent.click(screen.getByTestId('data-table-quick-all'));
     expect(screen.getByTestId('data-table-row-uid-1')).toBeInTheDocument();
     expect(screen.getByTestId('data-table-row-uid-2')).toBeInTheDocument();
+  });
+
+  it('shows only the "Beoordelen" klant after clicking the "te beoordelen" quick filter link', () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('data-table-quick-active'));
+    expect(screen.getByTestId('data-table-row-uid-1')).toBeInTheDocument();
+    expect(screen.queryByTestId('data-table-row-uid-2')).not.toBeInTheDocument();
   });
 
   it('opens the KlantModal with the clicked klant\'s data when a row is clicked', () => {

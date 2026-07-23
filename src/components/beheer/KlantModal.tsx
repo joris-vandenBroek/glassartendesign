@@ -116,15 +116,17 @@ export function KlantModal({ klant, prijsgroepen, onClose, onUpdated }: KlantMod
           )}
 
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleGoedkeuren}
-              disabled={!prijsgroepId}
-              data-testid="klant-modal-goedkeuren"
-              className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink disabled:opacity-40"
-            >
-              {t('klantenGoedkeuren')}
-            </button>
+            {klant.status !== 'Goedgekeurd' && (
+              <button
+                type="button"
+                onClick={handleGoedkeuren}
+                disabled={!prijsgroepId}
+                data-testid="klant-modal-goedkeuren"
+                className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink disabled:opacity-40"
+              >
+                {t('klantenGoedkeuren')}
+              </button>
+            )}
             <button
               type="button"
               onClick={handleAfwijzen}
