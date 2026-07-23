@@ -304,8 +304,12 @@ export function KunstwerkenSection({
         emptyLabel={t('kunstwerkenEmpty')}
         searchPlaceholder={t('dataTableSearchPlaceholder')}
       />
-      <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')}>
-        <div data-testid="kunstwerk-modal" className="flex flex-col gap-3 text-sm text-white/80">
+      <Modal isOpen={modalState !== null} onClose={closeModal} closeLabel={t('modalClose')} wide>
+        <div
+          data-testid="kunstwerk-modal"
+          className="grid grid-cols-1 gap-6 text-sm text-white/80 lg:grid-cols-[minmax(0,1fr)_320px]"
+        >
+          <div className="flex flex-col gap-3">
           <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
             {t('kunstwerkenLabelFoto')}
             <span
@@ -421,47 +425,50 @@ export function KunstwerkenSection({
           {materiaalIds.length > 0 && maatIds.length > 0 && (
             <div className="flex flex-col gap-1">
               <span className="text-xs uppercase tracking-wide text-white/60">{t('kunstwerkenLabelPrijzen')}</span>
-              <table data-testid="kunstwerk-modal-prijzen" className="text-sm text-white/80">
+              <table data-testid="kunstwerk-modal-prijzen" className="border-collapse text-sm text-white/80">
                 <thead>
                   <tr>
-                    <th></th>
-                    {maatIds.map((maatId) => {
-                      const maat = (maten ?? []).find((m) => m.id === maatId);
-                      return (
-                        <th key={maatId} className="px-2 py-1 text-xs">
-                          {maat ? `${maat.breedte}×${maat.hoogte}` : maatId}
+                    <th className="border border-white/10 px-2 py-1"></th>
+                    {(maten ?? [])
+                      .filter((maat) => maatIds.includes(maat.id))
+                      .map((maat) => (
+                        <th key={maat.id} className="border border-white/10 px-2 py-1 text-xs font-semibold">
+                          {`${maat.breedte}×${maat.hoogte}`}
                         </th>
-                      );
-                    })}
+                      ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {materiaalIds.map((materiaalId) => {
-                    const materiaal = (materialen ?? []).find((m) => m.id === materiaalId);
-                    return (
-                      <tr key={materiaalId}>
-                        <td className="px-2 py-1 text-xs">
-                          {materiaal ? `${materiaal.materiaaldikte}mm` : materiaalId}
+                  {(materialen ?? [])
+                    .filter((materiaal) => materiaalIds.includes(materiaal.id))
+                    .map((materiaal) => (
+                      <tr key={materiaal.id}>
+                        <td className="border border-white/10 px-2 py-1 text-xs whitespace-nowrap">
+                          {materiaalLabel(materiaal)}
                         </td>
-                        {maatIds.map((maatId) => {
-                          const key = prijsKey(materiaalId, maatId);
-                          return (
-                            <td key={maatId} className="px-2 py-1">
-                              <input
-                                type="number"
-                                value={prijzen[key] ?? ''}
-                                onChange={(event) =>
-                                  setPrijzen((current) => ({ ...current, [key]: event.target.value }))
-                                }
-                                data-testid={`kunstwerk-modal-prijs-${materiaalId}-${maatId}`}
-                                className="w-20 rounded-sm bg-black/40 px-2 py-1 text-sm text-white"
-                              />
-                            </td>
-                          );
-                        })}
+                        {(maten ?? [])
+                          .filter((maat) => maatIds.includes(maat.id))
+                          .map((maat) => {
+                            const key = prijsKey(materiaal.id, maat.id);
+                            return (
+                              <td key={maat.id} className="border border-white/10 px-2 py-1">
+                                <div className="flex items-center gap-1">
+                                  <span className="text-xs text-white/50">€</span>
+                                  <input
+                                    type="number"
+                                    value={prijzen[key] ?? ''}
+                                    onChange={(event) =>
+                                      setPrijzen((current) => ({ ...current, [key]: event.target.value }))
+                                    }
+                                    data-testid={`kunstwerk-modal-prijs-${materiaal.id}-${maat.id}`}
+                                    className="w-20 rounded-sm bg-black/40 px-2 py-1 text-sm text-white"
+                                  />
+                                </div>
+                              </td>
+                            );
+                          })}
                       </tr>
-                    );
-                  })}
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -504,27 +511,6 @@ export function KunstwerkenSection({
             />
           </label>
 
-          <div className="flex flex-col gap-1">
-            <span className="text-xs uppercase tracking-wide text-white/60">{t('kunstwerkenLabelPreview')}</span>
-            <KunstwerkSpecCard
-              fotoSlot={
-                foto ? (
-                  <img src={foto} alt={naam} data-testid="kunstwerk-spec-card-foto" className="h-full w-full object-contain" />
-                ) : undefined
-              }
-              code={naam}
-              titel={omschrijvingNl}
-              artiest={artiest}
-              collectieLabels={segmentIds.map((segmentId) => segmentNaamById.get(segmentId) ?? segmentId)}
-              materiaalLabels={(materialen ?? [])
-                .filter((materiaal) => materiaalIds.includes(materiaal.id))
-                .map(materiaalLabel)}
-              maatLabels={(maten ?? [])
-                .filter((maat) => maatIds.includes(maat.id))
-                .map((maat) => `${maat.breedte}×${maat.hoogte} cm`)}
-            />
-          </div>
-
           {actionError && (
             <p data-testid="kunstwerk-modal-error" className="text-xs text-red-400">
               {actionError}
@@ -551,6 +537,30 @@ export function KunstwerkenSection({
                 {t('kunstwerkenVerwijderen')}
               </button>
             )}
+          </div>
+          </div>
+
+          <div className="lg:sticky lg:top-0 lg:pt-10">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs uppercase tracking-wide text-white/60">{t('kunstwerkenLabelPreview')}</span>
+              <KunstwerkSpecCard
+                fotoSlot={
+                  foto ? (
+                    <img src={foto} alt={naam} data-testid="kunstwerk-spec-card-foto" className="h-full w-full object-contain" />
+                  ) : undefined
+                }
+                code={naam}
+                titel={omschrijvingNl}
+                artiest={artiest}
+                collectieLabels={segmentIds.map((segmentId) => segmentNaamById.get(segmentId) ?? segmentId)}
+                materiaalLabels={(materialen ?? [])
+                  .filter((materiaal) => materiaalIds.includes(materiaal.id))
+                  .map(materiaalLabel)}
+                maatLabels={(maten ?? [])
+                  .filter((maat) => maatIds.includes(maat.id))
+                  .map((maat) => `${maat.breedte}×${maat.hoogte} cm`)}
+              />
+            </div>
           </div>
         </div>
       </Modal>

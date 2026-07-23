@@ -9,9 +9,10 @@ interface ModalProps {
   onClose: () => void;
   closeLabel: string;
   children: ReactNode;
+  wide?: boolean;
 }
 
-export function Modal({ isOpen, onClose, closeLabel, children }: ModalProps) {
+export function Modal({ isOpen, onClose, closeLabel, children, wide = false }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -39,7 +40,11 @@ export function Modal({ isOpen, onClose, closeLabel, children }: ModalProps) {
         onClick={onClose}
         className="absolute inset-0 bg-black/75 backdrop-blur-sm"
       />
-      <div className="relative z-10 max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-lg border border-white/10 bg-charcoal p-6">
+      <div
+        className={`relative z-10 max-h-[85vh] w-full overflow-y-auto rounded-lg border border-white/10 bg-charcoal p-6 ${
+          wide ? 'max-w-6xl' : 'max-w-lg'
+        }`}
+      >
         <button
           ref={closeButtonRef}
           type="button"
