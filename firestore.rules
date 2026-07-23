@@ -56,7 +56,7 @@ service cloud.firestore {
            'segment_toegevoegd','segment_gewijzigd','segment_verwijderd',
            'kunstwerk_toegevoegd','kunstwerk_gewijzigd','kunstwerk_verwijderd',
            'prijsgroep_toegevoegd','prijsgroep_gewijzigd','prijsgroep_verwijderd',
-           'bedrijfsgegevens_gewijzigd']
+           'bedrijfsgegevens_gewijzigd','mandje_eigen_maat_toegevoegd','bestelling_prijs_vastgesteld']
         && request.resource.data.keys().hasOnly(['type','actorId','actorEmail','actorNaam','timestamp'])
         && request.resource.data.actorEmail is string
         && request.resource.data.actorNaam is string;
@@ -76,16 +76,24 @@ service cloud.firestore {
       match /bestellines/{lineId} {
         allow create: if request.auth != null &&
           request.auth.uid == get(/databases/$(database)/documents/bestelheaders/$(id)).data.klantId &&
-          request.resource.data.keys().hasOnly(['kunstwerkId', 'maatId', 'materiaalId', 'prijs', 'quantity']) &&
+          request.resource.data.keys().hasOnly(['kunstwerkId', 'maatId', 'materiaalId', 'breedte', 'hoogte', 'prijs', 'quantity']) &&
           request.resource.data.kunstwerkId is string && request.resource.data.kunstwerkId.size() > 0 &&
-          request.resource.data.maatId is string && request.resource.data.maatId.size() > 0 &&
+          request.resource.data.maatId is string &&
           request.resource.data.materiaalId is string && request.resource.data.materiaalId.size() > 0 &&
-          request.resource.data.prijs is number && request.resource.data.prijs > 0 &&
+          (request.resource.data.prijs == null || (request.resource.data.prijs is number && request.resource.data.prijs > 0)) &&
           request.resource.data.quantity is int && request.resource.data.quantity > 0;
         allow read: if request.auth != null &&
           (request.auth.uid == get(/databases/$(database)/documents/bestelheaders/$(id)).data.klantId ||
            exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)));
-        allow update, delete: if false;
+        allow update: if request.auth != null &&
+          exists(/databases/$(database)/documents/medewerkers/$(request.auth.uid)) &&
+          request.resource.data.keys().hasOnly(['kunstwerkId', 'maatId', 'materiaalId', 'breedte', 'hoogte', 'prijs', 'quantity']) &&
+          request.resource.data.prijs is number && request.resource.data.prijs > 0 &&
+          request.resource.data.kunstwerkId == resource.data.kunstwerkId &&
+          request.resource.data.maatId == resource.data.maatId &&
+          request.resource.data.materiaalId == resource.data.materiaalId &&
+          request.resource.data.quantity == resource.data.quantity;
+        allow delete: if false;
       }
     }
   }

@@ -76,7 +76,15 @@
     "remove": "Supprimer",
     "requestedStatus": "Demandée",
     "added": "Ajouté !",
-    "close": "Fermer"
+    "close": "Fermer",
+    "customSizeOption": "Indiquer une taille personnalisée",
+    "customWidthLabel": "Largeur (cm)",
+    "customHeightLabel": "Hauteur (cm)",
+    "customSizeSuffix": " (taille personnalisée)",
+    "customSizeMaxError": "Cette taille est trop grande. Maximum {maxBreedte}×{maxHoogte} cm.",
+    "customSizeLeadTime": "Attention : cette taille a un délai de livraison d'au moins {months, plural, one {# mois} other {# mois}}.",
+    "priceOnRequest": "Prix sur demande",
+    "customSizeNote": "{count, plural, one {+ # article, prix à confirmer après devis} other {+ # articles, prix à confirmer après devis}}"
   },
   "contactPage": {
     "title": "Contact",
@@ -198,6 +206,7 @@
       "statusAfgewezen": "Refusée",
       "modalClose": "Fermer",
       "modalLineUnknown": "Article inconnu",
+      "modalLinePriceOnRequest": "Prix sur demande",
       "loadError": "Impossible de charger vos commandes. Veuillez réessayer plus tard."
     },
     "conversations": {

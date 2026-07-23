@@ -75,6 +75,7 @@ const BESTELLINGEN: Bestelling[] = [
 
 function renderSection(overrides: Partial<React.ComponentProps<typeof BestellingenSection>> = {}) {
   const onBestellingUpdated = vi.fn();
+  const onLinePrijsVastgesteld = vi.fn();
   render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <BestellingenSection
@@ -85,11 +86,12 @@ function renderSection(overrides: Partial<React.ComponentProps<typeof Bestelling
         materiaalsoorten={MATERIAALSOORTEN}
         loadError={null}
         onBestellingUpdated={onBestellingUpdated}
+        onLinePrijsVastgesteld={onLinePrijsVastgesteld}
         {...overrides}
       />
     </NextIntlClientProvider>
   );
-  return { onBestellingUpdated };
+  return { onBestellingUpdated, onLinePrijsVastgesteld };
 }
 
 beforeEach(() => {
@@ -138,5 +140,23 @@ describe('BestellingenSection', () => {
       expect(onBestellingUpdated).toHaveBeenCalledWith({ ...BESTELLINGEN[0], status: 'Goedgekeurd' })
     );
     await waitFor(() => expect(screen.queryByTestId('bestelling-modal')).not.toBeInTheDocument());
+  });
+
+  it('keeps the modal open and reflects the new price after "Prijs vaststellen", without closing it', async () => {
+    updateDocMock.mockResolvedValue(undefined);
+    const bestellingenMetEigenMaat = [
+      {
+        ...BESTELLINGEN[0],
+        lines: [{ id: 'line-3', kunstwerkId: 'kw-1', maatId: '', materiaalId: 'mat-1', breedte: 90, hoogte: 140, prijs: null, quantity: 1 }],
+      },
+    ];
+    const { onLinePrijsVastgesteld } = renderSection({ bestellingen: bestellingenMetEigenMaat });
+    fireEvent.click(screen.getByTestId('data-table-row-header-1'));
+    fireEvent.change(screen.getByTestId('bestelling-modal-prijs-input-line-3'), { target: { value: '275' } });
+    fireEvent.click(screen.getByTestId('bestelling-modal-prijs-vaststellen-line-3'));
+
+    await waitFor(() => expect(onLinePrijsVastgesteld).toHaveBeenCalledWith('header-1', 'line-3', 275));
+    expect(screen.getByTestId('bestelling-modal')).toBeInTheDocument();
+    expect(screen.getByTestId('bestelling-modal-line-line-3')).toHaveTextContent('€ 275,00');
   });
 });

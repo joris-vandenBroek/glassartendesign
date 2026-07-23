@@ -8,7 +8,7 @@ import { Modal } from '@/components/Modal';
 import { useAdminAuth } from '@/lib/useAdminAuth';
 import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
 import { formatCurrency } from '@/lib/formatCurrency';
-import type { Bestelling } from './BestellingenSection';
+import type { Bestelling, BestellingLine } from './BestellingenSection';
 import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './materiaalTypes';
 
 interface BestellingModalProps {
@@ -19,6 +19,7 @@ interface BestellingModalProps {
   materiaalsoorten: Materiaalsoort[] | null;
   onClose: () => void;
   onUpdated: (bestelling: Bestelling) => void;
+  onLinePrijsVastgesteld: (bestellingId: string, lineId: string, prijs: number) => void;
 }
 
 export function BestellingModal({
@@ -29,20 +30,25 @@ export function BestellingModal({
   materiaalsoorten,
   onClose,
   onUpdated,
+  onLinePrijsVastgesteld,
 }: BestellingModalProps) {
   const t = useTranslations('beheer');
   const [error, setError] = useState<string | null>(null);
+  const [prijsDrafts, setPrijsDrafts] = useState<Record<string, string>>({});
   const { user } = useAdminAuth();
 
   useEffect(() => {
     if (bestelling) {
       setError(null);
+      setPrijsDrafts({});
     }
-  }, [bestelling]);
+  }, [bestelling?.id]);
 
   const materiaalsoortNaamById = new Map(
     (materiaalsoorten ?? []).map((soort) => [soort.id, soort.omschrijving])
   );
+
+  const heeftOngeprijsdeRegel = (bestelling?.lines ?? []).some((line) => line.prijs === null);
 
   async function handleGoedkeuren() {
     if (!bestelling) return;
@@ -66,6 +72,19 @@ export function BestellingModal({
     }
   }
 
+  async function handlePrijsVaststellen(line: BestellingLine) {
+    if (!bestelling) return;
+    const prijs = Number(prijsDrafts[line.id]);
+    if (!prijs || prijs <= 0) return;
+    try {
+      await updateDoc(doc(db, 'bestelheaders', bestelling.id, 'bestellines', line.id), { prijs });
+      void logActiviteit('bestelling_prijs_vastgesteld', actorFromMedewerker(user));
+      onLinePrijsVastgesteld(bestelling.id, line.id, prijs);
+    } catch {
+      setError(t('bestellingenActionError'));
+    }
+  }
+
   return (
     <Modal isOpen={bestelling !== null} onClose={onClose} closeLabel={t('modalClose')}>
       {bestelling && (
@@ -78,6 +97,11 @@ export function BestellingModal({
               const kunstwerk = (kunstwerken ?? []).find((k) => k.id === line.kunstwerkId);
               const materiaal = (materialen ?? []).find((m) => m.id === line.materiaalId);
               const maat = (maten ?? []).find((m) => m.id === line.maatId);
+              const maatWeergave = maat
+                ? `${maat.breedte}×${maat.hoogte} cm`
+                : line.breedte != null && line.hoogte != null
+                  ? `${line.breedte}×${line.hoogte} cm`
+                  : line.maatId;
               return (
                 <li
                   key={line.id}
@@ -99,12 +123,34 @@ export function BestellingModal({
                         </p>
                         <p className="text-white/50">
                           <span className="text-white/35">{t('bestellingenModalLabelMaat')}: </span>
-                          {maat ? `${maat.breedte}×${maat.hoogte} cm` : line.maatId}
+                          {maatWeergave}
                         </p>
                         <p className="text-white/50">
                           <span className="text-white/35">{t('bestellingenModalLabelPrijs')}: </span>
-                          {formatCurrency(line.prijs)}
+                          {line.prijs !== null ? formatCurrency(line.prijs) : t('bestellingenModalPrijsOpAanvraag')}
                         </p>
+                        {line.prijs === null && (
+                          <div className="mt-1 flex items-center gap-2">
+                            <input
+                              type="number"
+                              data-testid={`bestelling-modal-prijs-input-${line.id}`}
+                              value={prijsDrafts[line.id] ?? ''}
+                              onChange={(event) =>
+                                setPrijsDrafts((current) => ({ ...current, [line.id]: event.target.value }))
+                              }
+                              className="w-20 rounded-sm bg-black/40 px-2 py-1 text-xs text-white"
+                            />
+                            <button
+                              type="button"
+                              data-testid={`bestelling-modal-prijs-vaststellen-${line.id}`}
+                              onClick={() => handlePrijsVaststellen(line)}
+                              disabled={!prijsDrafts[line.id] || Number(prijsDrafts[line.id]) <= 0}
+                              className="rounded-sm border border-white/20 px-2 py-1 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white disabled:opacity-40"
+                            >
+                              {t('bestellingenModalPrijsVaststellen')}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -124,23 +170,31 @@ export function BestellingModal({
             </p>
           )}
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleGoedkeuren}
-              data-testid="bestelling-modal-goedkeuren"
-              className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink"
-            >
-              {t('bestellingenGoedkeuren')}
-            </button>
-            <button
-              type="button"
-              onClick={handleAfwijzen}
-              data-testid="bestelling-modal-afwijzen"
-              className="rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white"
-            >
-              {t('bestellingenAfwijzen')}
-            </button>
+          <div className="flex flex-col gap-2">
+            {heeftOngeprijsdeRegel && (
+              <p data-testid="bestelling-modal-goedkeuren-blocked" className="text-xs text-amber-400">
+                {t('bestellingenGoedkeurenBlocked')}
+              </p>
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleGoedkeuren}
+                disabled={heeftOngeprijsdeRegel}
+                data-testid="bestelling-modal-goedkeuren"
+                className="rounded-sm bg-silver px-4 py-2 text-xs tracking-wide text-ink disabled:opacity-40"
+              >
+                {t('bestellingenGoedkeuren')}
+              </button>
+              <button
+                type="button"
+                onClick={handleAfwijzen}
+                data-testid="bestelling-modal-afwijzen"
+                className="rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white"
+              >
+                {t('bestellingenAfwijzen')}
+              </button>
+            </div>
           </div>
         </div>
       )}

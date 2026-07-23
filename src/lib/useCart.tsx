@@ -21,7 +21,9 @@ export interface CartItem {
   materiaalLabel: string;
   maatId: string;
   maatLabel: string;
-  prijs: number;
+  breedte?: number;
+  hoogte?: number;
+  prijs: number | null;
   quantity: number;
 }
 
@@ -32,6 +34,7 @@ interface CartValue {
   isHydrated: boolean;
   totalQuantity: number;
   totalPrice: number;
+  unpricedLineCount: number;
   addItem: (input: AddItemInput) => void;
   removeItem: (id: string) => void;
   clear: () => void;
@@ -39,8 +42,17 @@ interface CartValue {
 
 const CartContext = createContext<CartValue | null>(null);
 
-function makeItemId(kunstwerkId: string, materiaalId: string, maatId: string): string {
-  return `${kunstwerkId}__${materiaalId}__${maatId}`;
+function makeItemId(
+  kunstwerkId: string,
+  materiaalId: string,
+  maatId: string,
+  breedte?: number,
+  hoogte?: number
+): string {
+  if (maatId) {
+    return `${kunstwerkId}__${materiaalId}__${maatId}`;
+  }
+  return `${kunstwerkId}__${materiaalId}__custom__${breedte}x${hoogte}`;
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -61,7 +73,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((input: AddItemInput) => {
     setItems((current) => {
-      const id = makeItemId(input.kunstwerkId, input.materiaalId, input.maatId);
+      const id = makeItemId(input.kunstwerkId, input.materiaalId, input.maatId, input.breedte, input.hoogte);
       const existing = current.find((item) => item.id === id);
       const next = existing
         ? current.map((item) =>
@@ -92,13 +104,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const totalPrice = useMemo(
-    () => items.reduce((sum, item) => sum + item.prijs * item.quantity, 0),
+    () => items.reduce((sum, item) => sum + (item.prijs ?? 0) * item.quantity, 0),
+    [items]
+  );
+
+  const unpricedLineCount = useMemo(
+    () => items.filter((item) => item.prijs === null).length,
     [items]
   );
 
   const value = useMemo(
-    () => ({ items, isHydrated, totalQuantity, totalPrice, addItem, removeItem, clear }),
-    [items, isHydrated, totalQuantity, totalPrice, addItem, removeItem, clear]
+    () => ({ items, isHydrated, totalQuantity, totalPrice, unpricedLineCount, addItem, removeItem, clear }),
+    [items, isHydrated, totalQuantity, totalPrice, unpricedLineCount, addItem, removeItem, clear]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

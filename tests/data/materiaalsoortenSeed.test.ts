@@ -3,11 +3,11 @@ import { MATERIAALSOORTEN_SEED, buildMaterialenSeed } from '@/data/materiaalsoor
 import type { Materiaalsoort } from '@/components/beheer/materiaalTypes';
 
 describe('MATERIAALSOORTEN_SEED', () => {
-  it('contains the 4 material types from the homepage', () => {
+  it('contains the 4 material types from the homepage, with eigen-maat settings for glas/dibond/acryl', () => {
     expect(MATERIAALSOORTEN_SEED).toEqual([
-      { omschrijving: 'Veiligheidsglas' },
-      { omschrijving: 'Dibond' },
-      { omschrijving: 'Acryl' },
+      { omschrijving: 'Veiligheidsglas', staatEigenMaatToe: true, levertijdMaandenEigenMaat: 3 },
+      { omschrijving: 'Dibond', staatEigenMaatToe: true, maxBreedte: 200, maxHoogte: 300 },
+      { omschrijving: 'Acryl', staatEigenMaatToe: true, maxBreedte: 200, maxHoogte: 300 },
       { omschrijving: 'Akoestische stof' },
     ]);
   });

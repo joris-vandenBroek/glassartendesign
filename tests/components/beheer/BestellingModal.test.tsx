@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
@@ -14,7 +15,10 @@ vi.mock('@/lib/firebase', () => ({
 }));
 
 vi.mock('firebase/firestore', () => ({
-  doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
+  doc: vi.fn((_db, ...segments: string[]) => ({
+    collectionName: segments.slice(0, -1).join('/'),
+    id: segments[segments.length - 1],
+  })),
   updateDoc: (...args: unknown[]) => updateDocMock(...args),
 }));
 
@@ -69,6 +73,7 @@ const BESTELLING: Bestelling = {
 function renderModal(bestelling: Bestelling | null) {
   const onClose = vi.fn();
   const onUpdated = vi.fn();
+  const onLinePrijsVastgesteld = vi.fn();
   render(
     <NextIntlClientProvider locale="nl" messages={messages}>
       <BestellingModal
@@ -79,10 +84,11 @@ function renderModal(bestelling: Bestelling | null) {
         materiaalsoorten={MATERIAALSOORTEN}
         onClose={onClose}
         onUpdated={onUpdated}
+        onLinePrijsVastgesteld={onLinePrijsVastgesteld}
       />
     </NextIntlClientProvider>
   );
-  return { onClose, onUpdated };
+  return { onClose, onUpdated, onLinePrijsVastgesteld };
 }
 
 beforeEach(() => {
@@ -184,5 +190,128 @@ describe('BestellingModal', () => {
     fireEvent.click(screen.getByTestId('bestelling-modal-afwijzen'));
     await screen.findByTestId('bestelling-modal-error');
     expect(logActiviteitMock).not.toHaveBeenCalled();
+  });
+});
+
+const BESTELLING_MET_EIGEN_MAAT: Bestelling = {
+  id: 'header-2',
+  klantId: 'uid-2',
+  companyName: 'Ander Bedrijf',
+  besteldatum: '3-7-2026',
+  status: 'Te beoordelen',
+  lineCount: 1,
+  totalQuantity: 1,
+  lines: [
+    { id: 'line-3', kunstwerkId: 'kw-1', maatId: '', materiaalId: 'mat-1', breedte: 90, hoogte: 140, prijs: null, quantity: 1 },
+  ],
+};
+
+describe('BestellingModal — eigen maat / offerte pricing', () => {
+  it('shows the custom breedte×hoogte and "Prijs op aanvraag" for an unpriced line, and disables Goedkeuren', () => {
+    renderModal(BESTELLING_MET_EIGEN_MAAT);
+    const line = screen.getByTestId('bestelling-modal-line-line-3');
+    expect(line).toHaveTextContent('90×140 cm');
+    expect(line).toHaveTextContent('Prijs op aanvraag');
+    expect(screen.getByTestId('bestelling-modal-goedkeuren')).toBeDisabled();
+    expect(screen.getByTestId('bestelling-modal-goedkeuren-blocked')).toHaveTextContent(
+      'Alle regels moeten eerst een prijs krijgen voordat u kunt goedkeuren.'
+    );
+  });
+
+  it('sets a price on an unpriced line via "Prijs vaststellen", updates Firestore, logs the event, and re-enables Goedkeuren', async () => {
+    updateDocMock.mockResolvedValue(undefined);
+    const { onLinePrijsVastgesteld } = renderModal(BESTELLING_MET_EIGEN_MAAT);
+    fireEvent.change(screen.getByTestId('bestelling-modal-prijs-input-line-3'), { target: { value: '275' } });
+    fireEvent.click(screen.getByTestId('bestelling-modal-prijs-vaststellen-line-3'));
+
+    await waitFor(() =>
+      expect(updateDocMock).toHaveBeenCalledWith(
+        { collectionName: 'bestelheaders/header-2/bestellines', id: 'line-3' },
+        { prijs: 275 }
+      )
+    );
+    await waitFor(() => expect(onLinePrijsVastgesteld).toHaveBeenCalledWith('header-2', 'line-3', 275));
+    expect(logActiviteitMock).toHaveBeenCalledWith('bestelling_prijs_vastgesteld', {
+      id: 'staff-1',
+      email: 'paul@glassartanddesign.com',
+      naam: 'paul@glassartanddesign.com',
+    });
+  });
+
+  it('keeps the "Prijs vaststellen" button disabled until a positive number is entered', () => {
+    renderModal(BESTELLING_MET_EIGEN_MAAT);
+    expect(screen.getByTestId('bestelling-modal-prijs-vaststellen-line-3')).toBeDisabled();
+    fireEvent.change(screen.getByTestId('bestelling-modal-prijs-input-line-3'), { target: { value: '0' } });
+    expect(screen.getByTestId('bestelling-modal-prijs-vaststellen-line-3')).toBeDisabled();
+    fireEvent.change(screen.getByTestId('bestelling-modal-prijs-input-line-3'), { target: { value: '275' } });
+    expect(screen.getByTestId('bestelling-modal-prijs-vaststellen-line-3')).not.toBeDisabled();
+  });
+
+  it('does not disable Goedkeuren when every line already has a price', () => {
+    renderModal(BESTELLING);
+    expect(screen.getByTestId('bestelling-modal-goedkeuren')).not.toBeDisabled();
+    expect(screen.queryByTestId('bestelling-modal-goedkeuren-blocked')).not.toBeInTheDocument();
+  });
+
+  it('keeps the draft price of a still-unpriced line after submitting another line\'s price in the same order', async () => {
+    updateDocMock.mockResolvedValue(undefined);
+
+    const BESTELLING_MET_TWEE_ONGEPRIJSDE_REGELS: Bestelling = {
+      id: 'header-3',
+      klantId: 'uid-3',
+      companyName: 'Weer Een Bedrijf',
+      besteldatum: '5-7-2026',
+      status: 'Te beoordelen',
+      lineCount: 2,
+      totalQuantity: 2,
+      lines: [
+        { id: 'line-4', kunstwerkId: 'kw-1', maatId: '', materiaalId: 'mat-1', breedte: 50, hoogte: 80, prijs: null, quantity: 1 },
+        { id: 'line-5', kunstwerkId: 'kw-1', maatId: '', materiaalId: 'mat-1', breedte: 60, hoogte: 90, prijs: null, quantity: 1 },
+      ],
+    };
+
+    // Mimics BestellingenSection: onLinePrijsVastgesteld merges the priced line into a
+    // brand-new `{ ...current, lines: [...] }` object, giving `bestelling` a new reference
+    // on every submit while the order id stays the same.
+    function Wrapper() {
+      const [bestelling, setBestelling] = useState(BESTELLING_MET_TWEE_ONGEPRIJSDE_REGELS);
+      return (
+        <NextIntlClientProvider locale="nl" messages={messages}>
+          <BestellingModal
+            bestelling={bestelling}
+            kunstwerken={KUNSTWERKEN}
+            materialen={MATERIALEN}
+            maten={MATEN}
+            materiaalsoorten={MATERIAALSOORTEN}
+            onClose={vi.fn()}
+            onUpdated={vi.fn()}
+            onLinePrijsVastgesteld={(_bestellingId, lineId, prijs) => {
+              setBestelling((current) => ({
+                ...current,
+                lines: current.lines.map((line) => (line.id === lineId ? { ...line, prijs } : line)),
+              }));
+            }}
+          />
+        </NextIntlClientProvider>
+      );
+    }
+
+    render(<Wrapper />);
+
+    fireEvent.change(screen.getByTestId('bestelling-modal-prijs-input-line-4'), { target: { value: '100' } });
+    fireEvent.change(screen.getByTestId('bestelling-modal-prijs-input-line-5'), { target: { value: '200' } });
+
+    fireEvent.click(screen.getByTestId('bestelling-modal-prijs-vaststellen-line-4'));
+
+    await waitFor(() =>
+      expect(updateDocMock).toHaveBeenCalledWith(
+        { collectionName: 'bestelheaders/header-3/bestellines', id: 'line-4' },
+        { prijs: 100 }
+      )
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId('bestelling-modal-prijs-input-line-5')).toHaveValue(200)
+    );
   });
 });

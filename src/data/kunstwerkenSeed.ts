@@ -10,9 +10,17 @@ export const SEGMENTEN_SEED: Omit<Segment, 'id'>[] = [
 ];
 
 export const MATEN_SEED: Omit<Maat, 'id'>[] = [
-  { breedte: 40, hoogte: 60 },
-  { breedte: 60, hoogte: 90 },
+  { breedte: 30, hoogte: 30 },
+  { breedte: 50, hoogte: 50 },
+  { breedte: 50, hoogte: 70 },
+  { breedte: 50, hoogte: 100 },
+  { breedte: 60, hoogte: 80 },
+  { breedte: 80, hoogte: 80 },
   { breedte: 80, hoogte: 120 },
+  { breedte: 100, hoogte: 100 },
+  { breedte: 120, hoogte: 120 },
+  { breedte: 120, hoogte: 180 },
+  { breedte: 100, hoogte: 150 },
 ];
 
 const BASISPRIJS_PER_M2 = 120;

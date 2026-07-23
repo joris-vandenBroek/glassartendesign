@@ -1,9 +1,9 @@
 import type { Materiaal, Materiaalsoort } from '@/components/beheer/materiaalTypes';
 
 export const MATERIAALSOORTEN_SEED: Omit<Materiaalsoort, 'id'>[] = [
-  { omschrijving: 'Veiligheidsglas' },
-  { omschrijving: 'Dibond' },
-  { omschrijving: 'Acryl' },
+  { omschrijving: 'Veiligheidsglas', staatEigenMaatToe: true, levertijdMaandenEigenMaat: 3 },
+  { omschrijving: 'Dibond', staatEigenMaatToe: true, maxBreedte: 200, maxHoogte: 300 },
+  { omschrijving: 'Acryl', staatEigenMaatToe: true, maxBreedte: 200, maxHoogte: 300 },
   { omschrijving: 'Akoestische stof' },
 ];
 

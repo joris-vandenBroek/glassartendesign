@@ -29,6 +29,7 @@ interface ActiviteitSectionProps {
 const TYPE_LABEL_KEYS: Record<ActiviteitType, string> = {
   kunstwerk_bekeken: 'activiteitTypeKunstwerkBekeken',
   mandje_toegevoegd: 'activiteitTypeMandjeToegevoegd',
+  mandje_eigen_maat_toegevoegd: 'activiteitTypeMandjeEigenMaatToegevoegd',
   bestelling_geplaatst: 'activiteitTypeBestellingGeplaatst',
   account_bezocht: 'activiteitTypeAccountBezocht',
   word_klant_bezocht: 'activiteitTypeWordKlantBezocht',
@@ -37,6 +38,7 @@ const TYPE_LABEL_KEYS: Record<ActiviteitType, string> = {
   klant_afgewezen: 'activiteitTypeKlantAfgewezen',
   bestelling_goedgekeurd: 'activiteitTypeBestellingGoedgekeurd',
   bestelling_afgewezen: 'activiteitTypeBestellingAfgewezen',
+  bestelling_prijs_vastgesteld: 'activiteitTypeBestellingPrijsVastgesteld',
   materiaalsoort_toegevoegd: 'activiteitTypeMateriaalsoortToegevoegd',
   materiaalsoort_gewijzigd: 'activiteitTypeMateriaalsoortGewijzigd',
   materiaalsoort_verwijderd: 'activiteitTypeMateriaalsoortVerwijderd',

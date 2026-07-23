@@ -121,4 +121,41 @@ describe('useAllOrders', () => {
     await waitFor(() => expect(result.current.loadError).toBe(true));
     expect(result.current.orders).toHaveLength(0);
   });
+
+  it('maps a missing prijs to null and passes through breedte/hoogte for a custom-size line', async () => {
+    getDocMock.mockResolvedValue({ exists: () => true, data: () => ({ status: 'Goedgekeurd' }) });
+    onAuthStateChangedMock.mockImplementation((_auth, callback) => {
+      callback({ uid: 'uid-1', email: 'klant@example.com' });
+      return () => {};
+    });
+    getDocsMock.mockImplementation((ref: { name?: string; collectionRef?: { name: string } }) => {
+      const name = ref.name ?? ref.collectionRef?.name;
+      if (name === 'bestelheaders') {
+        return Promise.resolve({
+          docs: [
+            {
+              id: 'header-1',
+              data: () => ({
+                klantId: 'uid-1',
+                bestelnr: 'GD-00001',
+                besteldatum: { toDate: () => new Date('2026-07-01T14:30:00') },
+                status: 'Te beoordelen',
+              }),
+            },
+          ],
+        });
+      }
+      if (name === 'bestelheaders/header-1/bestellines') {
+        return Promise.resolve({
+          docs: [{ id: 'line-1', data: () => ({ maatId: '', breedte: 90, hoogte: 140, quantity: 1 }) }],
+        });
+      }
+      return Promise.resolve({ docs: [] });
+    });
+
+    const { result } = renderHook(() => useAllOrders(), { wrapper });
+    await waitFor(() => expect(result.current.orders).toHaveLength(1));
+    const line = result.current.orders[0].lines?.[0];
+    expect(line).toMatchObject({ prijs: null, breedte: 90, hoogte: 140 });
+  });
 });

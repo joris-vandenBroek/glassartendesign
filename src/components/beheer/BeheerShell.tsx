@@ -97,7 +97,9 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
                 kunstwerkId: lineData.kunstwerkId,
                 maatId: lineData.maatId,
                 materiaalId: lineData.materiaalId,
-                prijs: lineData.prijs,
+                breedte: lineData.breedte,
+                hoogte: lineData.hoogte,
+                prijs: lineData.prijs ?? null,
                 quantity: lineData.quantity,
               };
             });
@@ -169,6 +171,16 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
   function handleBestellingUpdated(updated: Bestelling) {
     setRawBestellingen((current) =>
       (current ?? []).map((row) => (row.id === updated.id ? { ...row, status: updated.status } : row))
+    );
+  }
+
+  function handleLinePrijsVastgesteld(bestellingId: string, lineId: string, prijs: number) {
+    setRawBestellingen((current) =>
+      (current ?? []).map((row) =>
+        row.id === bestellingId
+          ? { ...row, lines: row.lines.map((line) => (line.id === lineId ? { ...line, prijs } : line)) }
+          : row
+      )
     );
   }
 
@@ -260,6 +272,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
             materiaalsoorten={materiaalsoorten.items}
             loadError={bestellingenLoadError}
             onBestellingUpdated={handleBestellingUpdated}
+            onLinePrijsVastgesteld={handleLinePrijsVastgesteld}
           />
         ) : activeSection === 'materiaalsoorten' ? (
           <MateriaalsoortenSection
