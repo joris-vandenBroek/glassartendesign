@@ -1,6 +1,10 @@
 export interface Materiaalsoort {
   id: string;
   omschrijving: string;
+  staatEigenMaatToe?: boolean;
+  maxBreedte?: number;
+  maxHoogte?: number;
+  levertijdMaandenEigenMaat?: number;
 }
 
 export interface Materiaal {

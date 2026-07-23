@@ -77,7 +77,7 @@ describe('MateriaalsoortenSection', () => {
       target: { value: 'Acryl' },
     });
     fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
-    await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ omschrijving: 'Acryl' }));
+    await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ omschrijving: 'Acryl', staatEigenMaatToe: false }));
     await waitFor(() => expect(screen.queryByTestId('materiaalsoort-modal')).not.toBeInTheDocument());
   });
 
@@ -95,7 +95,9 @@ describe('MateriaalsoortenSection', () => {
     expect(screen.getByTestId('materiaalsoort-modal-omschrijving')).toHaveValue('Dibond');
     fireEvent.change(screen.getByTestId('materiaalsoort-modal-omschrijving'), { target: { value: 'Dibond 3mm' } });
     fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
-    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith('soort-2', { omschrijving: 'Dibond 3mm' }));
+    await waitFor(() =>
+      expect(onUpdate).toHaveBeenCalledWith('soort-2', { omschrijving: 'Dibond 3mm', staatEigenMaatToe: false })
+    );
   });
 
   it('blocks deleting a materiaalsoort that still has materialen referencing it', async () => {
@@ -187,5 +189,44 @@ describe('MateriaalsoortenSection', () => {
     fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
     await screen.findByTestId('materiaalsoort-modal-error');
     expect(logActiviteitMock).not.toHaveBeenCalled();
+  });
+
+  it('shows the max-afmeting and levertijd fields only when "staat eigen maat toe" is checked', () => {
+    renderSection();
+    fireEvent.click(screen.getByTestId('materiaalsoorten-add'));
+    expect(screen.queryByTestId('materiaalsoort-modal-max-breedte')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-eigen-maat'));
+    expect(screen.getByTestId('materiaalsoort-modal-max-breedte')).toBeInTheDocument();
+    expect(screen.getByTestId('materiaalsoort-modal-max-hoogte')).toBeInTheDocument();
+    expect(screen.getByTestId('materiaalsoort-modal-levertijd-maanden')).toBeInTheDocument();
+  });
+
+  it('saves the eigen-maat fields when adding with "staat eigen maat toe" checked', async () => {
+    const { onAdd } = renderSection();
+    fireEvent.click(screen.getByTestId('materiaalsoorten-add'));
+    fireEvent.change(screen.getByTestId('materiaalsoort-modal-omschrijving'), { target: { value: 'Acryl' } });
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-eigen-maat'));
+    fireEvent.change(screen.getByTestId('materiaalsoort-modal-max-breedte'), { target: { value: '200' } });
+    fireEvent.change(screen.getByTestId('materiaalsoort-modal-max-hoogte'), { target: { value: '300' } });
+    fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
+    await waitFor(() =>
+      expect(onAdd).toHaveBeenCalledWith({
+        omschrijving: 'Acryl',
+        staatEigenMaatToe: true,
+        maxBreedte: 200,
+        maxHoogte: 300,
+      })
+    );
+  });
+
+  it('pre-fills the eigen-maat fields when editing a materiaalsoort that has them set', () => {
+    renderSection({
+      materiaalsoorten: [
+        { id: 'soort-1', omschrijving: 'Veiligheidsglas', staatEigenMaatToe: true, levertijdMaandenEigenMaat: 3 },
+      ],
+    });
+    fireEvent.click(screen.getByTestId('data-table-row-soort-1'));
+    expect(screen.getByTestId('materiaalsoort-modal-eigen-maat')).toBeChecked();
+    expect(screen.getByTestId('materiaalsoort-modal-levertijd-maanden')).toHaveValue(3);
   });
 });
