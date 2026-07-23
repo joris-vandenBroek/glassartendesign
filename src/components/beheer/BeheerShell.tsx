@@ -319,6 +319,7 @@ export function BeheerShell({ email, onLogout }: BeheerShellProps) {
             kunstwerken={kunstwerken.items}
             segmenten={segmenten.items}
             materialen={materialen.items}
+            materiaalsoorten={materiaalsoorten.items}
             maten={maten.items}
             loadError={kunstwerken.error === 'load' ? t('kunstwerkenLoadError') : null}
             onAdd={kunstwerken.add}
