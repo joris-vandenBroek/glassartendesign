@@ -205,6 +205,7 @@
       "statusAfgewezen": "Afgewezen",
       "modalClose": "Sluiten",
       "modalLineUnknown": "Onbekend artikel",
+      "modalLinePriceOnRequest": "Prijs op aanvraag",
       "loadError": "Bestellingen konden niet worden geladen. Probeer het later opnieuw."
     },
     "conversations": {

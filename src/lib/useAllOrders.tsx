@@ -12,7 +12,9 @@ export interface DisplayOrderLine {
   kunstwerkId: string | null;
   maatId: string | null;
   materiaalId: string | null;
-  prijs: number;
+  breedte?: number;
+  hoogte?: number;
+  prijs: number | null;
   quantity: number;
 }
 
@@ -68,7 +70,9 @@ export function useAllOrders(): UseAllOrdersResult {
                 kunstwerkId: lineData.kunstwerkId ?? null,
                 maatId: lineData.maatId ?? null,
                 materiaalId: lineData.materiaalId ?? null,
-                prijs: lineData.prijs ?? 0,
+                breedte: lineData.breedte,
+                hoogte: lineData.hoogte,
+                prijs: lineData.prijs ?? null,
                 quantity: lineData.quantity ?? 0,
               };
             });

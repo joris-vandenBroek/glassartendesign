@@ -63,9 +63,13 @@ export function AccountOrderModal({
                           <p className="text-white/50">
                             {materiaal ? materiaalLabel(materiaal) : line.materiaalId}
                             {' · '}
-                            {maat ? maatLabel(maat) : line.maatId}
+                            {maat
+                              ? maatLabel(maat)
+                              : line.breedte != null && line.hoogte != null
+                                ? `${line.breedte}×${line.hoogte} cm`
+                                : line.maatId}
                             {' · '}
-                            {formatCurrency(line.prijs)}
+                            {line.prijs !== null ? formatCurrency(line.prijs) : t('modalLinePriceOnRequest')}
                           </p>
                         </div>
                       </div>

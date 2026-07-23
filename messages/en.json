@@ -208,6 +208,7 @@
       "statusAfgewezen": "Rejected",
       "modalClose": "Close",
       "modalLineUnknown": "Unknown item",
+      "modalLinePriceOnRequest": "Price on request",
       "loadError": "Couldn't load your orders. Please try again later."
     },
     "invoices": {
