@@ -7,7 +7,8 @@ import { resolveKunstwerkOmschrijving } from '@/lib/resolveKunstwerkOmschrijving
 import { useCustomerAuth } from '@/lib/useCustomerAuth';
 import { logActiviteit, actorFromCustomer } from '@/lib/logActiviteit';
 import { WatermarkedImage } from './WatermarkedImage';
-import { ProductModal } from './ProductModal';
+import { ProductModal, materiaalLabel, maatLabel } from './ProductModal';
+import { KunstwerkSpecCard } from './KunstwerkSpecCard';
 import type { Segment, Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materiaalTypes';
 
 const ALL_FILTER = 'all';
@@ -34,6 +35,10 @@ export function ProductsGrid() {
     activeFilter === ALL_FILTER
       ? allKunstwerken
       : allKunstwerken.filter((kunstwerk) => kunstwerk.segmentIds.includes(activeFilter));
+
+  const materiaalsoortNaamById = new Map(
+    (materiaalsoorten.items ?? []).map((soort) => [soort.id, soort.omschrijving])
+  );
 
   function filterButtonClass(isActive: boolean) {
     return isActive
@@ -81,6 +86,10 @@ export function ProductsGrid() {
       >
         {visibleKunstwerken.map((kunstwerk) => {
           const omschrijving = resolveKunstwerkOmschrijving(kunstwerk, locale);
+          const beschikbareMaterialen = (materialen.items ?? []).filter((materiaal) =>
+            kunstwerk.materiaalIds.includes(materiaal.id)
+          );
+          const beschikbareMaten = (maten.items ?? []).filter((maat) => kunstwerk.maatIds.includes(maat.id));
           return (
             <div
               key={kunstwerk.id}
@@ -99,12 +108,19 @@ export function ProductsGrid() {
               }}
               className="group relative cursor-pointer overflow-hidden rounded border border-white/10 transition hover:-translate-y-1"
             >
-              <WatermarkedImage src={kunstwerk.foto} alt={omschrijving} className="aspect-square w-full" />
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-gold/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-br from-gold/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               />
-              <span className="badge-gold absolute left-2 top-2">{omschrijving}</span>
+              <KunstwerkSpecCard
+                fotoSlot={<WatermarkedImage src={kunstwerk.foto} alt={omschrijving} className="aspect-[2/3] w-full" />}
+                naam={kunstwerk.naam || omschrijving}
+                artiest={kunstwerk.artiest}
+                materiaalLabels={beschikbareMaterialen.map((materiaal) =>
+                  materiaalLabel(materiaal, materiaalsoortNaamById.get(materiaal.materiaalsoortId) ?? materiaal.materiaalsoortId)
+                )}
+                maatLabels={beschikbareMaten.map(maatLabel)}
+              />
             </div>
           );
         })}

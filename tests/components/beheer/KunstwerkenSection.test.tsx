@@ -43,6 +43,8 @@ const KUNSTWERKEN: Kunstwerk[] = [
   {
     id: 'kw-1',
     foto: 'https://storage.example.com/kw-1.jpg',
+    naam: 'Hotel paneel 1',
+    artiest: '',
     segmentIds: ['seg-1'],
     materiaalIds: ['mat-1'],
     maatIds: ['maat-1'],
@@ -114,11 +116,24 @@ describe('KunstwerkenSection', () => {
     fireEvent.click(screen.getByTestId('kunstwerk-modal-segment-seg-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-materiaal-mat-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-maat-maat-1'));
-    expect(screen.getByTestId('kunstwerk-modal-opslaan')).toBeDisabled(); // prijs and omschrijving still missing
+    expect(screen.getByTestId('kunstwerk-modal-opslaan')).toBeDisabled(); // naam, prijs and omschrijving still missing
 
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-naam'), { target: { value: 'Test' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '99' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-omschrijving-nl'), { target: { value: 'Test' } });
     expect(screen.getByTestId('kunstwerk-modal-opslaan')).not.toBeDisabled();
+  });
+
+  it('uploads a dropped photo via the drop zone', async () => {
+    uploadMock.mockResolvedValue('https://storage.example.com/gedropt.jpg');
+    renderSection();
+    fireEvent.click(screen.getByTestId('kunstwerken-add'));
+    const file = new File(['x'], 'gedropt.jpg', { type: 'image/jpeg' });
+    fireEvent.drop(screen.getByTestId('kunstwerk-modal-foto-dropzone'), {
+      dataTransfer: { files: [file] },
+    });
+    await waitFor(() => expect(uploadMock).toHaveBeenCalledWith(file));
+    await waitFor(() => expect(screen.getByTestId('kunstwerk-modal-foto-preview')).toBeInTheDocument());
   });
 
   it('rebuilds the price grid when the materiaal/maat selection changes', () => {
@@ -146,6 +161,8 @@ describe('KunstwerkenSection', () => {
     fireEvent.click(screen.getByTestId('kunstwerk-modal-segment-seg-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-materiaal-mat-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-maat-maat-1'));
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-naam'), { target: { value: 'Vibrant Spirit' } });
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-artiest'), { target: { value: 'Sabrina' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '99' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-omschrijving-nl'), { target: { value: 'Nieuw kunstwerk' } });
     fireEvent.click(screen.getByTestId('kunstwerk-modal-opslaan'));
@@ -153,6 +170,8 @@ describe('KunstwerkenSection', () => {
     await waitFor(() =>
       expect(onAdd).toHaveBeenCalledWith({
         foto: 'https://storage.example.com/nieuw.jpg',
+        naam: 'Vibrant Spirit',
+        artiest: 'Sabrina',
         segmentIds: ['seg-1'],
         materiaalIds: ['mat-1'],
         maatIds: ['maat-1'],
@@ -172,6 +191,7 @@ describe('KunstwerkenSection', () => {
     expect(screen.getByTestId('kunstwerk-modal-materiaal-mat-1')).toBeChecked();
     expect(screen.getByTestId('kunstwerk-modal-maat-maat-1')).toBeChecked();
     expect(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1')).toHaveValue(150);
+    expect(screen.getByTestId('kunstwerk-modal-naam')).toHaveValue('Hotel paneel 1');
     expect(screen.getByTestId('kunstwerk-modal-omschrijving-nl')).toHaveValue('Hotel paneel 1');
 
     fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '175' } });
@@ -180,6 +200,8 @@ describe('KunstwerkenSection', () => {
     await waitFor(() =>
       expect(onUpdate).toHaveBeenCalledWith('kw-1', {
         foto: 'https://storage.example.com/kw-1.jpg',
+        naam: 'Hotel paneel 1',
+        artiest: '',
         segmentIds: ['seg-1'],
         materiaalIds: ['mat-1'],
         maatIds: ['maat-1'],
@@ -229,6 +251,7 @@ describe('KunstwerkenSection', () => {
     fireEvent.click(screen.getByTestId('kunstwerk-modal-segment-seg-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-materiaal-mat-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-maat-maat-1'));
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-naam'), { target: { value: 'Nieuw kunstwerk' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '99' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-omschrijving-nl'), { target: { value: 'Nieuw kunstwerk' } });
     fireEvent.click(screen.getByTestId('kunstwerk-modal-opslaan'));
@@ -282,11 +305,39 @@ describe('KunstwerkenSection', () => {
     fireEvent.click(screen.getByTestId('kunstwerk-modal-segment-seg-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-materiaal-mat-1'));
     fireEvent.click(screen.getByTestId('kunstwerk-modal-maat-maat-1'));
+    fireEvent.change(screen.getByTestId('kunstwerk-modal-naam'), { target: { value: 'Nieuw kunstwerk' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-prijs-mat-1-maat-1'), { target: { value: '99' } });
     fireEvent.change(screen.getByTestId('kunstwerk-modal-omschrijving-nl'), { target: { value: 'Nieuw kunstwerk' } });
     fireEvent.click(screen.getByTestId('kunstwerk-modal-opslaan'));
 
     await screen.findByTestId('kunstwerk-modal-error');
     expect(logActiviteitMock).not.toHaveBeenCalled();
+  });
+
+  it('shows a backfill button for kunstwerken without a naam and fills naam from the NL description on click', async () => {
+    const zonderNaam: Kunstwerk = {
+      ...KUNSTWERKEN[0],
+      id: 'kw-2',
+      naam: '',
+      omschrijvingNl: 'Restaurant paneel 3',
+    };
+    const onUpdate = vi.fn().mockResolvedValue(true);
+    renderSection({ kunstwerken: [...KUNSTWERKEN, zonderNaam], onUpdate });
+
+    const backfillButton = screen.getByTestId('kunstwerken-backfill-namen');
+    expect(backfillButton).toHaveTextContent('1');
+    fireEvent.click(backfillButton);
+
+    await waitFor(() =>
+      expect(onUpdate).toHaveBeenCalledWith(
+        'kw-2',
+        expect.objectContaining({ naam: 'Restaurant paneel 3' })
+      )
+    );
+  });
+
+  it('does not show the backfill button when every kunstwerk already has a naam', () => {
+    renderSection();
+    expect(screen.queryByTestId('kunstwerken-backfill-namen')).not.toBeInTheDocument();
   });
 });

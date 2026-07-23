@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useOverlayDismiss } from '@/lib/useOverlayDismiss';
 
 interface ModalProps {
@@ -25,7 +26,7 @@ export function Modal({ isOpen, onClose, closeLabel, children }: ModalProps) {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       ref={modalRef}
       data-testid="modal"
@@ -51,6 +52,7 @@ export function Modal({ isOpen, onClose, closeLabel, children }: ModalProps) {
         </button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

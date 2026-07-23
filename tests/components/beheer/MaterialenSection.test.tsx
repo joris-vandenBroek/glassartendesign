@@ -23,6 +23,8 @@ const KUNSTWERKEN: Kunstwerk[] = [
   {
     id: 'kw-1',
     foto: 'https://example.com/kw-1.jpg',
+    naam: 'Hotel paneel',
+    artiest: '',
     segmentIds: [],
     materiaalIds: ['mat-1'],
     maatIds: [],

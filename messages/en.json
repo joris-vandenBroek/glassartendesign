@@ -31,6 +31,11 @@
     "intro": "Discover our artwork on glass, organized by application.",
     "filterAll": "All"
   },
+  "kunstwerkSpecCard": {
+    "materiaal": "Material",
+    "formaten": "Sizes",
+    "tagline": "Gallery quality printing"
+  },
   "segments": {
     "hotel": {
       "title": "Hotel"

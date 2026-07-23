@@ -5,6 +5,8 @@ import type { Kunstwerk } from '@/components/beheer/materiaalTypes';
 const BASE_KUNSTWERK: Kunstwerk = {
   id: 'kw-1',
   foto: 'https://example.com/foto.jpg',
+  naam: 'Kunstwerk',
+  artiest: '',
   segmentIds: [],
   materiaalIds: [],
   maatIds: [],

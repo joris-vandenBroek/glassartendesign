@@ -31,6 +31,11 @@
     "intro": "Ontdek onze kunstwerken op glas, gerangschikt per toepassing.",
     "filterAll": "Alle"
   },
+  "kunstwerkSpecCard": {
+    "materiaal": "Materiaal",
+    "formaten": "Formaten",
+    "tagline": "Gallery quality printing"
+  },
   "segments": {
     "hotel": {
       "title": "Hotel"
@@ -364,20 +369,27 @@
     "kunstwerkenActionError": "Er is iets misgegaan. Probeer het opnieuw.",
     "kunstwerkenEmpty": "Geen kunstwerken gevonden.",
     "kunstwerkenColFoto": "Foto",
+    "kunstwerkenColNaam": "Naam",
+    "kunstwerkenColArtiest": "Artiest",
     "kunstwerkenColSegmenten": "Segmenten",
     "kunstwerkenColOmschrijving": "Omschrijving (NL)",
     "kunstwerkenLabelFoto": "Foto",
+    "kunstwerkenFotoDropHint": "Sleep een foto hierheen of kies een bestand",
     "kunstwerkenFotoUploading": "Bezig met uploaden…",
     "kunstwerkenFotoUploadError": "De foto kon niet geüpload worden. Probeer het opnieuw.",
+    "kunstwerkenLabelNaam": "Naam",
+    "kunstwerkenLabelArtiest": "Artiest",
     "kunstwerkenLabelSegmenten": "Segmenten",
     "kunstwerkenLabelMaterialen": "Materialen",
     "kunstwerkenLabelMaten": "Maten",
     "kunstwerkenLabelPrijzen": "Prijzen per materiaal en maat",
+    "kunstwerkenLabelPreview": "Voorbeeld op de collectiepagina",
     "kunstwerkenLabelOmschrijvingNl": "Omschrijving (NL)",
     "kunstwerkenLabelOmschrijvingFr": "Omschrijving (FR)",
     "kunstwerkenLabelOmschrijvingDe": "Omschrijving (DE)",
     "kunstwerkenLabelOmschrijvingEn": "Omschrijving (EN)",
     "kunstwerkenToevoegen": "Kunstwerk toevoegen",
+    "kunstwerkenBackfillNamen": "Namen aanvullen ({count})",
     "kunstwerkenOpslaan": "Opslaan",
     "kunstwerkenVerwijderen": "Verwijderen",
     "prijsgroepenLoadError": "Kon de prijsgroepen niet laden. Probeer de pagina te verversen.",

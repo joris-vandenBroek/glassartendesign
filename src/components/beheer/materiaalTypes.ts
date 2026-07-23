@@ -30,6 +30,8 @@ export interface PrijsRegel {
 export interface Kunstwerk {
   id: string;
   foto: string;
+  naam: string;
+  artiest: string;
   segmentIds: string[];
   materiaalIds: string[];
   maatIds: string[];

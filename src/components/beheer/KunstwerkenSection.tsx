@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DataTable, type Column } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
+import { KunstwerkSpecCard } from '@/components/KunstwerkSpecCard';
 import { useKunstwerkFotoUpload } from '@/lib/useKunstwerkFotoUpload';
 import { useAdminAuth } from '@/lib/useAdminAuth';
 import { logActiviteit, actorFromMedewerker } from '@/lib/logActiviteit';
@@ -34,6 +35,8 @@ function toggle(list: string[], id: string): string[] {
 
 const LEGE_FORM = {
   foto: '',
+  naam: '',
+  artiest: '',
   segmentIds: [] as string[],
   materiaalIds: [] as string[],
   maatIds: [] as string[],
@@ -59,6 +62,8 @@ export function KunstwerkenSection({
   const { user } = useAdminAuth();
   const [modalState, setModalState] = useState<ModalState>(null);
   const [foto, setFoto] = useState(LEGE_FORM.foto);
+  const [naam, setNaam] = useState(LEGE_FORM.naam);
+  const [artiest, setArtiest] = useState(LEGE_FORM.artiest);
   const [segmentIds, setSegmentIds] = useState<string[]>(LEGE_FORM.segmentIds);
   const [materiaalIds, setMateriaalIds] = useState<string[]>(LEGE_FORM.materiaalIds);
   const [maatIds, setMaatIds] = useState<string[]>(LEGE_FORM.maatIds);
@@ -68,6 +73,8 @@ export function KunstwerkenSection({
   const [omschrijvingDe, setOmschrijvingDe] = useState(LEGE_FORM.omschrijvingDe);
   const [omschrijvingEn, setOmschrijvingEn] = useState(LEGE_FORM.omschrijvingEn);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [isDraggingFoto, setIsDraggingFoto] = useState(false);
+  const [backfillBezig, setBackfillBezig] = useState(false);
 
   const segmentNaamById = useMemo(() => {
     const map = new Map<string, string>();
@@ -94,6 +101,8 @@ export function KunstwerkenSection({
 
   function resetForm() {
     setFoto(LEGE_FORM.foto);
+    setNaam(LEGE_FORM.naam);
+    setArtiest(LEGE_FORM.artiest);
     setSegmentIds(LEGE_FORM.segmentIds);
     setMateriaalIds(LEGE_FORM.materiaalIds);
     setMaatIds(LEGE_FORM.maatIds);
@@ -112,6 +121,8 @@ export function KunstwerkenSection({
 
   function openEdit(kunstwerk: Kunstwerk) {
     setFoto(kunstwerk.foto);
+    setNaam(kunstwerk.naam ?? '');
+    setArtiest(kunstwerk.artiest ?? '');
     setSegmentIds(kunstwerk.segmentIds);
     setMateriaalIds(kunstwerk.materiaalIds);
     setMaatIds(kunstwerk.maatIds);
@@ -132,13 +143,35 @@ export function KunstwerkenSection({
     setModalState(null);
   }
 
-  async function handleFotoChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  async function handleFotoFile(file: File) {
     const url = await upload(file);
     if (url) {
       setFoto(url);
     }
+  }
+
+  async function handleFotoChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await handleFotoFile(file);
+  }
+
+  function handleFotoDragOver(event: React.DragEvent<HTMLSpanElement>) {
+    event.preventDefault();
+    setIsDraggingFoto(true);
+  }
+
+  function handleFotoDragLeave(event: React.DragEvent<HTMLSpanElement>) {
+    event.preventDefault();
+    setIsDraggingFoto(false);
+  }
+
+  async function handleFotoDrop(event: React.DragEvent<HTMLSpanElement>) {
+    event.preventDefault();
+    setIsDraggingFoto(false);
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+    await handleFotoFile(file);
   }
 
   const prijsCombinaties = materiaalIds.flatMap((materiaalId) =>
@@ -150,6 +183,7 @@ export function KunstwerkenSection({
   const opslaanDisabled =
     !foto ||
     uploading ||
+    !naam ||
     segmentIds.length === 0 ||
     materiaalIds.length === 0 ||
     maatIds.length === 0 ||
@@ -165,6 +199,8 @@ export function KunstwerkenSection({
     }));
     const data = {
       foto,
+      naam,
+      artiest,
       segmentIds,
       materiaalIds,
       maatIds,
@@ -197,6 +233,20 @@ export function KunstwerkenSection({
     }
   }
 
+  const kunstwerkenZonderNaam = kunstwerken.filter((kunstwerk) => !kunstwerk.naam);
+
+  async function handleBackfillNamen() {
+    setBackfillBezig(true);
+    for (const kunstwerk of kunstwerkenZonderNaam) {
+      const { id, ...data } = kunstwerk;
+      const success = await onUpdate(id, { ...data, naam: kunstwerk.omschrijvingNl || kunstwerk.id });
+      if (success) {
+        void logActiviteit('kunstwerk_gewijzigd', actorFromMedewerker(user));
+      }
+    }
+    setBackfillBezig(false);
+  }
+
   const columns: Column<KunstwerkRow>[] = [
     {
       key: 'foto',
@@ -204,13 +254,26 @@ export function KunstwerkenSection({
       sortable: false,
       render: (row) => <img src={row.foto} alt="" className="h-10 w-10 rounded object-cover" />,
     },
+    { key: 'naam', label: t('kunstwerkenColNaam') },
+    { key: 'artiest', label: t('kunstwerkenColArtiest') },
     { key: 'segmentNamen', label: t('kunstwerkenColSegmenten') },
     { key: 'omschrijvingNl', label: t('kunstwerkenColOmschrijving') },
   ];
 
   return (
     <div data-testid="kunstwerken-section">
-      <div className="mb-3 flex justify-end">
+      <div className="mb-3 flex justify-end gap-2">
+        {kunstwerkenZonderNaam.length > 0 && (
+          <button
+            type="button"
+            onClick={handleBackfillNamen}
+            disabled={backfillBezig}
+            data-testid="kunstwerken-backfill-namen"
+            className="rounded-sm border border-white/20 px-4 py-2 text-xs tracking-wide text-white/70 hover:border-white/40 hover:text-white disabled:opacity-40"
+          >
+            {t('kunstwerkenBackfillNamen', { count: kunstwerkenZonderNaam.length })}
+          </button>
+        )}
         <button
           type="button"
           onClick={openAdd}
@@ -232,13 +295,26 @@ export function KunstwerkenSection({
         <div data-testid="kunstwerk-modal" className="flex flex-col gap-3 text-sm text-white/80">
           <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
             {t('kunstwerkenLabelFoto')}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFotoChange}
-              data-testid="kunstwerk-modal-foto-input"
-              className="text-sm text-white"
-            />
+            <span
+              onDragOver={handleFotoDragOver}
+              onDragLeave={handleFotoDragLeave}
+              onDrop={handleFotoDrop}
+              data-testid="kunstwerk-modal-foto-dropzone"
+              className={`flex flex-col items-center gap-2 rounded-sm border border-dashed px-3 py-4 text-center transition-colors ${
+                isDraggingFoto ? 'border-silver bg-white/10' : 'border-white/20'
+              }`}
+            >
+              <span className="text-xs normal-case tracking-normal text-white/60">
+                {t('kunstwerkenFotoDropHint')}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFotoChange}
+                data-testid="kunstwerk-modal-foto-input"
+                className="text-sm text-white"
+              />
+            </span>
           </label>
           {uploading && (
             <p data-testid="kunstwerk-modal-foto-uploading" className="text-xs text-white/60">
@@ -250,6 +326,27 @@ export function KunstwerkenSection({
               {t('kunstwerkenFotoUploadError')}
             </p>
           )}
+
+          <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
+            {t('kunstwerkenLabelNaam')}
+            <input
+              type="text"
+              value={naam}
+              onChange={(event) => setNaam(event.target.value)}
+              data-testid="kunstwerk-modal-naam"
+              className="rounded-sm bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
+            {t('kunstwerkenLabelArtiest')}
+            <input
+              type="text"
+              value={artiest}
+              onChange={(event) => setArtiest(event.target.value)}
+              data-testid="kunstwerk-modal-artiest"
+              className="rounded-sm bg-black/40 px-3 py-2 text-sm text-white"
+            />
+          </label>
           {foto && (
             <img
               src={foto}
@@ -393,6 +490,25 @@ export function KunstwerkenSection({
               className="rounded-sm bg-black/40 px-3 py-2 text-sm text-white"
             />
           </label>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-xs uppercase tracking-wide text-white/60">{t('kunstwerkenLabelPreview')}</span>
+            <KunstwerkSpecCard
+              fotoSlot={
+                foto ? (
+                  <img src={foto} alt={naam} data-testid="kunstwerk-spec-card-foto" className="aspect-[2/3] w-full object-cover" />
+                ) : undefined
+              }
+              naam={naam}
+              artiest={artiest}
+              materiaalLabels={(materialen ?? [])
+                .filter((materiaal) => materiaalIds.includes(materiaal.id))
+                .map((materiaal) => `${materiaal.materiaaldikte}mm — ${materiaal.omschrijving}`)}
+              maatLabels={(maten ?? [])
+                .filter((maat) => maatIds.includes(maat.id))
+                .map((maat) => `${maat.breedte}×${maat.hoogte} cm`)}
+            />
+          </div>
 
           {actionError && (
             <p data-testid="kunstwerk-modal-error" className="text-xs text-red-400">

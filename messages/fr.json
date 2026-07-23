@@ -31,6 +31,11 @@
     "intro": "Découvrez nos œuvres sur verre, classées par application.",
     "filterAll": "Tous"
   },
+  "kunstwerkSpecCard": {
+    "materiaal": "Matériau",
+    "formaten": "Formats",
+    "tagline": "Gallery quality printing"
+  },
   "segments": {
     "hotel": {
       "title": "Hôtel"

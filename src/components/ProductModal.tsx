@@ -13,11 +13,11 @@ import type { Kunstwerk, Materiaal, Maat, Materiaalsoort } from './beheer/materi
 
 const CONFIRM_FEEDBACK_MS = 600;
 
-function materiaalLabel(materiaal: Materiaal, materiaalsoortNaam: string): string {
+export function materiaalLabel(materiaal: Materiaal, materiaalsoortNaam: string): string {
   return `${materiaal.materiaaldikte}mm ${materiaalsoortNaam}`;
 }
 
-function maatLabel(maat: Maat): string {
+export function maatLabel(maat: Maat): string {
   return `${maat.breedte}×${maat.hoogte} cm`;
 }
 
