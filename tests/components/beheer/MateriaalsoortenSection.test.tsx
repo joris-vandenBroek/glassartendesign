@@ -77,7 +77,15 @@ describe('MateriaalsoortenSection', () => {
       target: { value: 'Acryl' },
     });
     fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
-    await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ omschrijving: 'Acryl', staatEigenMaatToe: false }));
+    await waitFor(() =>
+      expect(onAdd).toHaveBeenCalledWith({
+        omschrijving: 'Acryl',
+        staatEigenMaatToe: false,
+        maxBreedte: null,
+        maxHoogte: null,
+        levertijdMaandenEigenMaat: null,
+      })
+    );
     await waitFor(() => expect(screen.queryByTestId('materiaalsoort-modal')).not.toBeInTheDocument());
   });
 
@@ -96,7 +104,13 @@ describe('MateriaalsoortenSection', () => {
     fireEvent.change(screen.getByTestId('materiaalsoort-modal-omschrijving'), { target: { value: 'Dibond 3mm' } });
     fireEvent.click(screen.getByTestId('materiaalsoort-modal-opslaan'));
     await waitFor(() =>
-      expect(onUpdate).toHaveBeenCalledWith('soort-2', { omschrijving: 'Dibond 3mm', staatEigenMaatToe: false })
+      expect(onUpdate).toHaveBeenCalledWith('soort-2', {
+        omschrijving: 'Dibond 3mm',
+        staatEigenMaatToe: false,
+        maxBreedte: null,
+        maxHoogte: null,
+        levertijdMaandenEigenMaat: null,
+      })
     );
   });
 
@@ -215,6 +229,7 @@ describe('MateriaalsoortenSection', () => {
         staatEigenMaatToe: true,
         maxBreedte: 200,
         maxHoogte: 300,
+        levertijdMaandenEigenMaat: null,
       })
     );
   });

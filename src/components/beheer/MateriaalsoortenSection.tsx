@@ -80,9 +80,9 @@ export function MateriaalsoortenSection({
     const data: Omit<Materiaalsoort, 'id'> = {
       omschrijving,
       staatEigenMaatToe,
-      ...(staatEigenMaatToe && maxBreedte ? { maxBreedte: Number(maxBreedte) } : {}),
-      ...(staatEigenMaatToe && maxHoogte ? { maxHoogte: Number(maxHoogte) } : {}),
-      ...(staatEigenMaatToe && levertijdMaanden ? { levertijdMaandenEigenMaat: Number(levertijdMaanden) } : {}),
+      maxBreedte: staatEigenMaatToe && maxBreedte ? Number(maxBreedte) : null,
+      maxHoogte: staatEigenMaatToe && maxHoogte ? Number(maxHoogte) : null,
+      levertijdMaandenEigenMaat: staatEigenMaatToe && levertijdMaanden ? Number(levertijdMaanden) : null,
     };
     const success =
       modalState.mode === 'add' ? await onAdd(data) : await onUpdate(modalState.materiaalsoort.id, data);

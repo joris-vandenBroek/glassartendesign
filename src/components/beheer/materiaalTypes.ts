@@ -2,9 +2,9 @@ export interface Materiaalsoort {
   id: string;
   omschrijving: string;
   staatEigenMaatToe?: boolean;
-  maxBreedte?: number;
-  maxHoogte?: number;
-  levertijdMaandenEigenMaat?: number;
+  maxBreedte?: number | null;
+  maxHoogte?: number | null;
+  levertijdMaandenEigenMaat?: number | null;
 }
 
 export interface Materiaal {
